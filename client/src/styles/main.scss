@@ -1,0 +1,47 @@
+// Import custom variables
+@import '~bootstrap/scss/bootstrap.scss';
+@import "./variables.scss";
+
+body {
+  margin: 0;
+  font-family: $font-family-sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $light;
+}
+
+.todo-item {
+  transition: all 0.3s ease;
+  
+  &.completed {
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.navbar {
+  margin-bottom: 2rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.form-error {
+  color: $danger;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+} 

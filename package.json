@@ -1,0 +1,24 @@
+{
+  "name": "fullstack-project",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev:client": "npm run start --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "build": "npm run build --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "7.0.0",
+    "eslint": "9.23.0",
+    "prettier": "3.2.5",
+    "typescript": "5.8.2"
+  },
+  "dependencies": {
+    "zod": "3.24.2"
+  }
+}
