@@ -10,7 +10,8 @@
     "dev:client": "npm run start --workspace=client",
     "dev:server": "npm run dev --workspace=server",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
-    "build": "npm run build --workspaces"
+    "build": "npm run build --workspaces",
+    "server:start": "npm run start --workspace=server"
   },
   "devDependencies": {
     "concurrently": "7.0.0",
@@ -20,5 +21,22 @@
   },
   "dependencies": {
     "zod": "3.24.2"
+  },
+  "overrides": {
+    "nth-check": "2.1.1",
+    "postcss": "8.4.31",
+    "workbox-webpack-plugin": "7.1.0",
+    "rollup": "3.29.5",
+    "css-select": {
+      "nth-check": "2.1.1"
+    },
+    "svgo": {
+      "css-select": {
+        "nth-check": "2.1.1"
+      }
+    },
+    "resolve-url-loader": {
+      "postcss": "8.4.31"
+    }
   }
 }
