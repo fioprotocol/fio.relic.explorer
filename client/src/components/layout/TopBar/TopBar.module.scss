@@ -1,0 +1,18 @@
+@import '~bootstrap/scss/bootstrap.scss';
+@import '../../../styles/variables.scss';
+
+.wrapper {
+  font-size: 0.875rem;
+}
+
+.networkItem {
+  padding: 0.5rem 0rem;
+  &:global(.active) {
+    background-color: transparent;
+    color: $text-dark;
+  }
+
+  & + & {
+    border-top: 1px solid $border-light;
+  }
+}

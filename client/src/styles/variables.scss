@@ -1,5 +1,5 @@
 // Colors
-$primary: #007bff;
+$primary: #9d6eff;
 $secondary: #6c757d;
 $success: #28a745;
 $danger: #dc3545;
@@ -7,6 +7,13 @@ $warning: #ffc107;
 $info: #17a2b8;
 $light: #f8f9fa;
 $dark: #343a40;
+
+// Custom colors
+$text-dark: #1a1b1f;
+$border-light: rgba(0, 0, 0, 0.05);
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-lighter: rgba(0, 0, 0, 0.08);
+$primary-hover: rgba(157, 110, 255, 0.1);
 
 // Spacing
 $spacer: 1rem;
