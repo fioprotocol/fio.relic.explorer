@@ -10,6 +10,11 @@ body {
   background-color: $light;
 }
 
+// Utility classes
+.text-primary {
+  color: $primary !important;
+}
+
 .todo-item {
   transition: all 0.3s ease;
   
@@ -17,20 +22,6 @@ body {
     opacity: 0.6;
     text-decoration: line-through;
   }
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-.navbar {
-  margin-bottom: 2rem;
-}
-
-.page-header {
-  margin-bottom: 2rem;
 }
 
 .loading-spinner {
