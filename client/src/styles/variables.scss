@@ -1,12 +1,25 @@
+// Bootstrap overrides
+$dark: #1f1f1f;
+$dark-rgb: 31, 31, 31;
+$theme-colors: (
+  "dark": $dark
+);
+
+// Override Bootstrap's CSS custom properties
+:root {
+  --bs-dark: #{$dark};
+  --bs-dark-rgb: #{$dark-rgb};
+  --bs-bg-opacity: 1;
+}
+
 // Colors
-$primary: #9d6eff;
+$primary: #765CD6;
 $secondary: #6c757d;
 $success: #28a745;
 $danger: #dc3545;
 $warning: #ffc107;
 $info: #17a2b8;
 $light: #f8f9fa;
-$dark: #343a40;
 
 // Custom colors
 $text-dark: #1a1b1f;
