@@ -86,7 +86,7 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ className = '' }) => {
             </div>
           </Col>
         </Row>
-        <div className="border-bottom border-secondary border-opacity-25" />
+        <div className="border-bottom border-secondary" />
       </Col>
     </Row>
   );

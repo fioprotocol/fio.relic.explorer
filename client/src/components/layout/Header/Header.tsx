@@ -38,7 +38,7 @@ const menuItems: MenuItem[] = [
 const Header: React.FC = () => {
   return (
     <div className={styles.header}>
-      <Navbar bg="white" expand="lg" className="py-2">
+      <Navbar bg="white" expand="lg" className="py-3 border-bottom border-top border-opacity-25">
         <Container>
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <img src="/images/logo-dark.png" alt="FIO Logo" className={styles.logoImage} />
