@@ -37,10 +37,11 @@ const TopBar: React.FC<TopBarProps> = ({
   selectedNetwork = DEFAULT_NETWORK,
   onNetworkChange,
 }) => {
-  const selectedNetworkLabel = networks.find((n) => n.value === selectedNetwork)?.label || networks[0].label;
+  const selectedNetworkLabel =
+    networks.find((n) => n.value === selectedNetwork)?.label || networks[0].label;
 
   return (
-    <div className={`py-3 bg-light border-bottom ${styles.wrapper}`}>
+    <div className={`py-3 ${styles.wrapper}`}>
       <Container className="d-flex justify-content-between align-items-center">
         <div>
           <div className="me-3">
@@ -66,7 +67,7 @@ const TopBar: React.FC<TopBarProps> = ({
                   key={network.value}
                   className={styles.networkItem}
                   active={network.value === selectedNetwork}
-                  onClick={() => onNetworkChange(network.value)}
+                  onClick={(): void => onNetworkChange(network.value)}
                 >
                   {network.label}
                 </Dropdown.Item>
