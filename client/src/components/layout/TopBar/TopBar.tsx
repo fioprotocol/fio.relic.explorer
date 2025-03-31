@@ -6,6 +6,8 @@ import { NetworkOption, DEFAULT_NETWORKS, DEFAULT_NETWORK } from '../../../const
 import styles from './TopBar.module.scss';
 
 interface TopBarProps {
+  price: string;
+  chainId: string;
   networks?: NetworkOption[];
   selectedNetwork?: string;
   onNetworkChange: (network: string) => void;
@@ -33,6 +35,8 @@ const CustomToggle = React.forwardRef(
 );
 
 const TopBar: React.FC<TopBarProps> = ({
+  price,
+  chainId,
   networks = DEFAULT_NETWORKS,
   selectedNetwork = DEFAULT_NETWORK,
   onNetworkChange,
@@ -45,13 +49,10 @@ const TopBar: React.FC<TopBarProps> = ({
       <Container className="d-flex justify-content-between align-items-center">
         <div>
           <div className="me-3">
-            FIO Price: <span className="text-primary">$0.04000000</span>
+            FIO Price: <span className="text-primary">{price ? `$${price}` : '-'}</span>
           </div>
           <div className="small text-muted">
-            FIO Chain ID:{' '}
-            <span className="text-primary">
-              2fdcae42c0182200e93f954a07401f19048a7624c6fe81d3c9541a614a88bd1c
-            </span>
+            FIO Chain ID: <span className="text-primary">{chainId}</span>
           </div>
         </div>
         <div className="d-flex align-items-center">
