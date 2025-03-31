@@ -46,7 +46,10 @@ const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <div className={`py-3 ${styles.wrapper}`}>
-      <Container className="d-flex justify-content-between align-items-center">
+      <Container
+        className="gx-5 gx-xxl-4 d-flex justify-content-between align-items-center"
+        fluid="xxl"
+      >
         <div>
           <div className="me-3">
             FIO Price: <span className="text-primary">{price ? `$${price}` : '-'}</span>
