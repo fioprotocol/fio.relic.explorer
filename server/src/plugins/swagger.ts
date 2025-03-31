@@ -3,6 +3,8 @@ import { FastifyInstance } from 'fastify';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 
+import config from '../config';
+
 export default fp(async (fastify: FastifyInstance) => {
   await fastify.register(fastifySwagger, {
     swagger: {
@@ -15,7 +17,7 @@ export default fp(async (fastify: FastifyInstance) => {
         url: 'https://swagger.io',
         description: 'Find more info here',
       },
-      host: `${process.env.HOST}:${process.env.PORT}`,
+      host: `${config.server.host}:${config.server.port}`,
       schemes: ['http', 'https'],
       consumes: ['application/json'],
       produces: ['application/json'],
