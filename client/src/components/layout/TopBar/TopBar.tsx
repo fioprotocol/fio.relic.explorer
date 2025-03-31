@@ -52,10 +52,10 @@ const TopBar: React.FC<TopBarProps> = ({
             FIO Price: <span className="text-primary">{price ? `$${price}` : '-'}</span>
           </div>
           <div className="small text-muted">
-            FIO Chain ID: <span className="text-primary">{chainId}</span>
+            FIO Chain ID: <span className="text-primary text-break">{chainId}</span>
           </div>
         </div>
-        <div className="d-flex align-items-center">
+        <div className="d-flex align-items-center d-none d-md-block">
           <Dropdown align="end">
             <Dropdown.Toggle as={CustomToggle}>
               <Link45deg className="text-primary me-2 ms-n1" size={28} />
