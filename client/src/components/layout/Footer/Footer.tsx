@@ -41,10 +41,10 @@ const Footer: React.FC = () => {
 
   return (
     <footer className={`bg-dark py-5 ${styles.footer}`}>
-      <Container>
+      <Container className="gx-5 gx-xxl-4" fluid="xxl">
         <SocialLinks />
 
-        <Row className="mb-4">
+        <Row className="mb-0 mb-lg-4">
           <Col xs={12} md={6} className="mb-4 mb-md-0">
             <div className="mb-3">
               <FioLogo variant="light" height={40} />
@@ -57,7 +57,7 @@ const Footer: React.FC = () => {
           </Col>
 
           <Col xs={12} md={6}>
-            <Row>
+            <Row className="gy-4">
               <Col xs={6} md={4}>
                 <ul className="list-unstyled">
                   {EXPLORER_LINKS.map((item, index) => (
@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
           </Col>
         </Row>
 
-        <div className="py-4">
+        <div className={`py-4 ${styles.bottomLine}`}>
           <Row className="align-items-center">
             <Col md={12}>
               <ul className="list-inline mb-0 text-md-start">

@@ -39,7 +39,7 @@ const Header: React.FC = () => {
   return (
     <div className={styles.header}>
       <Navbar bg="white" expand="lg" className="py-3 border-bottom border-top border-opacity-25">
-        <Container>
+        <Container className="gx-5 gx-xxl-4" fluid="xxl">
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <img src="/images/logo-dark.png" alt="FIO Logo" className={styles.logoImage} />
           </Navbar.Brand>
@@ -74,11 +74,7 @@ const Header: React.FC = () => {
 
               <div className="nav-divider mx-3">&nbsp;</div>
 
-              <Nav.Link
-                as={Link}
-                to="/launch"
-                className="launch"
-              >
+              <Nav.Link as={Link} to="/launch" className="launch">
                 <Wallet2 size={18} className="me-3" />
                 Launch FIO App
               </Nav.Link>

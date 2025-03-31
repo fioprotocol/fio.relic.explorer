@@ -71,8 +71,8 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ className = '' }) => {
     <Row className="mb-4">
       <Col xs={12}>
         <Row className="mb-4">
-          <Col xs={11} md={5}>
-            <div className={`d-flex gap-1 justify-content-start flex-wrap ${className}`}>
+          <Col xs={9} md={5}>
+            <div className={`d-flex gap-2 gap-lg-1 justify-content-start flex-wrap ${className}`}>
               {SOCIAL_LINKS.map((item, index) => (
                 <div key={index} className={styles.socialIcon}>
                   {renderLink(item)}
@@ -80,7 +80,7 @@ const SocialLinks: React.FC<SocialLinksProps> = ({ className = '' }) => {
               ))}
             </div>
           </Col>
-          <Col xs={1} md={7}>
+          <Col xs={3} md={7}>
             <div className="d-flex justify-content-end">
               <ScrollToTop />
             </div>

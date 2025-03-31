@@ -1,3 +1,4 @@
+@import '~bootstrap/scss/bootstrap.scss';
 @import '../../../styles/variables.scss';
 
 .footer {
@@ -58,5 +59,18 @@
 
   p {
     line-height: 32px;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .footer {
+    p {
+      line-height: 28px;
+      font-size: $font-size-sm;
+    }
+
+    .bottomLine {
+      font-size: $font-size-base * 0.63;
+    }
   }
 }
