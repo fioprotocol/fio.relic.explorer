@@ -46,7 +46,7 @@ const Header: React.FC = () => {
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto align-items-center gap-1">
+            <Nav className="ms-auto align-items-center gap-2 gap-xl-4">
               {menuItems.map((item, index) =>
                 item.items ? (
                   <NavDropdown
@@ -72,9 +72,9 @@ const Header: React.FC = () => {
                 )
               )}
 
-              <div className="nav-divider mx-3">&nbsp;</div>
+              <div className="nav-divider mx-2 mx-xl-0">&nbsp;</div>
 
-              <Nav.Link as={Link} to="/launch" className="launch">
+              <Nav.Link as={Link} to="/launch" className="launch pl-2 pl-xl-0 d-flex align-items-center">
                 <Wallet2 size={18} className="me-3" />
                 Launch FIO App
               </Nav.Link>
