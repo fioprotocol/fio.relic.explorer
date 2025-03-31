@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import dotenv from 'dotenv';
 import { AddressInfo } from 'net';
+import config from './config';
+import pool from './config/database'; // Import the database pool
 
 // Load environment variables
 dotenv.config();
@@ -14,7 +16,7 @@ import * as healthCheckRoute from './routes/health-check';
 
 const server = Fastify({
   logger: {
-    transport: process.env.NODE_ENV === 'development' 
+    transport: config.isDev 
       ? {
           target: 'pino-pretty',
           options: {
@@ -41,9 +43,15 @@ server.get('/', async () => {
 // Run the server
 const start = async () => {
   try {
+    // Test database connection before starting the server
+    const client = await pool.connect();
+    console.log('Successfully connected to the database');
+    client.release();
+    
+    // Start the server after successful database connection
     await server.listen({ 
-      port: parseInt(process.env.PORT || '9090', 10),
-      host: process.env.HOST || 'localhost'
+      port: config.server.port,
+      host: config.server.host,
     });
     
     const address = server.server.address();
