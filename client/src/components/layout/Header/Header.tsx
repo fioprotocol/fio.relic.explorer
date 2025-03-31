@@ -72,7 +72,7 @@ const Header: React.FC = () => {
                 )
               )}
 
-              <div className="nav-divider mx-3"></div>
+              <div className="nav-divider mx-3">&nbsp;</div>
 
               <Nav.Link
                 as={Link}
