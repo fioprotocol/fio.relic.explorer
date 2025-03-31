@@ -6,13 +6,44 @@
 }
 
 .networkItem {
-  padding: 0.5rem 0rem;
+  div {
+    padding: 0.5rem 0rem;
+  }
+
   &:global(.active) {
     background-color: transparent;
     color: $text-dark;
+    cursor: not-allowed;
+
+    &:active {
+      background-color: transparent;
+    }
+  }
+
+  &:global(:active) {
+    background-color: $primary;
   }
 
   & + & {
-    border-top: 1px solid $border-light;
+    div {
+      border-top: 1px solid $border-light;
+    }
+  }
+}
+
+.dropdownToggle {
+  transition: all 0.3s ease;
+
+  svg {
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    background-color: $primary;
+    color: $white !important;
+
+    svg {
+      color: $white !important;
+    }
   }
 }

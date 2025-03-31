@@ -23,7 +23,7 @@ const CustomToggle = React.forwardRef(
   ) => (
     <div
       ref={ref}
-      className="border br-2 ps-2 rounded-3 text-decoration-none text-dark d-flex align-items-center btn fw-medium"
+      className={`border br-2 ps-2 rounded-3 text-decoration-none text-dark d-flex align-items-center btn fw-medium text-white-hover ${styles.dropdownToggle}`}
       onClick={(e): void => {
         e.preventDefault();
         onClick(e);
@@ -62,15 +62,15 @@ const TopBar: React.FC<TopBarProps> = ({
               {selectedNetworkLabel}
             </Dropdown.Toggle>
 
-            <Dropdown.Menu className="rounded-3 px-4 py-3">
+            <Dropdown.Menu className="rounded-3 px-0 py-3">
               {networks.map((network) => (
                 <Dropdown.Item
                   key={network.value}
-                  className={styles.networkItem}
+                  className={`px-4 py-0 ${styles.networkItem}`}
                   active={network.value === selectedNetwork}
                   onClick={(): void => onNetworkChange(network.value)}
                 >
-                  {network.label}
+                  <div>{network.label}</div>
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>
