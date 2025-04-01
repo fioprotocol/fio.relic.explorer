@@ -47,7 +47,9 @@ const Footer: React.FC = () => {
         <Row className="mb-0 mb-lg-4">
           <Col xs={12} md={6} className="mb-4 mb-md-0">
             <div className="mb-3">
-              <FioLogo variant="light" height={40} />
+              <Link to="/">
+                <FioLogo variant="light" height={40} />
+              </Link>
             </div>
             <p className="text-white pe-md-5">
               FIO Chain is a fully decentralized public Delegated Proof of Stake (DPoS) blockchain
