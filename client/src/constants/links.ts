@@ -42,13 +42,13 @@ export const RESOURCE_LINKS: FooterLink[] = [
 ];
 
 export const EXTERNAL_LINKS: FooterLink[] = [
-  { href: 'https://developers.fio.net', label: 'Developer Portal' },
+  { href: 'https://dev.fio.net/', label: 'Developer Portal' },
   { href: 'https://fio.net', label: 'FIO Website' },
-  { href: 'https://fio.app', label: 'FIO dApp' },
+  { href: 'https://app.fio.net', label: 'FIO dApp' },
 ];
 
 export const LEGAL_LINKS: FooterLink[] = [
   { to: '/support', label: 'Support' },
   { to: '/privacy-policy', label: 'Privacy Policy' },
   { to: '/terms-of-service', label: 'Terms of Service' },
-]; 
+];
