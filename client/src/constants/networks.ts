@@ -8,4 +8,4 @@ export const DEFAULT_NETWORKS: NetworkOption[] = [
   { label: 'FIO Testnet', value: 'testnet' },
 ];
 
-export const DEFAULT_NETWORK = DEFAULT_NETWORKS[0].value; 
+export const DEFAULT_NETWORK = DEFAULT_NETWORKS[0].value;
