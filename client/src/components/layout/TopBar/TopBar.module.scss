@@ -1,5 +1,4 @@
-@import '~bootstrap/scss/bootstrap.scss';
-@import '../../../styles/variables.scss';
+@import '../../../styles/main.scss';
 
 .wrapper {
   font-size: 0.875rem;
@@ -12,7 +11,7 @@
 
   &:global(.active) {
     background-color: transparent;
-    color: $text-dark;
+    color: $dark;
     cursor: not-allowed;
 
     &:active {

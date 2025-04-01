@@ -5,6 +5,8 @@ import { Wallet2, ChevronDown } from 'react-bootstrap-icons';
 
 import { FioLogo } from 'src/components/common/FioLogo';
 
+import { FIO_DAPP_LINK } from 'src/constants/links';
+
 import styles from './Header.module.scss';
 
 interface MenuItem {
@@ -76,7 +78,12 @@ const Header: React.FC = () => {
 
               <div className="nav-divider mx-2 mx-xl-0">&nbsp;</div>
 
-              <Nav.Link as={Link} to="/launch" className="launch pl-2 pl-xl-0 d-flex align-items-center">
+              <Nav.Link
+                href={FIO_DAPP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="launch pl-2 pl-xl-0 d-flex align-items-center"
+              >
                 <Wallet2 size={18} className="me-3" />
                 Launch FIO App
               </Nav.Link>

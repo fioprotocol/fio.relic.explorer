@@ -1,5 +1,4 @@
-@import '~bootstrap/scss/bootstrap.scss';
-@import '../../../styles/variables.scss';
+@import '../../../styles/main.scss';
 
 .footer {
   position: relative;
@@ -14,13 +13,6 @@
       transition: all 0.3s ease-in-out;
       position: relative;
       overflow: hidden;
-
-      // div {
-      //   width: 24px;
-      //   height: 24px;
-      //   border-radius: 50%;
-      //   background-color: rgba($secondary, 0.8);
-      // }
 
       svg {
         width: 24px;
@@ -40,10 +32,6 @@
             fill: $light;
           }
         }
-
-        // div {
-        //   background-color: $light;
-        // }
       }
 
     }
@@ -53,7 +41,7 @@
     transition: color 0.2s ease-in-out;
 
     &:hover {
-      color: white !important;
+      color: $white !important;
     }
   }
 
