@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { Wallet2, ChevronDown } from 'react-bootstrap-icons';
 
+import { FioLogo } from 'src/components/common/FioLogo';
+
 import styles from './Header.module.scss';
 
 interface MenuItem {
@@ -41,7 +43,7 @@ const Header: React.FC = () => {
       <Navbar bg="white" expand="lg" className="py-3 border-bottom border-top border-opacity-25">
         <Container className="gx-5 gx-xxl-4" fluid="xxl">
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
-            <img src="/images/logo-dark.png" alt="FIO Logo" className={styles.logoImage} />
+            <FioLogo variant="dark" height={40} />
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
