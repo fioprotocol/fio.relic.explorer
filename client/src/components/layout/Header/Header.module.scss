@@ -1,5 +1,4 @@
-@import '~bootstrap/scss/bootstrap.scss';
-@import '../../../styles/variables.scss';
+@import '../../../styles/main.scss';
 
 .header {
   .logo-image {
@@ -16,28 +15,25 @@
 
     .hover-text-white {
       &:hover {
-        color: white !important;
+        color: $white !important;
       }
     }
 
     .navbar {
       .nav-link {
-        color: #1a1a1a !important;
+        color: $dark !important;
         font-weight: 500;
         padding: 0.5rem 0.25rem !important;
         font-size: 0.95rem;
 
         &:hover {
           color: $primary !important;
-        } 
-        &:last-child {
-          padding-right: 0 !important;
         }
       }
 
       .nav-link.launch {
-        color: $text-dark;
         text-decoration: none;
+        padding-right: 0 !important;
 
         svg {
           color: $primary;
@@ -73,7 +69,6 @@
 
           &:hover {
             background-color: rgba(108, 93, 211, 0.05);
-            color: $primary;
           }
         }
       }

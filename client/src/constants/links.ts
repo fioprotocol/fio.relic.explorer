@@ -5,6 +5,8 @@ interface FooterLink {
   icon?: string;
 }
 
+export const FIO_DAPP_LINK = 'https://app.fio.net';
+
 export const SOCIAL_LINKS: FooterLink[] = [
   { href: 'https://discord.gg/fio', icon: 'discord', label: 'Discord' },
   { href: '/', icon: 'hive', label: 'Hive' },
@@ -44,7 +46,7 @@ export const RESOURCE_LINKS: FooterLink[] = [
 export const EXTERNAL_LINKS: FooterLink[] = [
   { href: 'https://dev.fio.net/', label: 'Developer Portal' },
   { href: 'https://fio.net', label: 'FIO Website' },
-  { href: 'https://app.fio.net', label: 'FIO dApp' },
+  { href: FIO_DAPP_LINK, label: 'FIO dApp' },
 ];
 
 export const LEGAL_LINKS: FooterLink[] = [

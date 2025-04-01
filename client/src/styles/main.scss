@@ -1,6 +1,6 @@
 // Import custom variables
+@import './variables.scss';
 @import '~bootstrap/scss/bootstrap.scss';
-@import "./variables.scss";
 
 body {
   margin: 0;
@@ -10,14 +10,9 @@ body {
   background-color: $light;
 }
 
-// Utility classes
-.text-primary {
-  color: $primary !important;
-}
-
 .todo-item {
   transition: all 0.3s ease;
-  
+
   &.completed {
     opacity: 0.6;
     text-decoration: line-through;
