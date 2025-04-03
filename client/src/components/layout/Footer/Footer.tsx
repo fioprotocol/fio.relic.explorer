@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
+
+import Container from '../Container';
 import { FioLogo } from '../../common/FioLogo';
 import SocialLinks from './SocialLinks';
+
 import {
   EXPLORER_LINKS,
   RESOURCE_LINKS,
@@ -41,7 +44,7 @@ const Footer: React.FC = () => {
 
   return (
     <footer className={`bg-dark py-5 ${styles.footer}`}>
-      <Container className="gx-5 gx-xxl-4" fluid="xxl">
+      <Container>
         <SocialLinks />
 
         <Row className="mb-0 mb-lg-4">
