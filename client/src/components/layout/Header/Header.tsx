@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import { Wallet2, ChevronDown } from 'react-bootstrap-icons';
 
+import Container from '../Container';
 import { FioLogo } from 'src/components/common/FioLogo';
 
 import { FIO_DAPP_LINK } from 'src/constants/links';
@@ -43,7 +44,7 @@ const Header: React.FC = () => {
   return (
     <div className={styles.header}>
       <Navbar bg="white" expand="lg" className="py-3 border-bottom border-top border-opacity-25">
-        <Container className="gx-5 gx-xxl-4" fluid="xxl">
+        <Container>
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <FioLogo variant="dark" height={40} />
           </Navbar.Brand>

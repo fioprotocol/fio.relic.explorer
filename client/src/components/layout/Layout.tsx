@@ -50,7 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         chainId={chainId}
       />
       <Header />
-      <main className="main-content py-4">{children}</main>
+      <main className="main-content">{children}</main>
       <Footer />
     </div>
   );
