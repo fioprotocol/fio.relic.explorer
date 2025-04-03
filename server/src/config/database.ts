@@ -32,14 +32,4 @@ if (process.env.SSH_KEY_URL) {
 
 const pool = new Pool(poolConfig);
 
-// Test the connection
-pool.connect()
-  .then(client => {
-    console.log('Successfully connected to PostgreSQL database');
-    client.release();
-  })
-  .catch(err => {
-    console.error('Error connecting to the database:', err);
-  });
-
 export default pool;

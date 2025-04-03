@@ -19,6 +19,12 @@ const TransactionChart: React.FC<TransactionChartProps> = ({
 }) => {
   const [data, setData] = useState<TransactionDataPoint[]>([]);
 
+  const getTxData = async (): Promise<void> => {
+    const response = await fetch('/api/transactions-stats');
+    const responseData = await response.json();
+    setData(responseData.data.transactions);
+  };
+
   const formatDate = (date: string): string => {
     return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
@@ -41,13 +47,7 @@ const TransactionChart: React.FC<TransactionChartProps> = ({
   };
 
   useEffect(() => {
-    setData([
-      { date: '2023-12-29', transactions: 150000 },
-      { date: '2024-01-01', transactions: 250000 },
-      { date: '2024-01-03', transactions: 380000 },
-      { date: '2024-01-04', transactions: 310000 },
-      { date: '2024-01-06', transactions: 110000 },
-    ]);
+    getTxData();
   }, []);
 
   return (
