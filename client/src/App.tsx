@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
+import SearchPage from './pages/SearchPage';
 import HealthCheckPage from './pages/HealthCheckPage';
 import AboutPage from './pages/AboutPage';
 
@@ -13,6 +14,7 @@ const App: React.FC = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/health-check" element={<HealthCheckPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="*" element={
