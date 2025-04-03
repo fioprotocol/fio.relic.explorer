@@ -13,6 +13,7 @@ import cors from './plugins/cors';
 
 // Import routes
 import * as healthCheckRoute from './routes/health-check';
+import * as transactionsByDateRoute from './routes/transactions-stats';
 
 const server = Fastify({
   logger: {
@@ -34,6 +35,7 @@ server.register(swagger);
 
 // Register routes
 server.register(healthCheckRoute.default, { prefix: '/api/health-check' });
+server.register(transactionsByDateRoute.default, { prefix: '/api/transactions-stats' });
 
 // Root route
 server.get('/', async () => {
@@ -45,9 +47,13 @@ const start = async () => {
   try {
     // Test database connection before starting the server
     const client = await pool.connect();
-    console.log('Successfully connected to the database');
+    server.log.info('Successfully connected to the database');
     client.release();
-    
+  } catch (err) {
+    server.log.error(err);
+  }
+
+  try {
     // Start the server after successful database connection
     await server.listen({ 
       port: config.server.port,
