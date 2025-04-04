@@ -1,30 +1,16 @@
 import axios from 'axios';
 
-export interface SearchResult {
-  id: string;
-  type: 'account' | 'transaction' | 'domain' | 'handle' | 'publicKey';
-  title: string;
-  data: Record<string, any>; // todo: set type
-}
-
-export interface SearchResponse {
-  results: SearchResult[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-}
+import { SearchResult, SearchResponse } from 'shared/types/search';
 
 export const searchService = {
   /**
    * Search across accounts, transactions, domains, handles, and public keys
    */
-  search: async (query: string, page = 1, pageSize = 10): Promise<SearchResponse> => {
+  search: async (query: string): Promise<SearchResponse> => {
     try {
       const response = await axios.get<SearchResponse>('/api/search', {
         params: {
-          q: query,
-          page,
-          pageSize
+          q: query
         }
       });
       return response.data;

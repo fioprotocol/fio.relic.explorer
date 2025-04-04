@@ -4,25 +4,10 @@ import { Link } from 'react-router-dom';
 import { SearchContainer } from '../components/Search';
 import TransactionChart from 'src/components/TransactionChart/TransactionChart';
 import { useSearch } from '../hooks';
-import { searchService } from '../services/search';
 
 const HomePage: React.FC = () => {
   // Setup search hook with custom callback
-  const { handleSearch, isSearching } = useSearch({
-    // Optional callback to perform additional actions before navigation
-    onSearchCallback: async (query) => {
-      // You could log analytics, set context, or do other things here
-      console.log('Searching for:', query);
-      
-      try {
-        // Optionally pre-fetch results to cache them
-        await searchService.search(query);
-      } catch (error) {
-        // Handle error silently as navigation will still occur
-        console.error('Error pre-fetching search results', error);
-      }
-    }
-  });
+  const { handleSearch, isSearching } = useSearch();
 
   return (
     <>
