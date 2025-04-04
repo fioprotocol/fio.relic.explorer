@@ -49,3 +49,9 @@ jobs:
         run: |
          echo "Secret value is $PORT"
          echo "Secret value2 is $HOST"
+      - name: Fetch secret from AWS Parameter Store2
+        run: |
+          SECRET_VALUE=$(aws ssm get-parameter --name "/ECS-CLUSTER/beta/SQL_HOST" --with-decryption --query "Parameter.Value" --output text)
+          echo "SECRET_VALUE=${SECRET_VALUE}" >> $GITHUB_ENV
+      - name: Use the secret
+        run: echo "Secret value is $SECRET_VALUE"
