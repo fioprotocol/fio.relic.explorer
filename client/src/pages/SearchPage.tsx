@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Spinner, Alert, Pagination } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 
@@ -7,53 +7,59 @@ import { SearchContainer } from '../components/Search';
 
 import { useSearch } from '../hooks';
 
-import { searchService, SearchResult } from '../services/search';
+import { searchService } from '../services/search';
+
+import { SearchResult } from 'shared/types/search';
 
 const SearchPage: React.FC = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('q') || '';
-  
+
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [searchType] = useState<SearchResult['type']>('tx');
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Use the hook with navigation disabled to prevent unnecessary redirects on this page
-  const { handleSearch } = useSearch({ 
+  const { handleSearch } = useSearch({
     navigateOnSearch: false,
     defaultQuery: query,
     onSearchCallback: async (searchQuery) => {
       await fetchResults(searchQuery, currentPage, pageSize);
-    }
+    },
   });
 
-  const fetchResults = async (searchQuery: string, page: number, size: number): Promise<void> => {
-    if (!searchQuery) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const data = await searchService.search(searchQuery, page, size);
-      setResults(data.results);
-      setTotalCount(data.totalCount);
-      setCurrentPage(data.page);
-    } catch (err) {
-      setError('Failed to fetch search results. Please try again.');
-      console.error('Search error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchResults = useCallback(
+    async (searchQuery: string, page: number, size: number): Promise<void> => {
+      if (!searchQuery) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await searchService.searchByType(searchQuery, searchType, page, size);
+        setResults(data.results);
+        setTotalCount(data.totalCount || 0);
+        setCurrentPage(data.page || 1);
+      } catch (err) {
+        setError('Failed to fetch search results. Please try again.');
+        console.error('Search error:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchType]
+  );
 
   // Initial load of search results when page loads or query changes
   useEffect(() => {
     if (query) {
       fetchResults(query, currentPage, pageSize);
     }
-  }, [query, currentPage, pageSize]);
+  }, [query, currentPage, pageSize, fetchResults]);
 
   // Handle page change
   const handlePageChange = (page: number): void => {
@@ -69,10 +75,10 @@ const SearchPage: React.FC = () => {
 
     // Previous button
     items.push(
-      <Pagination.Prev 
-        key="prev" 
-        disabled={currentPage === 1} 
-        onClick={(): void => handlePageChange(currentPage - 1)} 
+      <Pagination.Prev
+        key="prev"
+        disabled={currentPage === 1}
+        onClick={(): void => handlePageChange(currentPage - 1)}
       />
     );
 
@@ -89,10 +95,14 @@ const SearchPage: React.FC = () => {
     }
 
     // Pages around current page
-    for (let page = Math.max(1, currentPage - 1); page <= Math.min(totalPages, currentPage + 1); page++) {
+    for (
+      let page = Math.max(1, currentPage - 1);
+      page <= Math.min(totalPages, currentPage + 1);
+      page++
+    ) {
       items.push(
-        <Pagination.Item 
-          key={page} 
+        <Pagination.Item
+          key={page}
           active={page === currentPage}
           onClick={(): void => handlePageChange(page)}
         >
@@ -115,10 +125,10 @@ const SearchPage: React.FC = () => {
 
     // Next button
     items.push(
-      <Pagination.Next 
-        key="next" 
-        disabled={currentPage === totalPages} 
-        onClick={(): void => handlePageChange(currentPage + 1)} 
+      <Pagination.Next
+        key="next"
+        disabled={currentPage === totalPages}
+        onClick={(): void => handlePageChange(currentPage + 1)}
       />
     );
 
@@ -128,12 +138,12 @@ const SearchPage: React.FC = () => {
   return (
     <div>
       <SearchContainer onSearch={handleSearch} value={query} />
-      
+
       <Container className="py-4">
         <h2 className="mb-4">Search Results for: "{query}"</h2>
-        
+
         {error && <Alert variant="danger">{error}</Alert>}
-        
+
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" role="status">
@@ -142,10 +152,8 @@ const SearchPage: React.FC = () => {
           </div>
         ) : results.length > 0 ? (
           <>
-            <p className="text-muted mb-4">
-              Found {totalCount} results
-            </p>
-            
+            <p className="text-muted mb-4">Found {totalCount} results</p>
+
             {results.map((result) => (
               <Card key={result.id} className="mb-3">
                 <Card.Body>
@@ -155,9 +163,7 @@ const SearchPage: React.FC = () => {
                   </Card.Subtitle>
                   <Card.Text>
                     {/* Render different content based on result type */}
-                    {result.type === 'transaction' && (
-                      <code className="d-block">{result.id}</code>
-                    )}
+                    {result.type === 'tx' && <code className="d-block">{result.id}</code>}
                     {(result.type === 'account' || result.type === 'publicKey') && (
                       <div>
                         <code className="d-block mb-2">{result.id}</code>
@@ -170,7 +176,7 @@ const SearchPage: React.FC = () => {
                 </Card.Body>
               </Card>
             ))}
-            
+
             {/* Pagination */}
             {totalCount > pageSize && (
               <div className="d-flex justify-content-center mt-4">
@@ -188,4 +194,4 @@ const SearchPage: React.FC = () => {
   );
 };
 
-export default SearchPage; 
+export default SearchPage;

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { searchService } from 'src/services/search';
+
 interface UseSearchOptions {
   navigateOnSearch?: boolean;
   defaultQuery?: string;
@@ -16,11 +18,7 @@ interface UseSearchReturn {
 }
 
 export const useSearch = (options: UseSearchOptions = {}): UseSearchReturn => {
-  const {
-    navigateOnSearch = true,
-    defaultQuery = '',
-    onSearchCallback
-  } = options;
+  const { navigateOnSearch = true, defaultQuery = '', onSearchCallback } = options;
 
   const [query, setQuery] = useState<string>(defaultQuery);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -28,20 +26,25 @@ export const useSearch = (options: UseSearchOptions = {}): UseSearchReturn => {
 
   const handleSearch = async (searchQuery: string): Promise<void> => {
     const trimmedQuery = searchQuery.trim();
-    
+
     if (!trimmedQuery) return;
-    
+
     setIsSearching(true);
-    
+
     try {
       // Call the callback if provided
       if (onSearchCallback) {
         await onSearchCallback(trimmedQuery);
-      }
-      
-      // Navigate to search results page if needed
-      if (navigateOnSearch) {
-        navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+
+        // Navigate to search results page if needed
+        if (navigateOnSearch) {
+          navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+        }
+      } else {
+        const results = await searchService.search(trimmedQuery);
+
+        // todo: navigate to proper page based on the type
+        navigate(`/?q=${encodeURIComponent(trimmedQuery)}`);
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -59,8 +62,8 @@ export const useSearch = (options: UseSearchOptions = {}): UseSearchReturn => {
     setQuery,
     isSearching,
     handleSearch,
-    resetSearch
+    resetSearch,
   };
 };
 
-export default useSearch; 
+export default useSearch;
