@@ -1,0 +1,13 @@
+@import '../../../styles/main.scss';
+
+.scrollTop {
+  cursor: pointer;
+  color: $white;
+  background: $primary;
+  transition: all 0.3s ease;
+  z-index: 1000;
+
+  &:hover {
+    background: darken($primary, 10%);
+  }
+}

@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import dotenv from 'dotenv';
 import { AddressInfo } from 'net';
+import config from './config';
+import pool from './config/database'; // Import the database pool
 
 // Load environment variables
 dotenv.config();
@@ -11,10 +13,11 @@ import cors from './plugins/cors';
 
 // Import routes
 import * as healthCheckRoute from './routes/health-check';
+import * as transactionsByDateRoute from './routes/transactions-stats';
 
 const server = Fastify({
   logger: {
-    transport: process.env.NODE_ENV === 'development' 
+    transport: config.isDev 
       ? {
           target: 'pino-pretty',
           options: {
@@ -32,6 +35,7 @@ server.register(swagger);
 
 // Register routes
 server.register(healthCheckRoute.default, { prefix: '/api/health-check' });
+server.register(transactionsByDateRoute.default, { prefix: '/api/transactions-stats' });
 
 // Root route
 server.get('/', async () => {
@@ -41,9 +45,19 @@ server.get('/', async () => {
 // Run the server
 const start = async () => {
   try {
+    // Test database connection before starting the server
+    const client = await pool.connect();
+    server.log.info('Successfully connected to the database');
+    client.release();
+  } catch (err) {
+    server.log.error(err);
+  }
+
+  try {
+    // Start the server after successful database connection
     await server.listen({ 
-      port: parseInt(process.env.PORT || '9090', 10),
-      host: process.env.HOST || 'localhost'
+      port: config.server.port,
+      host: config.server.host,
     });
     
     const address = server.server.address();

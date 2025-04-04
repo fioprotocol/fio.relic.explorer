@@ -1,0 +1,64 @@
+@import '../../../styles/main.scss';
+
+.footer {
+  position: relative;
+
+  .socialIcon {
+    a {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: $dark;
+      color: $dark;
+      transition: all 0.3s ease-in-out;
+      position: relative;
+      overflow: hidden;
+
+      svg {
+        width: 24px;
+        height: 24px;
+        path {
+          fill: rgba($secondary, 0.8);
+          transition: all 0.3s ease-in-out;
+        }
+      }
+
+      &:hover {
+        background-color: $primary;
+        color: $primary;
+
+        svg {
+          path {
+            fill: $light;
+          }
+        }
+      }
+
+    }
+  }
+
+  :global(.hover-white) {
+    transition: color 0.2s ease-in-out;
+
+    &:hover {
+      color: $white !important;
+    }
+  }
+
+  p {
+    line-height: 32px;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .footer {
+    p {
+      line-height: 28px;
+      font-size: $font-size-sm;
+    }
+
+    .bottomLine {
+      font-size: $font-size-base * 0.63;
+    }
+  }
+}

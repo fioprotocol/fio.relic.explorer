@@ -1,6 +1,6 @@
 // Import custom variables
+@import './variables.scss';
 @import '~bootstrap/scss/bootstrap.scss';
-@import "./variables.scss";
 
 body {
   margin: 0;
@@ -12,25 +12,11 @@ body {
 
 .todo-item {
   transition: all 0.3s ease;
-  
+
   &.completed {
     opacity: 0.6;
     text-decoration: line-through;
   }
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-.navbar {
-  margin-bottom: 2rem;
-}
-
-.page-header {
-  margin-bottom: 2rem;
 }
 
 .loading-spinner {
@@ -44,4 +30,4 @@ body {
   color: $danger;
   font-size: 0.875rem;
   margin-top: 0.25rem;
-} 
+}
