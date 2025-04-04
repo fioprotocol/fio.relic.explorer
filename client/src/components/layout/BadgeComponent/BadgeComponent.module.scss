@@ -1,0 +1,50 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/font-mixins.scss';
+
+.badge-component {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 11px !important;
+  border-radius: 12px !important;
+  border: none !important;
+  margin-bottom: 0;
+  gap: 10px;
+  width: 100%;
+}
+
+.badge-info {
+  background-color: rgba(0, 193, 255, 0.1) !important;
+  color: $dark !important;
+}
+
+.badge-error {
+  background-color: rgba(255, 0, 0, 0.1) !important;
+  color: $dark !important;
+}
+
+.badge-danger {
+  background-color: rgba(255, 0, 0, 0.1) !important;
+  color: $dark !important;
+}
+
+.badge-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.badge-title {
+  font-family: 'Proxima Nova', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.5em;
+}
+
+.badge-message {
+  font-family: 'Proxima Nova', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.5em;
+}

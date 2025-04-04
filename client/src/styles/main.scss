@@ -1,6 +1,8 @@
 // Import custom variables
 @import './variables.scss';
 @import '~bootstrap/scss/bootstrap.scss';
+@import './breakpoints.scss';
+@import './font-mixins.scss';
 
 body {
   margin: 0;
