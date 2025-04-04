@@ -45,8 +45,15 @@ jobs:
           echo "NODE_ENV=${NODE_ENV}" >> $GITHUB_ENV
           PORT=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
           echo "PORT=${PORT}" >> $GITHUB_ENV
+          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_HOST=${SSH_HOST}" >> $GITHUB_ENV
+          aws ssm get-parameter --name "/fio-relic/dev/ssh_key" --with-decryption --query "Parameter.Value" --output text > ssh_key
+          chmod 600 ssh_key
       - name: Use the secret
         run: |
           echo "Secret value1 is $HOST"
           echo "Secret value2 is $DB_HOST"
+      - name: SSH to EC2 and Deploy
+        run: |
+          ssh -i ssh_key -o StrictHostKeyChecking=no ubuntu@$SSH_HOST "ls -l"
       
