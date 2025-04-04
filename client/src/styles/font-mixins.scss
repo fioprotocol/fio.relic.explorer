@@ -1,23 +1,31 @@
+@mixin font-inter-300 {
+  font-family: 'Inter Light', sans-serif;
+}
+
 @mixin font-inter-400 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-style: normal;
+  font-family: 'Inter Regular', sans-serif;
 }
 
 @mixin font-inter-500 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-style: normal;
+  font-family: 'Inter Medium', sans-serif;
 }
 
 @mixin font-inter-600 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-style: normal;
+  font-family: 'Inter SemiBold', sans-serif;
 }
 
 @mixin font-inter-800 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  font-style: normal;
+  font-family: 'Inter ExtraBold', sans-serif;
+}
+
+@mixin font-proxima-nova-300 {
+  font-family: 'Proxima Nova Light', sans-serif;
+}
+
+@mixin font-proxima-nova-400 {
+  font-family: 'Proxima Nova Regular', sans-serif;
+}
+
+@mixin font-proxima-nova-800 {
+  font-family: 'Proxima Nova ExtraBold', sans-serif;
 }

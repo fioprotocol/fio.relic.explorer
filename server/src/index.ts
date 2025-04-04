@@ -13,8 +13,9 @@ import cors from './plugins/cors';
 
 // Import routes
 import * as healthCheckRoute from './routes/health-check';
-import * as transactionsByDateRoute from './routes/transactions-stats';
 import * as searchRoute from './routes/search';
+import * as getStatsRoute from './routes/stats';
+import { API_PREFIX } from '../../shared/constants/network';
 
 const server = Fastify({
   logger: {
@@ -35,9 +36,10 @@ server.register(cors);
 server.register(swagger);
 
 // Register routes
-server.register(healthCheckRoute.default, { prefix: '/api/health-check' });
-server.register(transactionsByDateRoute.default, { prefix: '/api/transactions-stats' });
-server.register(searchRoute.default, { prefix: '/api/search' });
+server.register(healthCheckRoute.default, { prefix: `/${API_PREFIX}/health-check` });
+server.register(getStatsRoute.default, { prefix: `/${API_PREFIX}/stats` });
+server.register(searchRoute.default, { prefix: '/${API_PREFIX}/search' });
+
 // Root route
 server.get('/', async () => {
   return { message: 'Welcome to the Fastify API' };
