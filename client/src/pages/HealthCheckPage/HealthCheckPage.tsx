@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+
+import { getHealthCheck } from 'src/services/health-check';
+
+import { HealthCheckResponse } from 'shared/types/health-check';
 
 import styles from './HealthCheckPage.module.scss';
-
-interface HealthCheckResponse {
-  data: {
-    status: string;
-    uptime: number;
-    timestamp: string;
-  };
-}
 
 const HealthCheckPage: React.FC = () => {
   const [healthStatus, setHealthStatus] = useState<HealthCheckResponse | null>(null);
@@ -21,8 +16,8 @@ const HealthCheckPage: React.FC = () => {
     setError('');
     
     try {
-      const response = await axios.get<HealthCheckResponse>('http://localhost:3000/api/health-check');
-      setHealthStatus(response.data);
+      const response = await getHealthCheck();
+      setHealthStatus(response);
     } catch (err) {
       setError('Failed to check health status');
       console.error('Health check error:', err);

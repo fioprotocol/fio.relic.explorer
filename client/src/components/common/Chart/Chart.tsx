@@ -53,11 +53,11 @@ const Chart: React.FC<ChartProps> = ({
 }) => {
   return (
     <div className="chart">
-      {title && <h2 className="text-start">{title}</h2>}
+      {title && <h2 className="chart-title">{title}</h2>}
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={height}>
           <RechartsLineChart data={data} margin={margin}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
             <XAxis
               dataKey={xAxisKey}
               tickFormatter={xAxisFormatter}
@@ -73,11 +73,11 @@ const Chart: React.FC<ChartProps> = ({
             />
             <Tooltip
               content={({ active, payload, label }): React.ReactNode => {
-                if (active && payload && payload.length) {
+                if (active && payload && payload.length && payload[0]?.value !== undefined) {
                   return (
                     <div className="custom-tooltip">
-                      <p className="label">{tooltipFormatter(label)}</p>
-                      <p className="value">{yAxisFormatter(payload[0].value)}</p>
+                      <p className="tooltip-label">{tooltipFormatter(label)}</p>
+                      <p className="tooltip-value">Transactions: {payload[0].value.toLocaleString()}</p>
                     </div>
                   );
                 }
@@ -90,7 +90,7 @@ const Chart: React.FC<ChartProps> = ({
               stroke={lineColor}
               strokeWidth={2}
               dot={{ r: 4 }}
-              activeDot={{ r: 8 }}
+              activeDot={{ r: 6 }}
             />
           </RechartsLineChart>
         </ResponsiveContainer>

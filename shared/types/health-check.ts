@@ -1,5 +1,7 @@
-export interface MockedDataResponse {
+export interface HealthCheckResponse {
   data: {
-    success: boolean;
+    status: string,
+    uptime: number,
+    timestamp: string,
   }
 }

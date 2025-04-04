@@ -1,0 +1,107 @@
+@import '../../../styles/main.scss';
+
+.tableCard {
+  background-color: transparent;
+  border-radius: 0 !important;
+  border: 0 solid !important;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.tableHeader {
+  padding: 1rem 1.5rem;
+  background-color: transparent;
+  border-bottom: 0.5px solid $mercury;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.25em;
+  color: $dark;
+}
+
+.tableBody {
+  padding: 0 !important;
+}
+
+.table {
+  margin-bottom: 0;
+  
+  thead {
+    th {
+      @include font-inter-600;
+      font-size: 13px;
+      color: $dark;
+      background-color: transparent;
+      border-bottom: 0.5px solid $mercury;
+      padding: 0.75rem 1.5rem;
+    }
+  }
+  
+  tbody {
+    tr {
+      border-bottom: 0.5px solid $mercury;
+      
+      &:hover {
+        background-color: $snow-drift;
+      }
+      
+      td {
+        padding: 0.75rem 1.5rem;
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        font-size: 13px;
+        color: $dark;
+        vertical-align: middle;
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+.tableMobile {
+  display: none;
+}
+
+.mobileRow {
+  padding: 1rem;
+  border-bottom: 0.5px solid $mercury;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.mobileItem {
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.mobileLabel {
+  @include font-inter-400;
+  font-size: 11px;
+  line-height: 1.36em;
+  color: #969696;
+  margin-bottom: 0.25rem;
+}
+
+.mobileValue {
+  @include font-inter-400;
+  font-size: 13px;
+  line-height: 1.5em;
+  color: $dark;
+}
+
+// Media queries
+@media (max-width: $breakpoint-md) {
+  .tableDesktop {
+    display: none;
+  }
+  
+  .tableMobile {
+    display: block;
+  }
+}

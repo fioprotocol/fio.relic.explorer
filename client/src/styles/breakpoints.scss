@@ -1,0 +1,57 @@
+// Device breakpoint variables
+$breakpoint-xs: 320px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1400px;
+
+// Breakpoint mixins for easier use in your components
+@mixin xs {
+  @media (min-width: #{$breakpoint-xs}) and (max-width: #{$breakpoint-sm}) {
+    @content;
+  }
+}
+
+@mixin sm {
+  @media (min-width: #{$breakpoint-sm}) and (max-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (min-width: #{$breakpoint-md}) and (max-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media (min-width: #{$breakpoint-lg}) and (max-width: #{$breakpoint-xl}) {
+    @content;
+  }
+}
+
+@mixin xl {
+  @media (min-width: #{$breakpoint-xl}) and (max-width: #{$breakpoint-xxl}) {
+    @content;
+  }
+}
+
+@mixin xxl {
+  @media (min-width: #{$breakpoint-xxl}) {
+    @content;
+  }
+}
+
+// Custom breakpoint mixin
+@mixin breakpoint($min, $max: null) {
+  @if $max {
+    @media (min-width: #{$min}) and (max-width: #{$max}) {
+      @content;
+    }
+  } @else {
+    @media (min-width: #{$min}) {
+      @content;
+    }
+  }
+} 
