@@ -38,7 +38,7 @@
   }
 
   &:hover {
-    background-color: $primary;
+    background-color: $primary !important;
     color: $white !important;
 
     svg {
