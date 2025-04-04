@@ -7,7 +7,7 @@ export interface SearchResult {
   data: Record<string, any>; // todo: set type
 }
 
-interface SearchResponse {
+export interface SearchResponse {
   results: SearchResult[];
   totalCount: number;
   page: number;
