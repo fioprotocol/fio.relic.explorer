@@ -34,7 +34,11 @@ jobs:
           export $(aws ssm get-parameters \
             --names /fio-relic/dev/CLIENT_URL /fio-relic/dev/DB_HOST /fio-relic/dev/DB_NAME /fio-relic/dev/DB_PASSWORD \
               /fio-relic/dev/DB_PORT /fio-relic/dev/DB_SSL /fio-relic/dev/DB_USER /fio-relic/dev/HOST /fio-relic/dev/NODE_ENV \
-              /fio-relic/dev/PORT /fio-relic/dev/ssh_key \
+            --with-decryption \
+            --query "Parameters[*].{Name:Name,Value:Value}" \
+            --output text | awk '{print $1 "=" $2}')
+          export $(aws ssm get-parameters \
+            --names /fio-relic/dev/PORT /fio-relic/dev/ssh_key \
             --with-decryption \
             --query "Parameters[*].{Name:Name,Value:Value}" \
             --output text | awk '{print $1 "=" $2}')
