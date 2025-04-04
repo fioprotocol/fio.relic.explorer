@@ -43,4 +43,6 @@ jobs:
             --query "Parameters[*].[Name,Value]" \
             --output text | awk '{sub(".*/", "", $1); print $1 "=" $2}')
       - name: Use the secret
-        run: echo "Secret value is $DB_HOST"
+        run: |
+         echo "Secret value is $SQL_HOST"
+         echo "Secret value is $DB_SSL"
