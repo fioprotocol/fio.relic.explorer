@@ -28,32 +28,25 @@ jobs:
       - name: Fetch secret from AWS Parameter Store
         run: |
           DB_NAME=$(aws ssm get-parameter --name "/fio-relic/dev/DB_NAME" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${DB_NAME}" >> $GITHUB_ENV
+          echo "DB_NAME=${DB_NAME}" >> $GITHUB_ENV
           DB_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${DB_HOST}" >> $GITHUB_ENV
+          echo "DB_HOST=${DB_HOST}" >> $GITHUB_ENV
           DB_PASSWORD=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${DB_PASSWORD}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${DB_PASSWORD}" >> $GITHUB_ENV
           DB_PORT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${DB_PORT}" >> $GITHUB_ENV
+          echo "DB_PORT=${DB_PORT}" >> $GITHUB_ENV
           DB_SSL=$(aws ssm get-parameter --name "/fio-relic/dev/DB_SSL" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${DB_SSL}" >> $GITHUB_ENV
+          echo "DB_SSL=${DB_SSL}" >> $GITHUB_ENV
           DB_USER=$(aws ssm get-parameter --name "/fio-relic/dev/DB_USER" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${DB_USER}" >> $GITHUB_ENV
+          echo "DB_USER=${DB_USER}" >> $GITHUB_ENV
           HOST=$(aws ssm get-parameter --name "/fio-relic/dev/HOST" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${HOST}" >> $GITHUB_ENV
+          echo "HOST=${HOST}" >> $GITHUB_ENV
           NODE_ENV=$(aws ssm get-parameter --name "/fio-relic/dev/NODE_ENV" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${NODE_ENV}" >> $GITHUB_ENV
+          echo "NODE_ENV=${NODE_ENV}" >> $GITHUB_ENV
           PORT=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${PORT}" >> $GITHUB_ENV
+          echo "PORT=${PORT}" >> $GITHUB_ENV
       - name: Use the secret
-        run: echo "Secret value2 is $HOST"
-      - name: Fetch secret from AWS Parameter Store2
         run: |
-          SECRET_VALUE=$(aws ssm get-parameter --name "/fio-relic/dev/DB_NAME" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${SECRET_VALUE}" >> $GITHUB_ENV
-          DB_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
-          echo "SECRET_VALUE=${DB_HOST}" >> $GITHUB_ENV
-      - name: Use the secret
-        run: echo "Secret value is $SECRET_VALUE"
-      - name: Use the secret2
-        run: echo "Secret value is $DB_HOST"
+          echo "Secret value1 is $HOST"
+          echo "Secret value2 is $DB_HOST"
+      
