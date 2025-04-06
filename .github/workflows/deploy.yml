@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [ devops ]
+    branches: [ pipeline ]
   pull_request:
-    branches: [ devops ]
+    branches: [ pipeline ]
 
 env: 
   AWS_REGION_DEV : "us-west-2"
