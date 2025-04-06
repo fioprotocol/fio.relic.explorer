@@ -33,6 +33,7 @@ jobs:
       - name: Build Image Client
         id: build-image-clinet
         env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG -f Dockerfile-client .
@@ -41,6 +42,7 @@ jobs:
       - name: Build Image Server
         id: build-image-server
         env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG -f Dockerfile-server .
