@@ -1,0 +1,83 @@
+on:
+  push:
+    branches: [ devops ]
+  pull_request:
+    branches: [ devops ]
+
+env: 
+  AWS_REGION_DEV : "us-west-2"
+  ECR_REPOSITORY_CLIENT: "fio-relic-explorer-client"
+  ECR_REPOSITORY_SERVER: "fio-relic-explorer-server"
+  
+permissions:
+      id-token: write
+      contents: read
+jobs:
+  Deploy-fio-relic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::916790350352:role/GitHubAction-AssumeRoleWithAction
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION_DEV }}
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build Image Client
+        id: build-image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY_CLIENT/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile-client .
+          docker push $ECR_REGISTRY_CLIENT/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY_CLIENT/$ECR_REPOSITORY:$IMAGE_TAG"
+      - name: Build Image Server
+        id: build-image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY_SERVER/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile-server .
+          docker push $ECR_REGISTRY_SERVER/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY_SERVER/$ECR_REPOSITORY:$IMAGE_TAG"
+      - name: Fetch secret from AWS Parameter Store
+        run: |
+          DB_NAME=$(aws ssm get-parameter --name "/fio-relic/dev/DB_NAME" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_NAME=${DB_NAME}" >> $GITHUB_ENV
+          DB_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_HOST=${DB_HOST}" >> $GITHUB_ENV
+          DB_PASSWORD=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_PASSWORD=${DB_PASSWORD}" >> $GITHUB_ENV
+          DB_PORT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_PORT=${DB_PORT}" >> $GITHUB_ENV
+          DB_SSL=$(aws ssm get-parameter --name "/fio-relic/dev/DB_SSL" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_SSL=${DB_SSL}" >> $GITHUB_ENV
+          DB_USER=$(aws ssm get-parameter --name "/fio-relic/dev/DB_USER" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_USER=${DB_USER}" >> $GITHUB_ENV
+          HOST=$(aws ssm get-parameter --name "/fio-relic/dev/HOST" --with-decryption --query "Parameter.Value" --output text)
+          echo "HOST=${HOST}" >> $GITHUB_ENV
+          NODE_ENV=$(aws ssm get-parameter --name "/fio-relic/dev/NODE_ENV" --with-decryption --query "Parameter.Value" --output text)
+          echo "NODE_ENV=${NODE_ENV}" >> $GITHUB_ENV
+          PORT=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "PORT=${PORT}" >> $GITHUB_ENV
+          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_HOST=${SSH_HOST}" >> $GITHUB_ENV
+          aws ssm get-parameter --name "/fio-relic/dev/ssh_key" --with-decryption --query "Parameter.Value" --output text > ssh_key
+          chmod 600 ssh_key
+      - name: Use the secret
+        run: |
+          echo "Secret value1 is $HOST"
+          echo "Secret value2 is $DB_HOST"
+  Deploy-fio-relic2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use the secret new
+        run: |
+          echo "Secret value1 is $HOST"
+          echo "Secret value2 is $DB_HOST"
