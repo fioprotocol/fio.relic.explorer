@@ -1,7 +1,8 @@
 // Import custom variables
-@import './variables.scss';
+@import './overrides.scss';
 @import './font-mixins.scss';
 @import '~bootstrap/scss/bootstrap.scss';
+@import './variables.scss';
 
 body {
   margin: 0;
@@ -34,5 +35,5 @@ body {
 }
 
 .f-size-xs {
-  font-size: $font-size-base * .75;
+  font-size: $font-size-xs;
 }
