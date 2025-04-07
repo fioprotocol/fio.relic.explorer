@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
-import SearchPage from './pages/SearchPage';
 import SearchNotFoundPage from './pages/SearchNotFoundPage';
 import HealthCheckPage from './pages/HealthCheckPage';
 import AboutPage from './pages/AboutPage';
@@ -17,7 +16,6 @@ const App: React.FC = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/search" element={<SearchPage />} />
           <Route path={ROUTES.searchNotFound.path} element={<SearchNotFoundPage />} />
           <Route path="/health-check" element={<HealthCheckPage />} />
           <Route path="/about" element={<AboutPage />} />
