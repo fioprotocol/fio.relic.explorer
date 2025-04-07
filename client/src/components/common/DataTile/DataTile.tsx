@@ -19,6 +19,95 @@ export interface DataTileProps {
   title?: string;
 }
 
+// Row layout component
+interface RowLayoutProps {
+  items: DataItem[];
+}
+
+const RowLayout: React.FC<RowLayoutProps> = ({ items }) => (
+  <Row className="d-flex flex-row gap-3 flex-wrap m-0">
+    {items.map((item, index) => (
+      <Col key={index} className={`flex-grow-1 p-0 ${styles.dataItemCol}`}>
+        <div className={`d-flex align-items-center w-100 ${styles.dataItem} ${styles.dataItemRow}`}>
+          <div className="d-flex flex-column gap-1 align-items-start">
+            <div className={styles.dataItemTitle}>{item.title}</div>
+            <div className={styles.dataItemValue}>{item.value}</div>
+          </div>
+        </div>
+      </Col>
+    ))}
+  </Row>
+);
+
+// Reusable DataItem component for list group items
+interface DataItemListGroupItemProps {
+  item: DataItem;
+}
+
+const DataItemListGroupItem: React.FC<DataItemListGroupItemProps> = ({ item }) => (
+  <ListGroup.Item className={styles.dataItem}>
+    <div className={styles.dataItemContent}>
+      <div className={styles.dataItemTitle}>{item.title}</div>
+      <div className={styles.dataItemValue}>{item.value}</div>
+    </div>
+  </ListGroup.Item>
+);
+
+// Reusable DataItemsList component
+interface DataItemsListProps {
+  items: DataItem[];
+  keyPrefix?: string;
+}
+
+const DataItemsList: React.FC<DataItemsListProps> = ({ items, keyPrefix = '' }) => (
+  <ListGroup variant="flush" className="d-flex flex-column gap-3 p-0 w-100 border-0">
+    {items.map((item, index) => (
+      <DataItemListGroupItem 
+        key={`${keyPrefix}${index}`}
+        item={item} 
+      />
+    ))}
+  </ListGroup>
+);
+
+// Multi-column layout component
+interface MultiColumnLayoutProps {
+  items: DataItem[];
+  columns: number;
+}
+
+const MultiColumnLayout: React.FC<MultiColumnLayoutProps> = ({ items, columns }) => {
+  // Calculate items per column
+  const itemsPerCol = Math.ceil(items.length / columns);
+  
+  return (
+    <Row className="d-flex w-100 m-0 gap-3">
+      {Array.from({ length: columns }).map((_, colIndex) => {
+        // Get items for this column
+        const colItems = items.slice(
+          colIndex * itemsPerCol,
+          (colIndex + 1) * itemsPerCol
+        );
+        
+        return (
+          <Col key={colIndex} className="p-0">
+            <DataItemsList items={colItems} keyPrefix={`col-${colIndex}-`} />
+          </Col>
+        );
+      })}
+    </Row>
+  );
+};
+
+// Column layout component
+interface ColumnLayoutProps {
+  items: DataItem[];
+}
+
+const ColumnLayout: React.FC<ColumnLayoutProps> = ({ items }) => (
+  <DataItemsList items={items} />
+);
+
 export const DataTile: React.FC<DataTileProps> = ({ 
   children,
   className = '',
@@ -28,76 +117,21 @@ export const DataTile: React.FC<DataTileProps> = ({
   title
 }) => {
   const renderItems = (): ReactNode => {
-    if (layout === 'row') {
-      return (
-        <Row className={styles['data-items-row']}>
-          {items.map((item, index) => (
-            <Col key={index} className={styles['data-item-col']}>
-              <div className={`${styles['data-item']} ${styles['data-item-row']}`}>
-                <div className={styles['data-item-content']}>
-                  <div className={styles['data-item-title']}>{item.title}</div>
-                  <div className={styles['data-item-value']}>{item.value}</div>
-                </div>
-              </div>
-            </Col>
-          ))}
-        </Row>
-      );
-    } else if (layout === 'multi-column') {
-      // Calculate items per column
-      const itemsPerCol = Math.ceil(items.length / columns);
-      
-      return (
-        <Row className={styles['data-items-multi-col']}>
-          {Array.from({ length: columns }).map((_, colIndex) => {
-            // Get items for this column
-            const colItems = items.slice(
-              colIndex * itemsPerCol,
-              (colIndex + 1) * itemsPerCol
-            );
-            
-            return (
-              <Col key={colIndex} className={styles['data-items-col']}>
-                <ListGroup variant="flush" className={styles['data-items']}>
-                  {colItems.map((item, itemIndex) => (
-                    <ListGroup.Item 
-                      key={`${colIndex}-${itemIndex}`} 
-                      className={styles['data-item']}
-                    >
-                      <div className={styles['data-item-content']}>
-                        <div className={styles['data-item-title']}>{item.title}</div>
-                        <div className={styles['data-item-value']}>{item.value}</div>
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              </Col>
-            );
-          })}
-        </Row>
-      );
-    } else {
-      // Default column layout
-      return (
-        <ListGroup variant="flush" className={styles['data-items']}>
-          {items.map((item, index) => (
-            <ListGroup.Item key={index} className={styles['data-item']}>
-              <div className={styles['data-item-content']}>
-                <div className={styles['data-item-title']}>{item.title}</div>
-                <div className={styles['data-item-value']}>{item.value}</div>
-              </div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
-      );
+    switch (layout) {
+      case 'row':
+        return <RowLayout items={items} />;
+      case 'multi-column':
+        return <MultiColumnLayout items={items} columns={columns} />;
+      default:
+        return <ColumnLayout items={items} />;
     }
   };
 
   return (
     <CardComponent title={title} className={className}>
-      <Card.Body className={styles['data-tile-content']}>
+      <Card.Body className="d-flex flex-column gap-3 p-0">
         {renderItems()}
-        {children && <div className={styles['data-tile-children']}>{children}</div>}
+        {children ? children : null}
       </Card.Body>
     </CardComponent>
   );

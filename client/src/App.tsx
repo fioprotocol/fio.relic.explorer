@@ -5,8 +5,6 @@ import HomePage from './pages/HomePage';
 import HealthCheckPage from './pages/HealthCheckPage';
 import AboutPage from './pages/AboutPage';
 
-import './styles/main.scss';
-
 const App: React.FC = () => {
   return (
     <Router>

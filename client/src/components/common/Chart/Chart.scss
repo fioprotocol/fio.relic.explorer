@@ -6,27 +6,20 @@
 
   .chart-title {
     @include font-inter-600;
-    font-size: 16px;
-    line-height: 1.25em;
+    font-size: $font-size-base;
     color: $caviar;
     margin: 0 0 20px;
   }
 
-  .chart-container {
-    width: 100%;
-    height: 100%;
-  }
-
   .custom-tooltip {
-    background-color: #282A2F;
+    background-color: $baltic-sea;
     border-radius: 8px;
     padding: 8px 12px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-    border: none;
 
     .tooltip-label {
       margin: 0 0 5px;
-      font-size: 11px;
+      font-size: $font-size-xs;
       @include font-inter-400;
       line-height: 1.454em;
       color: $white-smoke;
@@ -34,8 +27,7 @@
 
     .tooltip-value {
       @include font-inter-400;
-      margin: 0;
-      font-size: 11px;
+      font-size: $font-size-xs;
       line-height: 1.454em;
       color: $white-smoke;
     }
