@@ -103,4 +103,4 @@ jobs:
           IMAGE_PREFIX_CLIENT: "916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client"
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          ansible-playbook -i ansible/dev-inventory --private-key ./ssh-key --extra-vars "IMAGE_TAG=${{ IMAGE_TAG }} IMAGE_PREFIX_SERVER=${{ IMAGE_PREFIX_SERVER }} IMAGE_PREFIX_CLIENT=${{ IMAGE_PREFIX_CLIENT }}" ansible/fio-server.yml
+          ansible-playbook -i ansible/dev-inventory --private-key ./ssh-key --extra-vars "IMAGE_TAG=$IMAGE_TAG IMAGE_PREFIX_SERVER=$IMAGE_PREFIX_SERVER IMAGE_PREFIX_CLIENT=$IMAGE_PREFIX_CLIENT" ansible/fio-server.yml
