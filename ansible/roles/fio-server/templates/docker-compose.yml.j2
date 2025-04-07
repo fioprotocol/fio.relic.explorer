@@ -1,8 +1,5 @@
-# {{ ansible_managed }}
-version: '3.8'
 
 services:
-
   fio-server:
     image: {{ IMAGE_PREFIX_SERVER }}:{{ IMAGE_TAG }}
     restart: always
@@ -32,7 +29,7 @@ services:
       - app-network
   
 networks:
-  elevate:
+  app-network:
     name: app-network
     driver: bridge     
  
