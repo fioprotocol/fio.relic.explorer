@@ -1,0 +1,15 @@
+@import '../../../styles/main.scss';
+
+.chart {
+  background: transparent;
+  @include font-inter-600;
+
+  .customTooltip {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    @include font-inter-400;
+  }
+
+  :global(.recharts-cartesian-axis-tick-value tspan) {
+    @include font-inter-500;
+  }
+}

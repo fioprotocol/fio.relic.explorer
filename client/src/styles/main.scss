@@ -32,3 +32,7 @@ body {
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
+
+.f-size-xs {
+  font-size: $font-size-base * .75;
+}

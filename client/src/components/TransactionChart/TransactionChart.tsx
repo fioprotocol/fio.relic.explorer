@@ -5,6 +5,8 @@ import { DEFAULT_DAYS } from '../../constants/stats';
 
 import { TransactionChartProps } from './types';
 
+import styles from './TransactionChart.module.scss';
+
 export const TransactionChart: FC<TransactionChartProps> = ({
   chartData,
   title = `Transaction History in ${DEFAULT_DAYS} Days`,
@@ -31,15 +33,17 @@ export const TransactionChart: FC<TransactionChartProps> = ({
   };
 
   return (
-    <Chart
-      data={chartData}
-      title={title}
-      xAxisKey="date"
-      yAxisKey="transactions"
-      xAxisFormatter={formatDate}
-      yAxisFormatter={formatTransactions}
-      tooltipFormatter={formatTooltipDate}
-    />
+    <div className={`${styles.transactionChart} border border-1 pt-4 px-3 rounded-3`}>
+      <Chart
+        data={chartData}
+        title={title}
+        xAxisKey="date"
+        yAxisKey="transactions"
+        xAxisFormatter={formatDate}
+        yAxisFormatter={formatTransactions}
+        tooltipFormatter={formatTooltipDate}
+      />
+    </div>
   );
 };
 
