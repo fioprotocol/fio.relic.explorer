@@ -60,6 +60,12 @@ const validateType = (q: string): SearchResultType => {
       'fio.token',
       'fio.treasury',
       'fio.whitelst',
+      'fio.reqobt',
+      'fio.tpid',
+      'fio.staking',
+      'fio.perms',
+      'fio.escrow',
+      'fio.oracle',
     ].includes(q);
   const isDomain = /^(?!-)[a-zA-Z0-9-]{1,62}(?<!-)$/.test(q);
   const isTransactionId = /^[a-f0-9]{64}$/.test(q);
