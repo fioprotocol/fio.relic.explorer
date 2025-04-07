@@ -4,7 +4,7 @@ services:
     image: {{ IMAGE_PREFIX_SERVER }}:{{ IMAGE_TAG }}
     restart: always
     container_name: fio-server
-    env_file: /data/fio/fio-server.env
+    env_file: /data/fio/fio-relic-server/config/fio-server.env
     hostname: backend
     networks:
       - app-network
@@ -17,7 +17,7 @@ services:
     image: {{ IMAGE_PREFIX_CLIENT }}:{{ IMAGE_TAG }}
     restart: always
     container_name: fio-client
-    env_file: /data/fio/fio-client.env
+    env_file: /data/fio/fio-relic-server/config/fio-client.env
     hostname: frontend
     expose:
       - 80
