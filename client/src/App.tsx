@@ -8,8 +8,6 @@ import AboutPage from './pages/AboutPage';
 
 import { ROUTES } from './constants/routes';
 
-import './styles/main.scss';
-
 const App: React.FC = () => {
   return (
     <Router>

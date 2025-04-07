@@ -54,7 +54,7 @@ const Chart: React.FC<ChartProps> = ({
   return (
     <div className="chart">
       {title && <h2 className="chart-title">{title}</h2>}
-      <div className="chart-container">
+      <div className="w-100 h-100">
         <ResponsiveContainer width="100%" height={height}>
           <RechartsLineChart data={data} margin={margin}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
@@ -75,9 +75,9 @@ const Chart: React.FC<ChartProps> = ({
               content={({ active, payload, label }): React.ReactNode => {
                 if (active && payload && payload.length && payload[0]?.value !== undefined) {
                   return (
-                    <div className="custom-tooltip">
+                    <div className="custom-tooltip border-0">
                       <p className="tooltip-label">{tooltipFormatter(label)}</p>
-                      <p className="tooltip-value">Transactions: {payload[0].value.toLocaleString()}</p>
+                      <p className="tooltip-value m-0">Transactions: {payload[0].value.toLocaleString()}</p>
                     </div>
                   );
                 }

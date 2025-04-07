@@ -1,152 +1,38 @@
 @import '../../../styles/main.scss';
-  
-.card-body {
-  padding: 0 !important;
+
+.dataItemCol {
+  min-width: 180px;
 }
 
-.data-tile-content {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 0;
-}
-
-.data-items {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  border: none;
-}
-
-// Row layout styles
-.data-items-row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 15px;
-  width: 100%;
-  margin: 0;
-  
-  .data-item-col {
-    flex: 1;
-    padding: 0;
-    min-width: 180px;
-  }
-}
-
-// Multi-column layout styles
-.data-items-multi-col {
-  display: flex;
-  width: 100%;
-  margin: 0;
-  
-  .data-items-col {
-    padding: 0 10px;
-    
-    &:first-child {
-      padding-left: 0;
-    }
-    
-    &:last-child {
-      padding-right: 0;
-    }
-  }
-}
-
-.data-item {
-  display: flex;
-  align-items: center;
+.dataItem {
   padding: 10px 0 10px 15px !important;
   border-bottom: 0.5px solid $mercury !important;
-  width: 100%;
   background-color: transparent !important;
 
   &:last-child {
     border-bottom: none !important;
   }
 
-  &.data-item-row {
+  &.dataItemRow {
     border-bottom: none !important;
     padding: 15px !important;
     border-radius: 4px;
     background-color: $snow-drift !important;
   }
 
-  .data-item-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
+  .dataItemTitle {
+    @include font-inter-400;
+    font-size: $font-size-xxs;
+    color: $mountain-mist;
   }
 
-  .data-item-title {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 2em;
-    color: #969696;
-  }
-
-  .data-item-value {
+  .dataItemValue {
     @include font-inter-600;
-    font-size: 14px;
-    line-height: 1.428em;
+    font-size: $font-size-sm;
     color: $caviar;
   }
 }
 
-.data-tile-children {
-  width: 100%;
+.dataTileChildren {
   padding-top: 5px;
-}
-
-// Layout specific styles
-.layout-row {
-  .data-tile-content {
-    gap: 0;
-  }
-}
-
-.layout-multi-column {
-  .data-tile-content {
-    gap: 0;
-  }
-}
-
-@include md {
-  .data-item {
-    .data-item-title {
-      font-size: 12px;
-      line-height: 1.666em;
-    }
-
-    .data-item-value {
-      font-size: 16px;
-      line-height: 1.25em;
-    }
-  }
-  
-  // Better column distribution for row layout on tablets+
-  .data-items-row {
-    .data-item-col {
-      flex: 1 0 auto;
-    }
-  }
-}
-
-// For small devices - make multi-column layout stack vertically
-@include sm {
-  .data-items-multi-col {
-    flex-direction: column;
-    
-    .data-items-col {
-      width: 100%;
-      padding: 0;
-      margin-bottom: 10px;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
 }

@@ -11,5 +11,9 @@ type StatisticComponentProps = {
 };
 
 export const StatisticComponent: React.FC<StatisticComponentProps> = ({ stats, chartData }) => {
-  return <DataTile title="Statistics" items={stats} columns={2} layout="multi-column"><TransactionChart chartData={chartData} /></DataTile>;
+  return (
+    <DataTile title="Statistics" items={stats} columns={2} layout="multi-column">
+      <TransactionChart chartData={chartData} />
+    </DataTile>
+  );
 };

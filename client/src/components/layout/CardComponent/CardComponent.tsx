@@ -10,8 +10,8 @@ type CardComponentProps = {
 }
 
 export const CardComponent: FC<CardComponentProps> = ({ children, title, className }) => {
-  return <Card className={`${styles['card-component']} ${className}`}>
-    {title && <Card.Header className={styles['card-title']}>{title}</Card.Header>}
+  return <Card className={`p-4 w-100 mb-0 ${styles.cardComponent} ${className}`}>
+    {title && <Card.Header className={`mb-3 p-0 border-0 ${styles.cardTitle}`}>{title}</Card.Header>}
     {children}
   </Card>
 };
