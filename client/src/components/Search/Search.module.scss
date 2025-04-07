@@ -25,3 +25,10 @@
     box-shadow: none !important;
   }
 }
+
+.topBarSearchIcon {
+  &:global(.spinner-border-sm) {
+    --bs-spinner-width: 0.875rem;
+    --bs-spinner-height: 0.875rem;
+  }
+}

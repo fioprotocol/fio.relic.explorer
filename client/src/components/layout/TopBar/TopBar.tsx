@@ -50,7 +50,7 @@ const TopBar: React.FC<TopBarProps> = ({
   const selectedNetworkLabel =
     networks.find((n) => n.value === selectedNetwork)?.label || networks[0].label;
 
-  const { handleSearch } = useSearch();
+  const { handleSearch, isSearching } = useSearch();
 
   return (
     <div className={`py-3 ${styles.wrapper}`}>
@@ -68,7 +68,7 @@ const TopBar: React.FC<TopBarProps> = ({
           <Col xs={12} lg={6}>
             <div className="d-none d-lg-flex align-items-center justify-content-between gap-4">
               <div className="flex-grow-1">
-                <TopBarSearch onSearch={handleSearch} />
+                <TopBarSearch onSearch={handleSearch} searching={isSearching} />
               </div>
               <Dropdown align="end" className="d-none d-md-flex">
                 <Dropdown.Toggle as={CustomToggle}>

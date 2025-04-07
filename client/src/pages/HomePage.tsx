@@ -11,8 +11,8 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <SearchContainer onSearch={handleSearch} />
-      
+      <SearchContainer onSearch={handleSearch} searching={isSearching} />
+
       <Container className="mt-5">
         <Row className="justify-content-center text-center">
           <Col md={8}>

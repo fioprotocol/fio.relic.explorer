@@ -1,7 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { searchService } from 'src/services/search';
+
+import { ROUTES } from 'src/constants/routes';
+
+import { SearchResultType } from 'shared/types/search';
 
 interface UseSearchOptions {
   navigateOnSearch?: boolean;
@@ -17,10 +21,21 @@ interface UseSearchReturn {
   resetSearch: () => void;
 }
 
+const ROUTE_BY_SEARCH_TYPE: Record<SearchResultType, string> = {
+  publicKey: ROUTES.account.path,
+  account: ROUTES.account.path,
+  tx: ROUTES.transaction.path,
+  domain: ROUTES.domain.path,
+  handle: ROUTES.handle.path,
+};
+
 export const useSearch = (options: UseSearchOptions = {}): UseSearchReturn => {
   const { navigateOnSearch = true, defaultQuery = '', onSearchCallback } = options;
 
-  const [query, setQuery] = useState<string>(defaultQuery);
+  const location = useLocation();
+  const locationQuery = new URLSearchParams(location.search).get('q') || '';
+
+  const [query, setQuery] = useState<string>(locationQuery || defaultQuery);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -43,11 +58,17 @@ export const useSearch = (options: UseSearchOptions = {}): UseSearchReturn => {
       } else {
         const results = await searchService.search(trimmedQuery);
 
-        // todo: navigate to proper page based on the type
-        navigate(`/?q=${encodeURIComponent(trimmedQuery)}`);
+        const route =
+          results.length > 0
+            ? `${ROUTE_BY_SEARCH_TYPE[results[0].type]}`.replace(':id', results[0].id)
+            : ROUTES.searchNotFound.path;
+
+        navigate(`${route}?q=${encodeURIComponent(trimmedQuery)}`);
       }
     } catch (error) {
       console.error('Search error:', error);
+
+      navigate(`/${ROUTES.searchNotFound.path}?q=${encodeURIComponent(trimmedQuery)}`);
     } finally {
       setIsSearching(false);
     }
