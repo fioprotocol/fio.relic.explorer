@@ -19,17 +19,17 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
   return (
     <Card className={`${styles.tableCard} ${className || ''}`}>
       {title && <Card.Header className={styles.tableHeader}>{title}</Card.Header>}
-      <Card.Body className={styles.tableBody}>
+      <Card.Body className="p-0">
         <div className={styles.tableDesktop}>
-          <BootstrapTable responsive hover className={styles.table}>
+          <BootstrapTable responsive hover className="m-0">
             <thead>
-              <tr>
+              <tr className={styles.thead}>
                 {columns.map((column) => (
                   <th key={column.key}>{column.title}</th>
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className={styles.tbody}>
               {data.map((record, index) => (
                 <tr key={index}>
                   {columns.map((column) => (
@@ -45,10 +45,10 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
         
         <div className={styles.tableMobile}>
           {data.map((record, index) => (
-            <div key={index} className={styles.mobileRow}>
+            <div key={index} className={`p-3 ${styles.mobileRow}`}>
               {columns.map((column) => (
-                <div key={`mobile-${index}-${column.key}`} className={styles.mobileItem}>
-                  <div className={styles.mobileLabel}>{column.title}</div>
+                <div key={`mobile-${index}-${column.key}`} className={`d-flex flex-column mb-2 ${styles.mobileItem}`}>
+                  <div className={`mb-1${styles.mobileLabel}`}>{column.title}</div>
                   <div className={styles.mobileValue}>
                     {record[column.key]}
                   </div>

@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Inter Light';
-  src: url('../fonts/Inter-Light.ttf') format('truetype');
+  src: url('./fonts/Inter-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: 'Inter Regular';
-  src: url('../fonts/Inter-Regular.ttf') format('truetype');
+  src: url('./fonts/Inter-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -16,7 +16,7 @@
 
 @font-face {
   font-family: 'Inter Medium';
-  src: url('../fonts/Inter-Medium.ttf') format('truetype');
+  src: url('./fonts/Inter-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
   font-family: 'Inter SemiBold';
-  src: url('../fonts/Inter-SemiBold.ttf') format('truetype');
+  src: url('./fonts/Inter-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -32,7 +32,7 @@
 
 @font-face {
   font-family: 'Inter ExtraBold';
-  src: url('../fonts/Inter-ExtraBold.ttf') format('truetype');
+  src: url('./fonts/Inter-ExtraBold.ttf') format('truetype');
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -40,7 +40,7 @@
 
 @font-face {
   font-family: 'Proxima Nova Light';
-  src: url('../fonts/Proxima-Nova-Light.otf') format('truetype');
+  src: url('./fonts/Proxima-Nova-Light.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -48,7 +48,7 @@
 
 @font-face {
   font-family: 'Proxima Nova Regular';
-  src: url('../fonts/Proxima-Nova-Regular.ttf') format('opentype');
+  src: url('./fonts/Proxima-Nova-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -56,7 +56,7 @@
 
 @font-face {
   font-family: 'Proxima Nova ExtraBold';
-  src: url('../fonts/Proxima-Nova-ExtraBold.otf') format('opentype');
+  src: url('./fonts/Proxima-Nova-ExtraBold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
