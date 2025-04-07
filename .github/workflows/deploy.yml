@@ -49,7 +49,6 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG"
   Deploy-fio-relic:
-    needs: Build-fio-relic
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -104,4 +103,6 @@ jobs:
           IMAGE_PREFIX_CLIENT: "916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client"
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          ls -al
+          cat ./ssh_key
           ansible-playbook -i ansible/dev-inventory --private-key ./ssh-key --extra-vars "IMAGE_TAG=$IMAGE_TAG IMAGE_PREFIX_SERVER=$IMAGE_PREFIX_SERVER IMAGE_PREFIX_CLIENT=$IMAGE_PREFIX_CLIENT" ansible/deploy-server.yml
