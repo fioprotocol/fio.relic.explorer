@@ -13,7 +13,7 @@ permissions:
       id-token: write
       contents: read
 jobs:
-  Deploy-fio-relic:
+  Build-fio-relic:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -48,6 +48,20 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG -f Dockerfile-server .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG"
+  Deploy-fio-relic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::916790350352:role/GitHubAction-AssumeRoleWithAction
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION_DEV }}
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
       - name: Fetch secret from AWS Parameter Store
         run: |
           DB_NAME=$(aws ssm get-parameter --name "/fio-relic/dev/DB_NAME" --with-decryption --query "Parameter.Value" --output text)
@@ -68,12 +82,25 @@ jobs:
           echo "NODE_ENV=${NODE_ENV}" >> $GITHUB_ENV
           PORT=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
           echo "PORT=${PORT}" >> $GITHUB_ENV
-          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
+          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST" --with-decryption --query "Parameter.Value" --output text)
           echo "SSH_HOST=${SSH_HOST}" >> $GITHUB_ENV
+          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/REACT_APP_BASE_URL" --with-decryption --query "Parameter.Value" --output text)
+          echo "REACT_APP_BASE_URL=${REACT_APP_BASE_URL}" >> $GITHUB_ENV
           aws ssm get-parameter --name "/fio-relic/dev/ssh_key" --with-decryption --query "Parameter.Value" --output text > ssh_key
           chmod 600 ssh_key
       - name: Use the secret
         run: |
           echo "Secret value1 is $HOST"
           echo "Secret value2 is $DB_HOST"
- 
+      - name: Prepare ENV file
+        run: |
+          envsubst < ansible/roles/fio-server/templates/fio-server.env.j2.tmp > ansible/roles/fio-server/templates/fio-server.env.j2
+          envsubst < ansible/roles/fio-server/templates/fio-client.env.j2.tmp > ansible/roles/fio-server/templates/fio-client.env.j2
+      - name: Run Deploy Server
+        id: deploy-fio-server
+        env:
+          IMAGE_PREFIX_SERVER: "916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-server"
+          IMAGE_PREFIX_CLIENT: "916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client"
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          ansible-playbook -i ansible/dev-inventory --private-key ./ssh-key --extra-vars "IMAGE_TAG=${{ IMAGE_TAG }} IMAGE_PREFIX_SERVER=${{ IMAGE_PREFIX_SERVER }} IMAGE_PREFIX_CLIENT=${{ IMAGE_PREFIX_CLIENT }}" ansible/fio-server.yml
