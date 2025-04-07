@@ -84,7 +84,7 @@ jobs:
           echo "PORT=${PORT}" >> $GITHUB_ENV
           SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST" --with-decryption --query "Parameter.Value" --output text)
           echo "SSH_HOST=${SSH_HOST}" >> $GITHUB_ENV
-          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/REACT_APP_BASE_URL" --with-decryption --query "Parameter.Value" --output text)
+          REACT_APP_BASE_URL=$(aws ssm get-parameter --name "/fio-relic/dev/REACT_APP_BASE_URL" --with-decryption --query "Parameter.Value" --output text)
           echo "REACT_APP_BASE_URL=${REACT_APP_BASE_URL}" >> $GITHUB_ENV
           aws ssm get-parameter --name "/fio-relic/dev/ssh_key" --with-decryption --query "Parameter.Value" --output text > ssh_key
           chmod 600 ssh_key
