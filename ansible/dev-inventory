@@ -2,7 +2,6 @@
 ansible_become=yes
 ansible_become_method=sudo
 ansible_ssh_pipelining=true
-ansible_python_interpreter='/usr/bin/env python3'
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ControlMaster=auto -o ControlPersist=60s'
 
 [all:children]
