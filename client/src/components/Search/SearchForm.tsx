@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Form, InputGroup, Button } from 'react-bootstrap';
+import { Form, InputGroup, Button, Spinner } from 'react-bootstrap';
 import { Search as SearchIcon } from 'react-bootstrap-icons';
 
 interface SearchFormProps {
   onSearch: (searchQuery: string) => void;
+  searching?: boolean;
   value?: string;
 }
 
-const SearchForm: React.FC<SearchFormProps> = ({ onSearch, value }) => {
+const SearchForm: React.FC<SearchFormProps> = ({ onSearch, value, searching = false }) => {
   const [query, setQuery] = useState(value || '');
 
   const handleSubmit = (e: React.FormEvent): void => {
@@ -27,9 +28,10 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, value }) => {
           onChange={(e): void => setQuery(e.target.value)}
           className="py-3"
           aria-label="Search"
+          disabled={searching}
         />
-        <Button variant="primary" type="submit">
-          <SearchIcon size={20} />
+        <Button variant="primary" type="submit" disabled={searching}>
+          {searching ? <Spinner animation="border" size="sm" /> : <SearchIcon size={16} />}
         </Button>
       </InputGroup>
     </Form>

@@ -6,14 +6,14 @@ export const searchService = {
   /**
    * Search across accounts, transactions, domains, handles, and public keys
    */
-  search: async (query: string): Promise<SearchResponse> => {
+  search: async (query: string): Promise<SearchResult[]> => {
     try {
       const response = await axios.get<SearchResponse>('/api/search', {
         params: {
           q: query
         }
       });
-      return response.data;
+      return response.data.results;
     } catch (error) {
       console.error('Error searching:', error);
       throw error;

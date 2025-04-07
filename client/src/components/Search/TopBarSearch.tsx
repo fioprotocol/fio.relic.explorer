@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Form, InputGroup, Button } from 'react-bootstrap';
+import { Form, InputGroup, Button, Spinner } from 'react-bootstrap';
 import { Search as SearchIcon } from 'react-bootstrap-icons';
 import { useLocation } from 'react-router-dom';
 
 import Container from 'src/components/layout/Container';
 
+import { ROUTES } from 'src/constants/routes';
+
 import styles from './Search.module.scss';
 
 // Define pages where the search should be hidden as a constant
-const HIDE_SEARCH_ON_PAGES = ['/search', '/dashboard/*', '/'];
+const HIDE_SEARCH_ON_PAGES = [ROUTES.home.path, ROUTES.search.path, ROUTES.searchNotFound.path];
 
 interface TopBarSearchProps {
   onSearch: (searchQuery: string) => void;
+  searching?: boolean;
   withContainer?: boolean;
   placeholder?: string;
   className?: string;
@@ -19,6 +22,7 @@ interface TopBarSearchProps {
 
 const TopBarSearch: React.FC<TopBarSearchProps> = ({
   onSearch,
+  searching = false,
   placeholder = 'Search by Account, Public Key, Handle, Domain or Transaction',
   className = '',
   withContainer = false,
@@ -55,13 +59,19 @@ const TopBarSearch: React.FC<TopBarSearchProps> = ({
           onChange={(e): void => setQuery(e.target.value)}
           className={`py-2 text-small ${styles.topBarSearchInput}`}
           aria-label="Search"
+          disabled={searching}
         />
         <Button
           variant="primary"
           type="submit"
           className="d-flex align-items-center justify-content-center"
+          disabled={searching}
         >
-          <SearchIcon size={14} />
+          {searching ? (
+            <Spinner animation="border" size="sm" className={styles.topBarSearchIcon} />
+          ) : (
+            <SearchIcon size={14} />
+          )}
         </Button>
       </InputGroup>
     </Form>

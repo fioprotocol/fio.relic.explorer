@@ -16,8 +16,8 @@ const INVALID_QUERY_ERR_CODE = 'INVALID_QUERY';
 
 const queryByType: Record<SearchResultType, string> = {
   publicKey: `
-    SELECT * FROM pubaddresses 
-    WHERE pub_address = $1
+    SELECT * FROM accounts 
+    WHERE public_key = $1
     LIMIT 1
   `,
   handle: `
@@ -45,13 +45,12 @@ const queryByType: Record<SearchResultType, string> = {
 const validateType = (q: string): SearchResultType => {
   // Validation patterns
   const isFioPublicAddress = /^FIO[a-zA-Z0-9]{42,}$/i.test(q) && Ecc.PublicKey.isValid(q);
-  // const isFioHandle = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/i.test(q);
   const isFioHandle =
     /^(?=.{3,64}$)[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?@[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?$/gim.test(
       q
     );
   const isAccount =
-    /^[a-zA-Z]{12}$/.test(q) ||
+    /^[a-zA-Z0-9]{12}$/.test(q) ||
     [
       'eosio',
       'eosio.msig',
@@ -147,12 +146,11 @@ const searchRoute: FastifyPluginAsync = async (fastify) => {
         let sqlQuery = queryByType[type];
 
         const result = await pool.query(sqlQuery, params);
-        console.log('Search results:', result);
 
         // Format response based on the type of search
         return {
           results: result.rows.map((row) => ({
-            id: row.id || row.transaction_id || row.domain_name || row.account_name || row.handle,
+            id: row.transaction_id || row.domain_name || row.account_name || row.handle,
             type,
             title: '',
             data: row,

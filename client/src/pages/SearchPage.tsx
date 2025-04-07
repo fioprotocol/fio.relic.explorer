@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Spinner, Alert, Pagination } from 'react-bootstrap';
-import { useLocation } from 'react-router-dom';
 
 import Container from '../components/layout/Container';
 import { SearchContainer } from '../components/Search';
@@ -12,9 +11,6 @@ import { searchService } from '../services/search';
 import { SearchResult } from 'shared/types/search';
 
 const SearchPage: React.FC = () => {
-  const location = useLocation();
-  const query = new URLSearchParams(location.search).get('q') || '';
-
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searchType] = useState<SearchResult['type']>('tx');
   const [totalCount, setTotalCount] = useState(0);
@@ -24,9 +20,8 @@ const SearchPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Use the hook with navigation disabled to prevent unnecessary redirects on this page
-  const { handleSearch } = useSearch({
+  const { handleSearch, query, isSearching } = useSearch({
     navigateOnSearch: false,
-    defaultQuery: query,
     onSearchCallback: async (searchQuery) => {
       await fetchResults(searchQuery, currentPage, pageSize);
     },
@@ -137,7 +132,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <div>
-      <SearchContainer onSearch={handleSearch} value={query} />
+      <SearchContainer onSearch={handleSearch} value={query} searching={isSearching} />
 
       <Container className="py-4">
         <h2 className="mb-4">Search Results for: "{query}"</h2>
@@ -185,8 +180,8 @@ const SearchPage: React.FC = () => {
             )}
           </>
         ) : (
-          <Alert variant="info">
-            No results found for "{query}". Please try a different search term.
+          <Alert variant="danger">
+            Your search <span className="fw-bold">{query}</span> - Did not match any records
           </Alert>
         )}
       </Container>
