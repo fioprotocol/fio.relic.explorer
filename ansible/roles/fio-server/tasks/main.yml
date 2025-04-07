@@ -1,0 +1,47 @@
+---
+- name: Create folders
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    state: directory
+  loop:
+    - /root/.docker/
+    - "{{ FRONTEND_MAIN_DIR }}"
+    - "{{ FRONTEND_MAIN_DIR }}/upload"
+    - "{{ FRONTEND_MAIN_DIR }}/logs"
+    - "{{ FRONTEND_MAIN_DIR }}/config"
+
+# - name: Docker login
+#   copy:
+#     src: config.json
+#     dest: /root/.docker/config.json 
+
+- name: Cleanup old docker images
+  shell: "(docker system prune -a -f > /dev/null &)"
+  async: 10
+  poll: 0
+
+- name: Setup docker-compose.yml
+  template: 
+    src: "docker-compose.yml.j2"
+    dest: "{{ FRONTEND_MAIN_DIR }}/docker-compose.yml"
+    force: yes
+  register: docker_service_update
+
+- name: Env
+  template: 
+    src: "elevate-server.env.j2"
+    dest: "{{ FRONTEND_MAIN_DIR }}/config/elevate-server.env"
+    force: yes
+
+- name: Start/update services
+  shell:
+    cmd: docker-compose up -d
+    chdir: "{{ FRONTEND_MAIN_DIR }}"
+  register: output
+  debugger: on_failed
+
+- debug:
+    var: output
+  when: docker_service_update.changed

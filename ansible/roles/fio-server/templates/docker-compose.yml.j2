@@ -1,0 +1,38 @@
+# {{ ansible_managed }}
+version: '3.8'
+
+services:
+
+  fio-server:
+    image: {{ IMAGE_REGESTRY }}/{{ IMAGE_PREFIX_SERVER }}:{{ IMAGE_TAG }}
+    restart: always
+    container_name: fio-server
+    env_file: /data/fio/fio-server.env
+    hostname: backend
+    networks:
+      - app-network
+    expose:
+      - {{ BACKEND_TCP_PORT }}
+    ports:
+      - {{ BACKEND_TCP_PORT }}:9090/tcp
+
+  fio-client:
+    image: {{ IMAGE_REGESTRY }}/{{ IMAGE_PREFIX_CLIENT }}:{{ IMAGE_TAG }}
+    restart: always
+    container_name: fio-client
+    env_file: /data/fio/fio-client.env
+    hostname: frontend
+    expose:
+      - 80
+    ports:
+      - 80:80/tcp
+    depends_on:
+      - fio-server
+    networks:
+      - app-network
+  
+networks:
+  elevate:
+    name: app-network
+    driver: bridge     
+ 
