@@ -4,7 +4,7 @@ version: '3.8'
 services:
 
   fio-server:
-    image: {{ IMAGE_REGESTRY }}/{{ IMAGE_PREFIX_SERVER }}:{{ IMAGE_TAG }}
+    image: {{ IMAGE_PREFIX_SERVER }}:{{ IMAGE_TAG }}
     restart: always
     container_name: fio-server
     env_file: /data/fio/fio-server.env
@@ -17,7 +17,7 @@ services:
       - {{ BACKEND_TCP_PORT }}:9090/tcp
 
   fio-client:
-    image: {{ IMAGE_REGESTRY }}/{{ IMAGE_PREFIX_CLIENT }}:{{ IMAGE_TAG }}
+    image: {{ IMAGE_PREFIX_CLIENT }}:{{ IMAGE_TAG }}
     restart: always
     container_name: fio-client
     env_file: /data/fio/fio-client.env
