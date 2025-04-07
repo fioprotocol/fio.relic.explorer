@@ -81,6 +81,8 @@ jobs:
           echo "HOST=${HOST}" >> $GITHUB_ENV
           NODE_ENV=$(aws ssm get-parameter --name "/fio-relic/dev/NODE_ENV" --with-decryption --query "Parameter.Value" --output text)
           echo "NODE_ENV=${NODE_ENV}" >> $GITHUB_ENV
+          CLIENT_URL=$(aws ssm get-parameter --name "/fio-relic/dev/CLIENT_URL" --with-decryption --query "Parameter.Value" --output text)
+          echo "CLIENT_URL=${CLIENT_URL}" >> $GITHUB_ENV
           PORT=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
           echo "PORT=${PORT}" >> $GITHUB_ENV
           SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST" --with-decryption --query "Parameter.Value" --output text)
