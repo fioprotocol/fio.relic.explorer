@@ -6,6 +6,8 @@ import * as healthCheckRoute from './health-check';
 import * as searchRoute from './search';
 import * as getStatsRoute from './stats';
 import * as transactionsRoute from './transactions';
+import * as blocksRoute from './blocks';
+import * as currentBlockRoute from './current-block';
 
 interface RouteConfig {
   plugin: FastifyPluginAsync;
@@ -17,6 +19,8 @@ const routes: RouteConfig[] = [
   { plugin: getStatsRoute.default, prefix: `/${API_PREFIX}/stats` },
   { plugin: searchRoute.default, prefix: `/${API_PREFIX}/search` },
   { plugin: transactionsRoute.default, prefix: `/${API_PREFIX}/transactions` },
+  { plugin: blocksRoute.default, prefix: `/${API_PREFIX}/blocks` },
+  { plugin: currentBlockRoute.default, prefix: `/${API_PREFIX}/current-block` },
 ];
 
 export const registerRoutes = async (server: FastifyInstance): Promise<void> => {

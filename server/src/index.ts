@@ -16,16 +16,16 @@ import { registerRoutes } from './routes';
 
 const server = Fastify({
   logger: {
-    transport: config.isDev 
+    transport: config.isDev
       ? {
           target: 'pino-pretty',
           options: {
             translateTime: 'HH:MM:ss Z',
             ignore: 'pid,hostname',
-          }
+          },
         }
-      : undefined
-  }
+      : undefined,
+  },
 });
 
 // Register plugins
@@ -53,16 +53,14 @@ const start = async () => {
 
   try {
     // Start the server after successful database connection
-    await server.listen({ 
+    await server.listen({
       port: config.server.port,
       host: config.server.host,
     });
-    
+
     const address = server.server.address();
-    const port = typeof address === 'string' 
-      ? address 
-      : (address as AddressInfo)?.port;
-      
+    const port = typeof address === 'string' ? address : (address as AddressInfo)?.port;
+
     console.log(`Server listening on port ${port}`);
   } catch (err) {
     server.log.error(err);
@@ -70,4 +68,4 @@ const start = async () => {
   }
 };
 
-start(); 
+start();
