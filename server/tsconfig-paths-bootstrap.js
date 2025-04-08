@@ -4,5 +4,6 @@ tsConfigPaths.register({
   baseUrl: './dist',
   paths: {
     '@shared/*': ['shared/*'],
+    'src/*': ['server/src/*'],
   },
 });

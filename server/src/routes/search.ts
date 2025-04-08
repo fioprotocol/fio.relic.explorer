@@ -3,7 +3,7 @@ import { Ecc } from '@fioprotocol/fiojs';
 
 import pool from '../config/database';
 
-import { SearchResponse, SearchResultType } from 'shared/types/search';
+import { SearchResponse, SearchResultType } from '@shared/types/search';
 
 // Define the query interface
 interface SearchQuery {
