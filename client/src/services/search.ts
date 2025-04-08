@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { API_PREFIX } from '@shared/constants/network';
 import { SearchResult, SearchResponse } from '@shared/types/search';
 
 export const searchService = {
@@ -8,7 +9,7 @@ export const searchService = {
    */
   search: async (query: string): Promise<SearchResult[]> => {
     try {
-      const response = await axios.get<SearchResponse>('/api/search', {
+      const response = await axios.get<SearchResponse>(`/${API_PREFIX}/search`, {
         params: {
           q: query
         }
@@ -30,7 +31,7 @@ export const searchService = {
     pageSize = 10
   ): Promise<SearchResponse> => {
     try {
-      const response = await axios.get<SearchResponse>(`/api/search/${type}`, {
+      const response = await axios.get<SearchResponse>(`/${API_PREFIX}/search/${type}`, {
         params: {
           q: query,
           page,

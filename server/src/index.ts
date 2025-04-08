@@ -38,7 +38,7 @@ server.register(swagger);
 // Register routes
 server.register(healthCheckRoute.default, { prefix: `/${API_PREFIX}/health-check` });
 server.register(getStatsRoute.default, { prefix: `/${API_PREFIX}/stats` });
-server.register(searchRoute.default, { prefix: '/${API_PREFIX}/search' });
+server.register(searchRoute.default, { prefix: `/${API_PREFIX}/search` });
 
 // Root route
 server.get('/', async () => {
