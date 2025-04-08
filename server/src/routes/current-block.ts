@@ -1,4 +1,5 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
+import { CurrentBlockResponse } from '@shared/types/blocks';
 
 import pool from 'src/config/database';
 
@@ -18,8 +19,9 @@ const currentBlockRoute: FastifyPluginAsync = async (fastify) => {
               properties: {
                 pk_block_number: { type: 'number' },
                 block_id: { type: 'string' },
-                timestamp: { type: 'string' },
-                transactions: { type: 'number' },
+                producer_account_name: { type: 'string' },
+                stamp: { type: 'string' },
+                transaction_count: { type: 'number' },
               },
             },
           },
@@ -31,18 +33,22 @@ const currentBlockRoute: FastifyPluginAsync = async (fastify) => {
     },
   };
 
-  server.get('/', getCurrentBlockOpts, async (request: FastifyRequest, reply: FastifyReply) => {
-    const sqlQuery = `SELECT *, (
+  server.get(
+    '/',
+    getCurrentBlockOpts,
+    async (request: FastifyRequest, reply: FastifyReply): Promise<CurrentBlockResponse> => {
+      const sqlQuery = `SELECT *, (
       SELECT COUNT(*)
       FROM transactions t
       WHERE t.fk_block_number = b.pk_block_number
-    ) as transactions FROM blocks b ORDER BY pk_block_number DESC LIMIT 1`;
-    const result = await pool.query(sqlQuery);
+    ) as transaction_count FROM blocks b ORDER BY pk_block_number DESC LIMIT 1`;
+      const result = await pool.query(sqlQuery);
 
-    return {
-      data: result.rows[0],
-    };
-  });
+      return {
+        data: result.rows[0],
+      };
+    }
+  );
 };
 
 export default currentBlockRoute;

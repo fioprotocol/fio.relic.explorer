@@ -1,6 +1,7 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 
 import pool from 'src/config/database';
+import { BlocksResponse } from '@shared/types/blocks';
 
 interface BlocksQuery {
   Querystring: {
@@ -46,7 +47,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
   server.get<BlocksQuery>(
     '/',
     getBlocksOpts,
-    async (request: FastifyRequest<BlocksQuery>, reply: FastifyReply) => {
+    async (request: FastifyRequest<BlocksQuery>, reply: FastifyReply): Promise<BlocksResponse> => {
       const { offset = 0, limit = 25 } = request.query;
 
       const sqlQuery = `
@@ -56,22 +57,25 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
           b.block_id,
           b.producer_account_name,
           b.schedule_version,
-          (
-            SELECT COUNT(*)
-            FROM transactions t
-            WHERE t.fk_block_number = b.pk_block_number
-          ) as transaction_count
+          COUNT(t.transaction_id) as transaction_count
         FROM
           blocks b
+          LEFT JOIN transactions t ON t.fk_block_number = b.pk_block_number
+        GROUP BY
+          b.pk_block_number,
+          b.stamp,
+          b.block_id,
+          b.producer_account_name,
+          b.schedule_version
         ORDER BY
           b.pk_block_number DESC
-          LIMIT $1
-          OFFSET $2
+        LIMIT $1
+        OFFSET $2
       `;
       const result = await pool.query(sqlQuery, [limit, offset]);
 
       return {
-        data: result.rows[0],
+        data: result.rows,
       };
     }
   );
