@@ -28,7 +28,9 @@ const RowLayout: React.FC<RowLayoutProps> = ({ items }) => (
   <Row className="d-flex flex-row gap-3 flex-wrap m-0">
     {items.map((item, index) => (
       <Col key={index} className={`flex-grow-1 p-0 ${styles.dataItemCol}`}>
-        <div className={`d-flex align-items-center w-100 bg-transparent ${styles.dataItem} ${styles.dataItemRow}`}>
+        <div
+          className={`d-flex align-items-center w-100 bg-transparent p-3 rounded-1 border-0 ${styles.dataItem} ${styles.dataItemRow}`}
+        >
           <div className="d-flex flex-column gap-1 align-items-start">
             <div className={styles.dataItemTitle}>{item.title}</div>
             <div className={styles.dataItemValue}>{item.value}</div>
@@ -45,7 +47,7 @@ interface DataItemListGroupItemProps {
 }
 
 const DataItemListGroupItem: React.FC<DataItemListGroupItemProps> = ({ item }) => (
-  <ListGroup.Item className={styles.dataItem}>
+  <ListGroup.Item className={`${styles.dataItem} py-2 ps-3 pe-0 border-bottom`}>
     <div>
       <div className={styles.dataItemTitle}>{item.title}</div>
       <div className={styles.dataItemValue}>{item.value}</div>
@@ -62,10 +64,7 @@ interface DataItemsListProps {
 const DataItemsList: React.FC<DataItemsListProps> = ({ items, keyPrefix = '' }) => (
   <ListGroup variant="flush" className="d-flex flex-column gap-3 p-0 w-100 border-0">
     {items.map((item, index) => (
-      <DataItemListGroupItem 
-        key={`${keyPrefix}${index}`}
-        item={item} 
-      />
+      <DataItemListGroupItem key={`${keyPrefix}${index}`} item={item} />
     ))}
   </ListGroup>
 );
@@ -79,16 +78,13 @@ interface MultiColumnLayoutProps {
 const MultiColumnLayout: React.FC<MultiColumnLayoutProps> = ({ items, columns }) => {
   // Calculate items per column
   const itemsPerCol = Math.ceil(items.length / columns);
-  
+
   return (
     <Row className="d-flex w-100 m-0 gap-3">
       {Array.from({ length: columns }).map((_, colIndex) => {
         // Get items for this column
-        const colItems = items.slice(
-          colIndex * itemsPerCol,
-          (colIndex + 1) * itemsPerCol
-        );
-        
+        const colItems = items.slice(colIndex * itemsPerCol, (colIndex + 1) * itemsPerCol);
+
         return (
           <Col key={colIndex} className="p-0">
             <DataItemsList items={colItems} keyPrefix={`col-${colIndex}-`} />
@@ -104,17 +100,15 @@ interface ColumnLayoutProps {
   items: DataItem[];
 }
 
-const ColumnLayout: React.FC<ColumnLayoutProps> = ({ items }) => (
-  <DataItemsList items={items} />
-);
+const ColumnLayout: React.FC<ColumnLayoutProps> = ({ items }) => <DataItemsList items={items} />;
 
-export const DataTile: React.FC<DataTileProps> = ({ 
+export const DataTile: React.FC<DataTileProps> = ({
   children,
   className = '',
   columns = 2,
   items,
   layout = 'column',
-  title
+  title,
 }) => {
   const renderItems = (): ReactNode => {
     switch (layout) {
@@ -137,4 +131,4 @@ export const DataTile: React.FC<DataTileProps> = ({
   );
 };
 
-export default DataTile; 
+export default DataTile;

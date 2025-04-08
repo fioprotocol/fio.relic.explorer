@@ -10,22 +10,30 @@ export interface TableColumn {
 
 export interface TableProps {
   columns: TableColumn[];
-  data: {[key:string]: string | number | React.ReactElement}[];
+  data: { [key: string]: string | number | React.ReactElement }[];
   title?: string;
   className?: string;
 }
 
 export const TableComponent: React.FC<TableProps> = ({ columns, data, title, className }) => {
   return (
-    <Card className={`bg-transparent border-0 rounded-0 mb-4 ${styles.tableCard} ${className || ''}`}>
-      {title && <Card.Header className={`bg-transparent border-bottom py-3 px-4 ${styles.tableHeader}`}>{title}</Card.Header>}
+    <Card className={`bg-transparent border-0 rounded-0 mb-4 overflow-hidden ${className || ''}`}>
+      {title && (
+        <Card.Header
+          className={`bg-transparent border-bottom py-3 px-4 text-dark ${styles.tableHeader}`}
+        >
+          {title}
+        </Card.Header>
+      )}
       <Card.Body className="p-0">
-        <div className={styles.tableDesktop}>
+        <div className="d-none d-lg-block">
           <BootstrapTable responsive hover className="m-0">
             <thead>
               <tr className={styles.thead}>
                 {columns.map((column) => (
-                  <th key={column.key} className="py-3 px-4 bg-transparent">{column.title}</th>
+                  <th key={column.key} className="py-3 px-4 bg-transparent">
+                    {column.title}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -42,16 +50,17 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
             </tbody>
           </BootstrapTable>
         </div>
-        
-        <div className={styles.tableMobile}>
+
+        <div className="d-block d-lg-none">
           {data.map((record, index) => (
             <div key={index} className={`p-3 border-bottom ${styles.mobileRow}`}>
               {columns.map((column) => (
-                <div key={`mobile-${index}-${column.key}`} className={`d-flex flex-column mb-2 ${styles.mobileItem}`}>
+                <div
+                  key={`mobile-${index}-${column.key}`}
+                  className={`d-flex flex-column mb-2 ${styles.mobileItem}`}
+                >
                   <div className={`mb-1${styles.mobileLabel}`}>{column.title}</div>
-                  <div className={styles.mobileValue}>
-                    {record[column.key]}
-                  </div>
+                  <div className={styles.mobileValue}>{record[column.key]}</div>
                 </div>
               ))}
             </div>
