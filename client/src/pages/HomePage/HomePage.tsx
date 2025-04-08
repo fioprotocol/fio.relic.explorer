@@ -1,21 +1,30 @@
 import React from 'react';
 
-import Container from '../../components/layout/Container';
-import { SearchComponent } from '../../components/SearchComponent';
-import { StatisticComponent } from '../../components/StatisticComponent';
+import Container from 'src/components/layout/Container';
+import SearchContainer from 'src/components/Search/SearchContainer';
+import { StatisticComponent } from 'src/components/StatisticComponent';
+import { TransactionPageComponent } from 'src/pages/TransactionsPage/TransactionPageComponent';
 
-import { TransactionPageComponent } from '../TransactionsPage/TransactionPageComponent';
 import { useHomePageContext } from './HomePageContext';
+import { useSearch } from 'src/hooks';
 
 const HomePage: React.FC = () => {
   const { stats, chartData } = useHomePageContext();
+  const { handleSearch, query, isSearching } = useSearch();
 
   return (
-    <Container>
-      <SearchComponent />
-      <StatisticComponent stats={stats} chartData={chartData} />
-      <TransactionPageComponent />
-    </Container>
+    <>
+      <SearchContainer
+        onSearch={handleSearch}
+        value={query}
+        searching={isSearching}
+        hovered={true}
+      />
+      <Container>
+        <StatisticComponent stats={stats} chartData={chartData} />
+        <TransactionPageComponent />
+      </Container>
+    </>
   );
 };
 

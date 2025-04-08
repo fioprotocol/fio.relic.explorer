@@ -10,12 +10,18 @@ import styles from './Search.module.scss';
 interface SearchContainerProps {
   searching?: boolean;
   value?: string;
+  hovered?: boolean;
   onSearch: (searchQuery: string) => void;
 }
 
-const SearchContainer: React.FC<SearchContainerProps> = ({ onSearch, value, searching = false }) => {
+const SearchContainer: React.FC<SearchContainerProps> = ({
+  onSearch,
+  value,
+  searching = false,
+  hovered = false,
+}) => {
   return (
-    <div className={`${styles.searchContainer} w-100 py-5`}>
+    <div className={`${styles.searchContainer} w-100 py-5 ${hovered ? styles.hovered : ''}`}>
       <Container className="py-5">
         <h3 className="text-white mb-4">FIO Chain Explorer</h3>
         <Row>

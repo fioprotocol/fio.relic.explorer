@@ -68,7 +68,7 @@ export const useSearch = (options: UseSearchOptions = {}): UseSearchReturn => {
     } catch (error) {
       console.error('Search error:', error);
 
-      navigate(`/${ROUTES.searchNotFound.path}?q=${encodeURIComponent(trimmedQuery)}`);
+      navigate(`${ROUTES.searchNotFound.path}?q=${encodeURIComponent(trimmedQuery)}`);
     } finally {
       setIsSearching(false);
     }
