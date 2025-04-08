@@ -1,18 +1,8 @@
 @import '../../../styles/main.scss';
 
-.tableCard {
-  overflow: hidden;
-}
-
 .tableHeader {
-  padding: 1rem 1.5rem;
   border-color: $mercury;
-  color: $dark;
   @include font-inter-600;
-}
-
-.tableBody {
-  padding: 0 !important;
 }
 
 .thead {
@@ -27,11 +17,11 @@
 .tbody {
   tr {
     border-bottom: 0.5px solid $mercury;
-    
+
     &:hover {
       background-color: $snow-drift;
     }
-    
+
     td {
       @include font-inter-400;
       font-size: $font-size-sm;
@@ -41,19 +31,15 @@
   }
 }
 
-.tableMobile {
-  display: none;
-}
-
 .mobileRow {
   border-color: $mercury;
-  
+
   &:last-child {
     border-bottom: none;
   }
 }
 
-.mobileItem {  
+.mobileItem {
   &:last-child {
     margin-bottom: 0;
   }
@@ -69,15 +55,4 @@
   @include font-inter-400;
   font-size: $font-size-xs;
   color: $dark;
-}
-
-// Media queries
-@include media-breakpoint-down(lg) {
-  .tableDesktop {
-    display: none;
-  }
-  
-  .tableMobile {
-    display: block;
-  }
 }

@@ -5,17 +5,13 @@
 }
 
 .dataItem {
-  padding: 10px 0 10px 15px !important;
-  border-bottom: 0.5px solid $mercury !important;
+  border-color: $mercury !important;
 
   &:last-child {
     border-bottom: none !important;
   }
 
   &.dataItemRow {
-    border-bottom: none !important;
-    padding: 15px !important;
-    border-radius: 4px;
     background-color: $snow-drift !important;
   }
 
@@ -30,8 +26,4 @@
     font-size: $font-size-sm;
     color: $caviar;
   }
-}
-
-.dataTileChildren {
-  padding-top: 5px;
 }
