@@ -7,36 +7,29 @@ import Container from '../Container';
 import { FioLogo } from 'src/components/common/FioLogo';
 
 import { FIO_DAPP_LINK } from 'src/constants/links';
+import { ROUTES } from 'src/constants/routes';
 
 import styles from './Header.module.scss';
 
 interface MenuItem {
-  title: string;
+  label: string;
   path: string;
-  items?: { title: string; path: string }[];
+  items?: { label: string; path: string }[];
 }
 
 const menuItems: MenuItem[] = [
-  { title: 'Transactions', path: '/transactions' },
-  { title: 'Blocks', path: '/blocks' },
-  { title: 'FIO Handles', path: '/handles' },
-  { title: 'FIO Domains', path: '/domains' },
-  { title: 'Accounts', path: '/accounts' },
+  ROUTES.transactions,
+  ROUTES.blocks,
+  ROUTES.handles,
+  ROUTES.domains,
+  ROUTES.accounts,
   {
-    title: 'Governance',
-    path: '/governance',
-    items: [
-      { title: 'Producers', path: '/producers' },
-      { title: 'Proxies', path: '/proxies' },
-    ],
+    ...ROUTES.governance,
+    items: [ROUTES.producers, ROUTES.proxies],
   },
   {
-    title: 'Advanced',
-    path: '/advanced',
-    items: [
-      { title: 'Contracts', path: '/contracts' },
-      { title: 'Multisigs', path: '/multisigs' },
-    ],
+    ...ROUTES.advanced,
+    items: [ROUTES.contracts, ROUTES.multisigs],
   },
 ];
 
@@ -58,21 +51,21 @@ const Header: React.FC = () => {
                     key={index}
                     title={
                       <span className="dropdown-title">
-                        {item.title}
+                        {item.label}
                         <ChevronDown size={14} className="ms-2" />
                       </span>
                     }
-                    id={`${item.title.toLowerCase()}-dropdown`}
+                    id={`${item.label.toLowerCase()}-dropdown`}
                   >
                     {item.items.map((subItem, subIndex) => (
                       <NavDropdown.Item key={subIndex} as={Link} to={subItem.path}>
-                        {subItem.title}
+                        {subItem.label}
                       </NavDropdown.Item>
                     ))}
                   </NavDropdown>
                 ) : (
                   <Nav.Link key={index} as={Link} to={item.path}>
-                    {item.title}
+                    {item.label}
                   </Nav.Link>
                 )
               )}

@@ -1,3 +1,5 @@
+import { ROUTES } from './routes';
+
 interface FooterLink {
   to?: string;
   href?: string;
@@ -29,18 +31,18 @@ export const SOCIAL_LINKS: FooterLink[] = [
 ];
 
 export const EXPLORER_LINKS: FooterLink[] = [
-  { to: '/transactions', label: 'Transactions' },
-  { to: '/blocks', label: 'Blocks' },
-  { to: '/handles', label: 'FIO Handles' },
-  { to: '/domains', label: 'FIO Domains' },
-  { to: '/accounts', label: 'Accounts' },
+  { to: ROUTES.transactions.path, label: ROUTES.transactions.label },
+  { to: ROUTES.blocks.path, label: ROUTES.blocks.label },
+  { to: ROUTES.handles.path, label: ROUTES.handles.label },
+  { to: ROUTES.domains.path, label: ROUTES.domains.label },
+  { to: ROUTES.accounts.path, label: ROUTES.accounts.label },
 ];
 
 export const RESOURCE_LINKS: FooterLink[] = [
-  { to: '/block-producers', label: 'Block Producers' },
-  { to: '/proxies', label: 'Proxies' },
-  { to: '/multisigs', label: 'Multisigs' },
-  { to: '/contracts', label: 'Contracts' },
+  { to: ROUTES.producers.path, label: ROUTES.producers.label },
+  { to: ROUTES.proxies.path, label: ROUTES.proxies.label },
+  { to: ROUTES.multisigs.path, label: ROUTES.multisigs.label },
+  { to: ROUTES.contracts.path, label: ROUTES.contracts.label },
 ];
 
 export const EXTERNAL_LINKS: FooterLink[] = [
@@ -50,7 +52,7 @@ export const EXTERNAL_LINKS: FooterLink[] = [
 ];
 
 export const LEGAL_LINKS: FooterLink[] = [
-  { to: '/support', label: 'Support' },
-  { to: '/privacy-policy', label: 'Privacy Policy' },
-  { to: '/terms-of-service', label: 'Terms of Service' },
+  { to: ROUTES.support.path, label: ROUTES.support.label },
+  { to: ROUTES.privacyPolicy.path, label: ROUTES.privacyPolicy.label },
+  { to: ROUTES.termsOfService.path, label: ROUTES.termsOfService.label },
 ];
