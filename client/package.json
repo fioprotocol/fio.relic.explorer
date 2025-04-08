@@ -11,7 +11,7 @@
     "react-bootstrap": "2.10.9",
     "react-bootstrap-icons": "1.11.5",
     "react-dom": "19.0.0",
-    "react-router-dom": "7.4.0",
+    "react-router": "7.5.0",
     "react-scripts": "5.0.1",
     "recharts": "2.15.1",
     "sass": "1.86.0"
@@ -43,7 +43,6 @@
   "proxy": "http://localhost:9090",
   "devDependencies": {
     "@types/react": "19.0.0",
-    "@types/react-dom": "19.0.0",
-    "babel-plugin-transform-remove-console": "6.9.4"
+    "@types/react-dom": "19.0.0"
   }
 }

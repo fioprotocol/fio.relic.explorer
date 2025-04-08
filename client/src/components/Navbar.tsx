@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Navbar as BootstrapNavbar, Nav } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const Navbar: React.FC = () => {
   return (

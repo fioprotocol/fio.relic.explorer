@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { API_PREFIX } from 'shared/constants/network';
-import { HealthCheckResponse } from 'shared/types/health-check';
+import { API_PREFIX } from '@shared/constants/network';
+import { HealthCheckResponse } from '@shared/types/health-check';
 
 const API_URL = `${API_PREFIX}/health-check`;
 

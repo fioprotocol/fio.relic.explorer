@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Row, Col } from 'react-bootstrap';
 
 import Container from '../Container';

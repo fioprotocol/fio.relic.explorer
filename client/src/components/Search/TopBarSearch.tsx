@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, InputGroup, Button, Spinner } from 'react-bootstrap';
 import { Search as SearchIcon } from 'react-bootstrap-icons';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import Container from 'src/components/layout/Container';
 
