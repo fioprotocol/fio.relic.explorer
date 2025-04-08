@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import { Wallet2, ChevronDown } from 'react-bootstrap-icons';
 

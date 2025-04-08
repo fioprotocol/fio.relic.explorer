@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { SearchResult, SearchResponse } from 'shared/types/search';
+import { SearchResult, SearchResponse } from '@shared/types/search';
 
 export const searchService = {
   /**

@@ -2,7 +2,7 @@ import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions
 
 import pool from '../config/database';
 
-import { ChainInfoResponse } from 'shared/types/fio-api-server';
+import { ChainInfoResponse } from '@shared/types/fio-api-server';
 
 const getStatsRoute: FastifyPluginAsync = async (fastify) => {
   // Cast instance to use the type provider

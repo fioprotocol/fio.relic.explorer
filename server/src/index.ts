@@ -15,7 +15,7 @@ import cors from './plugins/cors';
 import * as healthCheckRoute from './routes/health-check';
 import * as searchRoute from './routes/search';
 import * as getStatsRoute from './routes/stats';
-import { API_PREFIX } from '../../shared/constants/network';
+import { API_PREFIX } from '@shared/constants/network';
 
 const server = Fastify({
   logger: {

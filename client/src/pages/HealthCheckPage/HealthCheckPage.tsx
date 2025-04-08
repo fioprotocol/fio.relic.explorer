@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { getHealthCheck } from 'src/services/health-check';
 
-import { HealthCheckResponse } from 'shared/types/health-check';
+import { HealthCheckResponse } from '@shared/types/health-check';
 
 import styles from './HealthCheckPage.module.scss';
 

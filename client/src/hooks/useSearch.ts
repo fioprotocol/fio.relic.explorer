@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 import { searchService } from 'src/services/search';
 
 import { ROUTES } from 'src/constants/routes';
 
-import { SearchResultType } from 'shared/types/search';
+import { SearchResultType } from '@shared/types/search';
 
 interface UseSearchOptions {
   navigateOnSearch?: boolean;
