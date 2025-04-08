@@ -1,0 +1,3 @@
+---
+SERVER_MAIN_DIR: "/data/fio/fio-relic-server"
+BACKEND_TCP_PORT: "9090"
