@@ -28,7 +28,7 @@ const RowLayout: React.FC<RowLayoutProps> = ({ items }) => (
   <Row className="d-flex flex-row gap-3 flex-wrap m-0">
     {items.map((item, index) => (
       <Col key={index} className={`flex-grow-1 p-0 ${styles.dataItemCol}`}>
-        <div className={`d-flex align-items-center w-100 ${styles.dataItem} ${styles.dataItemRow}`}>
+        <div className={`d-flex align-items-center w-100 bg-transparent ${styles.dataItem} ${styles.dataItemRow}`}>
           <div className="d-flex flex-column gap-1 align-items-start">
             <div className={styles.dataItemTitle}>{item.title}</div>
             <div className={styles.dataItemValue}>{item.value}</div>
@@ -46,7 +46,7 @@ interface DataItemListGroupItemProps {
 
 const DataItemListGroupItem: React.FC<DataItemListGroupItemProps> = ({ item }) => (
   <ListGroup.Item className={styles.dataItem}>
-    <div className={styles.dataItemContent}>
+    <div>
       <div className={styles.dataItemTitle}>{item.title}</div>
       <div className={styles.dataItemValue}>{item.value}</div>
     </div>
