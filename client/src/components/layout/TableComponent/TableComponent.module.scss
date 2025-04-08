@@ -1,17 +1,12 @@
 @import '../../../styles/main.scss';
 
 .tableCard {
-  background-color: transparent;
-  border-radius: 0 !important;
-  border: 0 !important;
   overflow: hidden;
-  margin-bottom: 1.5rem;
 }
 
 .tableHeader {
   padding: 1rem 1.5rem;
-  background-color: transparent;
-  border-bottom: 0.5px solid $mercury;
+  border-color: $mercury;
   color: $dark;
   @include font-inter-600;
 }
@@ -25,9 +20,7 @@
     @include font-inter-600;
     font-size: $font-size-sm;
     color: $dark;
-    background-color: transparent;
-    border-bottom: 0.5px solid $mercury;
-    padding: 0.75rem 1.5rem;
+    border-color: $mercury;
   }
 }
 
@@ -40,12 +33,10 @@
     }
     
     td {
-      padding: 0.75rem 1.5rem;
       @include font-inter-400;
       font-size: $font-size-sm;
       color: $dark;
       vertical-align: middle;
-      background-color: transparent;
     }
   }
 }
@@ -55,7 +46,7 @@
 }
 
 .mobileRow {
-  border-bottom: 0.5px solid $mercury;
+  border-color: $mercury;
   
   &:last-child {
     border-bottom: none;

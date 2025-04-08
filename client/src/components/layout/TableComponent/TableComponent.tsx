@@ -17,15 +17,15 @@ export interface TableProps {
 
 export const TableComponent: React.FC<TableProps> = ({ columns, data, title, className }) => {
   return (
-    <Card className={`${styles.tableCard} ${className || ''}`}>
-      {title && <Card.Header className={styles.tableHeader}>{title}</Card.Header>}
+    <Card className={`bg-transparent border-0 rounded-0 mb-4 ${styles.tableCard} ${className || ''}`}>
+      {title && <Card.Header className={`bg-transparent border-bottom py-3 px-4 ${styles.tableHeader}`}>{title}</Card.Header>}
       <Card.Body className="p-0">
         <div className={styles.tableDesktop}>
           <BootstrapTable responsive hover className="m-0">
             <thead>
               <tr className={styles.thead}>
                 {columns.map((column) => (
-                  <th key={column.key}>{column.title}</th>
+                  <th key={column.key} className="py-3 px-4 bg-transparent">{column.title}</th>
                 ))}
               </tr>
             </thead>
@@ -33,7 +33,7 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
               {data.map((record, index) => (
                 <tr key={index}>
                   {columns.map((column) => (
-                    <td key={`${index}-${column.key}`}>
+                    <td key={`${index}-${column.key}`} className="py-3 px-4 bg-transparent">
                       {record[column.key]}
                     </td>
                   ))}
@@ -45,7 +45,7 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
         
         <div className={styles.tableMobile}>
           {data.map((record, index) => (
-            <div key={index} className={`p-3 ${styles.mobileRow}`}>
+            <div key={index} className={`p-3 border-bottom ${styles.mobileRow}`}>
               {columns.map((column) => (
                 <div key={`mobile-${index}-${column.key}`} className={`d-flex flex-column mb-2 ${styles.mobileItem}`}>
                   <div className={`mb-1${styles.mobileLabel}`}>{column.title}</div>

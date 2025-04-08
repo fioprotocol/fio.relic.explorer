@@ -2,13 +2,11 @@
 
 .cardComponent {
   background-color: $white;
-  border-radius: 8px !important;
-  border: 0.5px solid $gainsboro !important;
+  border-color:$gainsboro;
   box-shadow: $box-shadow-default;
 }
 
 .cardTitle {
   @include font-inter-600;
   color: $caviar;
-  background-color: transparent !important;
 }
