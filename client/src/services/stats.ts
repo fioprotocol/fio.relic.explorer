@@ -1,8 +1,9 @@
-import axios from 'axios';
-import { API_PREFIX } from '@shared/constants/network';
 import { StatsResponse } from '@shared/types/stats';
+import { apiClient } from './api-client';
 
 export const getStats = async (days: number): Promise<StatsResponse> => {
-  const response = await axios.get<StatsResponse>(`${API_PREFIX}/stats?days=${days}`);
+  const response = await apiClient.get<StatsResponse>(`/stats`, {
+    params: { days }
+  });
   return response.data;
 };

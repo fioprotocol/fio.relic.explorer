@@ -5,12 +5,31 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Create a new PostgreSQL connection pool
-const poolConfig: any = {
+const poolConfig: {
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
+  ssl?: {
+    rejectUnauthorized: boolean;
+  };
+  max: number;
+  idleTimeoutMillis: number;
+  connectionTimeoutMillis: number;
+  ssh?: {
+    host: string;
+    port: number;
+    username: string;
+    privateKey: string;
+    passphrase?: string;
+  };
+} = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || '',
+  user: process.env.DB_USER || '',
+  password: process.env.DB_PASSWORD || '',
   ssl: process.env.DB_SSL === 'true' ? {
     rejectUnauthorized: false
   } : undefined,
@@ -22,10 +41,10 @@ const poolConfig: any = {
 // Add SSH configuration if SSH key URL is provided
 if (process.env.SSH_KEY_URL) {
   poolConfig.ssh = {
-    host: process.env.SSH_HOST,
+    host: process.env.SSH_HOST || '',
     port: parseInt(process.env.SSH_PORT || '22'),
-    username: process.env.SSH_USER,
-    privateKey: process.env.SSH_KEY_URL,
+    username: process.env.SSH_USER || '',
+    privateKey: process.env.SSH_KEY_URL || '',
     passphrase: process.env.SSH_KEY_PASSPHRASE, // Optional if your key requires a passphrase
   };
 }

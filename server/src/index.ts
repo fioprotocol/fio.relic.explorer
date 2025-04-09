@@ -11,11 +11,8 @@ dotenv.config();
 import swagger from './plugins/swagger';
 import cors from './plugins/cors';
 
-// Import routes
-import * as healthCheckRoute from './routes/health-check';
-import * as searchRoute from './routes/search';
-import * as getStatsRoute from './routes/stats';
-import { API_PREFIX } from '@shared/constants/network';
+// Import routes handler
+import { registerRoutes } from './routes';
 
 const server = Fastify({
   logger: {
@@ -35,10 +32,8 @@ const server = Fastify({
 server.register(cors);
 server.register(swagger);
 
-// Register routes
-server.register(healthCheckRoute.default, { prefix: `/${API_PREFIX}/health-check` });
-server.register(getStatsRoute.default, { prefix: `/${API_PREFIX}/stats` });
-server.register(searchRoute.default, { prefix: `/${API_PREFIX}/search` });
+// Register all routes
+registerRoutes(server);
 
 // Root route
 server.get('/', async () => {

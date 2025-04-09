@@ -1,5 +1,5 @@
 import React, { ReactNode, ReactElement } from 'react';
-import { Card, ListGroup, Row, Col } from 'react-bootstrap';
+import { Card, ListGroup, Row, Col, Spinner } from 'react-bootstrap';
 import { CardComponent } from '../../layout/CardComponent';
 import styles from './DataTile.module.scss';
 
@@ -17,6 +17,7 @@ export interface DataTileProps {
   items: DataItem[];
   layout?: LayoutType;
   title?: string;
+  loading?: boolean;
 }
 
 // Row layout component
@@ -109,6 +110,7 @@ export const DataTile: React.FC<DataTileProps> = ({
   items,
   layout = 'column',
   title,
+  loading = false,
 }) => {
   const renderItems = (): ReactNode => {
     switch (layout) {
@@ -125,6 +127,7 @@ export const DataTile: React.FC<DataTileProps> = ({
     <CardComponent title={title} className={className}>
       <Card.Body className="d-flex flex-column gap-3 p-0">
         {renderItems()}
+        {loading && <Spinner animation="border" variant="secondary" className="align-self-center" />}
         {children ? children : null}
       </Card.Body>
     </CardComponent>
