@@ -1,13 +1,14 @@
-import axios from 'axios';
-import { API_PREFIX } from '@shared/constants/network';
-import { BlocksResponse, CurrentBlockResponse } from '@shared/types/blocks';
+import { Block, BlocksResponse, CurrentBlockResponse } from '@shared/types/blocks';
+
+import { apiClient } from './api-client';
 
 export const getBlocks = async (): Promise<BlocksResponse> => {
-  const response = await axios.get<BlocksResponse>(`${API_PREFIX}/blocks`);
+  const response = await apiClient.get<BlocksResponse>('/blocks');
   return response.data;
 };
 
-export const getCurrent = async (): Promise<CurrentBlockResponse> => {
-  const response = await axios.get<CurrentBlockResponse>(`${API_PREFIX}/current-block`);
-  return response.data;
+export const getCurrent = async (): Promise<Block> => {
+  const { data } = await apiClient.get<CurrentBlockResponse>('/current-block');
+
+  return data.data;
 };

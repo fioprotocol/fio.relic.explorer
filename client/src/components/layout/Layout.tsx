@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { setProducers } from 'src/services/bpmonitor';
-
 import TopBar from './TopBar';
 import Header from './Header';
 import Footer from './Footer';
@@ -42,7 +40,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     fetchPrice();
     fetchChainId();
-    setProducers();
   }, []);
 
   return (
