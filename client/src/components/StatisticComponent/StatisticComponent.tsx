@@ -8,11 +8,12 @@ type StatisticComponentProps = {
   days?: number;
   stats: DataItem[];
   chartData: TransactionDataPoint[];
+  loading: boolean;
 };
 
-export const StatisticComponent: React.FC<StatisticComponentProps> = ({ stats, chartData }) => {
+export const StatisticComponent: React.FC<StatisticComponentProps> = ({ stats, chartData, loading }) => {
   return (
-    <DataTile title="Statistics" items={stats} columns={2} layout="multi-column">
+    <DataTile title="Statistics" items={stats} columns={2} layout="multi-column" loading={loading}>
       <TransactionChart chartData={chartData} />
     </DataTile>
   );

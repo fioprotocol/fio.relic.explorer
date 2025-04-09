@@ -9,7 +9,7 @@ import { useHomePageContext } from './HomePageContext';
 import { useSearch } from 'src/hooks';
 
 const HomePage: React.FC = () => {
-  const { stats, chartData } = useHomePageContext();
+  const { stats, chartData, loading } = useHomePageContext();
   const { handleSearch, query, isSearching } = useSearch();
 
   return (
@@ -21,7 +21,7 @@ const HomePage: React.FC = () => {
         hovered={true}
       />
       <Container>
-        <StatisticComponent stats={stats} chartData={chartData} />
+        <StatisticComponent stats={stats} chartData={chartData} loading={loading} />
         <TransactionPageComponent />
       </Container>
     </>
