@@ -99,6 +99,13 @@ jobs:
         run: |
           envsubst < ansible/roles/fio-server/templates/fio-server.env.j2.tmp > ansible/roles/fio-server/templates/fio-server.env.j2
           envsubst < ansible/roles/fio-server/templates/fio-client.env.j2.tmp > ansible/roles/fio-server/templates/fio-client.env.j2
+      - name: SSH to EC2 and run command
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ssh_key root@$SSH_HOST "\
+            aws ecr get-login-password --region us-west-2 | \
+            docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client && \
+            aws ecr get-login-password --region us-west-2 | \
+            docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-server"
       - name: Run Deploy Server
         id: deploy-fio-server
         env:
