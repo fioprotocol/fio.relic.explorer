@@ -41,3 +41,11 @@ body {
 .f-size-sm {
   font-size: $font-size-sm;
 }
+
+a {
+  text-decoration: none;
+}
+
+.text-truncate-max-w {
+  max-width: 30rem;
+}

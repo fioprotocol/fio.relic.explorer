@@ -1,6 +1,11 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 
 import pool from 'src/config/database';
+
+import {
+  DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
+  DEFAULT_REQUEST_ITEMS_LIMIT,
+} from '@shared/constants/network';
 import { BlocksResponse } from '@shared/types/blocks';
 
 interface BlocksQuery {
@@ -17,6 +22,17 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
   // Health check endpoint
   const getBlocksOpts: RouteShorthandOptions = {
     schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          offset: { type: 'number', default: 0 },
+          limit: {
+            type: 'number',
+            default: DEFAULT_REQUEST_ITEMS_LIMIT,
+            maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
+          },
+        },
+      },
       response: {
         200: {
           type: 'object',
@@ -48,7 +64,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
     '/',
     getBlocksOpts,
     async (request: FastifyRequest<BlocksQuery>, reply: FastifyReply): Promise<BlocksResponse> => {
-      const { offset = 0, limit = 25 } = request.query;
+      const { offset = 0, limit = DEFAULT_REQUEST_ITEMS_LIMIT } = request.query;
 
       const sqlQuery = `
         SELECT
