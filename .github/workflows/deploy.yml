@@ -38,5 +38,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ssh_key root@$SSH_HOST "\
             aws ecr get-login-password --region us-west-2 | \
             docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client, \
-            docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-server
-            "
+            docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-server"
