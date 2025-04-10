@@ -6,6 +6,7 @@ import * as healthCheckRoute from './health-check';
 import * as searchRoute from './search';
 import * as getStatsRoute from './stats';
 import * as blocksRoute from './blocks';
+import * as blockRoute from './block';
 import * as currentBlockRoute from './current-block';
 import { getTransactionsRoute, getTransactionByIdRoute, getTransactionStatsRoute } from './transactions/index';
 
@@ -19,6 +20,7 @@ const routes: RouteConfig[] = [
   { plugin: getStatsRoute.default, prefix: `/${API_PREFIX}/stats` },
   { plugin: searchRoute.default, prefix: `/${API_PREFIX}/search` },
   { plugin: blocksRoute.default, prefix: `/${API_PREFIX}/blocks` },
+  { plugin: blockRoute.default, prefix: `/${API_PREFIX}/blocks/:block_number` },
   { plugin: currentBlockRoute.default, prefix: `/${API_PREFIX}/current-block` },
   { plugin: getTransactionsRoute, prefix: `/${API_PREFIX}/transactions` },
   { plugin: getTransactionStatsRoute, prefix: `/${API_PREFIX}/transactions/stats` },
