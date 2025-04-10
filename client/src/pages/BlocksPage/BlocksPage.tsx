@@ -8,6 +8,8 @@ import { LoadableTable } from 'src/components/common/LoadableTable';
 
 import { useBlocksPageContext } from './BlocksPageContext';
 
+import { formatBlockNumber, formatDate, truncateLongText } from 'src/utils/general';
+
 import { ROUTES } from 'src/constants/routes';
 
 const columns = [
@@ -55,18 +57,15 @@ const BlocksPage: React.FC = () => {
               blocks.map((block) => ({
                 pk_block_number: (
                   <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
-                    {block.pk_block_number.toLocaleString()}
+                    {formatBlockNumber(block.pk_block_number)}
                   </Link>
                 ),
                 block_id: (
                   <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
-                    {`${block.block_id.substring(
-                      0,
-                      6
-                    )}...${block.block_id.substring(block.block_id.length - 6)}`}
+                    {truncateLongText(block.block_id)}
                   </Link>
                 ),
-                stamp: new Date(block.stamp).toUTCString(),
+                stamp: formatDate(block.stamp),
                 producer: (
                   <Link to={`${ROUTES.accounts.path}/${block.producer_account_name}`}>
                     {producers.get(block.producer_account_name)?.candidate_name ||

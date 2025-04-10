@@ -8,6 +8,8 @@ import { DataTile } from 'src/components/common/DataTile';
 
 import { useBlockDetailsContext } from './BlockDetailsContext';
 
+import { formatBlockNumber, formatDate } from 'src/utils/general';
+
 import { ROUTES } from 'src/constants/routes';
 
 const BlockDetailsPage: React.FC = () => {
@@ -16,7 +18,7 @@ const BlockDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <h4>Block: #{block_number?.toLocaleString()}</h4>
+      <h4>Block: #{formatBlockNumber(block_number || 0)}</h4>
       {!block || loading ? (
         <div className="d-flex justify-content-center align-items-center">
           <Spinner color="primary" />
@@ -26,7 +28,7 @@ const BlockDetailsPage: React.FC = () => {
           <div className="d-flex justify-content-between align-items-center mb-2">
             <p>Block ID: {block?.block_id}</p>
             <div className="d-flex justify-content-between align-items-center">
-              <p>{new Date(block?.stamp).toUTCString()}</p>
+              <p>{formatDate(block?.stamp)}</p>
               <p>Status: - </p>
             </div>
           </div>
@@ -40,7 +42,7 @@ const BlockDetailsPage: React.FC = () => {
                 title: 'Previous Block',
                 value: (
                   <Link to={`${ROUTES.blocks.path}/${previous_block_number}`}>
-                    {previous_block_number?.toLocaleString()}
+                    {formatBlockNumber(previous_block_number || 0)}
                   </Link>
                 ),
               },
@@ -48,7 +50,7 @@ const BlockDetailsPage: React.FC = () => {
                 title: 'Next Block',
                 value: (
                   <Link to={`${ROUTES.blocks.path}/${next_block_number}`}>
-                    {next_block_number?.toLocaleString()}
+                    {formatBlockNumber(next_block_number || 0)}
                   </Link>
                 ),
               },
