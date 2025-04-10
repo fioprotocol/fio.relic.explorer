@@ -21,8 +21,14 @@ export const TransactionPageComponent: FC<TransactionPageComponentProps> = ({
   title,
   showActionButton = false,
 }) => {
-  const { transactions, loading, onActionButtonClick } = useTransactionsComponentContext();
+  const { 
+    transactions, 
+    onActionButtonClick,
+    ...paginationProps
+  } = useTransactionsComponentContext();
 
+  // On homepage: show action button, no pagination
+  // On transactions page: show pagination, no action button
   return (
     <LoadableTable
       columns={columns}
@@ -30,8 +36,9 @@ export const TransactionPageComponent: FC<TransactionPageComponentProps> = ({
       title={title || 'Transactions'}
       showActionButton={showActionButton}
       actionButtonText="VIEW ALL TRANSACTIONS"
-      isLoading={loading}
       onActionButtonClick={onActionButtonClick}
+      showPagination={!showActionButton}
+      {...paginationProps}
     />
   );
 };

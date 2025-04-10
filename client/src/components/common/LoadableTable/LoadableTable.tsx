@@ -5,7 +5,9 @@ import Row from 'react-bootstrap/Row';
 
 import { TableComponent } from 'src/components/layout/TableComponent';
 import { ActionButton } from 'src/components/common/ActionButton/ActionButton';
+import { Pagination } from 'src/components/common/Pagination';
 import { AnyObject } from '@shared/types/general';
+import { UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
 
 type LoadableTableProps = {
   actionButtonText?: string;
@@ -13,11 +15,12 @@ type LoadableTableProps = {
   columns: { key: string; title: string }[];
   data: AnyObject[];
   emptyState?: ReactNode;
-  isLoading?: boolean;
   onActionButtonClick?: () => void;
   showActionButton?: boolean;
   title?: string;
-};
+  // Pagination props
+  showPagination?: boolean;
+} & UsePaginationDefaultProps;
 
 export const LoadableTable: FC<LoadableTableProps> = ({
   actionButtonText,
@@ -25,13 +28,16 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   columns,
   data = [],
   emptyState,
-  isLoading = false,
+  loading = false,
   onActionButtonClick,
   showActionButton,
-  title
+  title,
+  // Pagination props
+  showPagination = true,
+  ...paginationProps
 }) => {
   // Show loading state or empty state if needed
-  const displayEmptyState = !isLoading && data.length === 0 ? emptyState : undefined;
+  const displayEmptyState = !loading && data.length === 0 ? emptyState : undefined;
   
   return (
     <Row className="flex-column align-items-center gap-3">
@@ -41,8 +47,13 @@ export const LoadableTable: FC<LoadableTableProps> = ({
         title={title}
         className={className}
       />
-      {isLoading && <Spinner animation="border" variant="secondary" />}
+      {loading && <Spinner animation="border" variant="secondary" />}
       {displayEmptyState}
+      
+      {showPagination && (
+        <Pagination {...paginationProps} loading={loading} />
+      )}
+      
       {showActionButton && <ActionButton onClick={onActionButtonClick} name={actionButtonText} />}
     </Row>
   );

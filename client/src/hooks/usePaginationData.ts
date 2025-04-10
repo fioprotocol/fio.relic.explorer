@@ -1,6 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { AnyObject } from '@shared/types/general';
 import { DEFAULT_REQUEST_ITEMS_LIMIT } from '@shared/constants/network';
+import { QUERY_PARAMS_NAMES } from 'src/constants/query';
 
 type UsePaginationDataProps = {
   action: (params: AnyObject) => Promise<AnyObject>;
@@ -9,110 +11,119 @@ type UsePaginationDataProps = {
   limit?: number;
 };
 
-type UsePaginationDataReturn<T> = {
-  data: T[];
+export type UsePaginationDefaultProps = {
   loading: boolean;
   error: Error | null;
-  loadMore: () => void;
-  hasMore: boolean;
-  reset: () => void;
+  currentPage: number | null;
+  totalPages: number;
+  goToPage: (page: number) => void;
+  reset?: () => void;
 };
 
-export const usePaginationData = <T>({ 
+export type UsePaginationDataReturn<T, O = AnyObject> = {
+  data: T[];
+  otherData: O | null;
+} & UsePaginationDefaultProps;
+
+const PAGE_PARAM_NAME = QUERY_PARAMS_NAMES.PAGE;
+
+export const usePaginationData = <T, O = AnyObject>({ 
   action, 
   params = {}, 
   dataKey = 'data',
-  limit = DEFAULT_REQUEST_ITEMS_LIMIT
-}: UsePaginationDataProps): UsePaginationDataReturn<T> => {
+  limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+}: UsePaginationDataProps): UsePaginationDataReturn<T, O> => {
+  // Get URL parameters
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const urlPage = isNaN(Number(searchParams.get(PAGE_PARAM_NAME))) ? null : Number(searchParams.get(PAGE_PARAM_NAME));
+
   const [data, setData] = useState<T[]>([]);
-  const [offset, setOffset] = useState<number | null>(null);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [otherData, setOtherData] = useState<O | null>(null);
+  const [currentPage, setCurrentPage] = useState<number | null>(urlPage || null);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  
-  // Store memoized versions of the params and serialized params
-  const paramsRef = useRef(params);
-  const serializedParamsRef = useRef(JSON.stringify(params));
 
-  // Function to fetch data with the given offset
-  const fetchData = useCallback(async (currentOffset: number, isNewSearch: boolean) => {
-    // Prevent concurrent requests
-    if (loading) return;
+  const serializedParams = JSON.stringify(params);
+
+  // Function to update URL with new page number
+  const updateUrlPage = useCallback((page: number) => {
+    const newSearchParams = new URLSearchParams(location?.search || '');
+    if (page === 1) {
+      newSearchParams.delete(PAGE_PARAM_NAME);
+    } else {
+      newSearchParams.set(PAGE_PARAM_NAME, page.toString());
+    }
+    
+    navigate(`${location?.pathname}?${newSearchParams.toString()}`, { replace: true });
+  }, [location?.pathname, location?.search, navigate]);
+
+  // Function to fetch data for a specific page
+  const fetchData = useCallback(async () => {
+    const page = currentPage || 1;
     
     setLoading(true);
     setError(null);
 
     try {
+      const offset = (page - 1) * limit;
+      
       const queryParams = {
-        ...paramsRef.current,
-        offset: currentOffset,
+        ...JSON.parse(serializedParams),
+        offset,
         limit
       };
       
       const response = await action(queryParams);
-      const newItems = (response[dataKey] || []) as T[];
+      const { [dataKey]: newItems = [], total, ...restData } = response || {};
       
-      setData(prevData => {
-        // If this is a new search or the first page, replace the data
-        if (isNewSearch || currentOffset === 0) {
-          return [...newItems];
-        }
-        // Otherwise append to existing data
-        return [...prevData, ...newItems];
-      });
+      // Calculate total pages if available
+      setTotalPages(Math.ceil(total / limit));
       
-      // Update hasMore flag based on returned items count
-      setHasMore(newItems.length >= limit);
+      setData(newItems as T[]);
+      
+      // Store additional data
+      setOtherData(Object.keys(restData).length > 0 ? restData as O : null);
     } catch (error) {
       setError(error as Error);
     } finally {
       setLoading(false);
     }
-  }, [action, dataKey, limit, loading]);
+  }, [action, dataKey, limit, serializedParams, currentPage]);
+
+  useEffect(() => {
+    updateUrlPage(currentPage || 1);
+  }, [currentPage, updateUrlPage]);
+
 
   // Reset pagination and load initial data when params change
   useEffect(() => {
-    const serializedParams = JSON.stringify(params);
-    
-    // Skip if params haven't actually changed
-    if (serializedParams === serializedParamsRef.current && offset !== null) {
-      return;
-    }
-    
-    // Update refs with current values
-    paramsRef.current = params;
-    serializedParamsRef.current = serializedParams;
-    
-    // Reset pagination state
-    setOffset(0);
-    setHasMore(true);
-    
-    // Load first page with new parameters
-    fetchData(0, true);
-  }, [params, fetchData, offset]);
+    fetchData();
+  }, [fetchData]);
 
-  // Function to load more data
-  const loadMore = useCallback(() => {
-    if (!loading && hasMore && offset !== null) {
-      const nextOffset = offset + limit;
-      setOffset(nextOffset);
-      fetchData(nextOffset, false);
+  // Navigation functions
+  const goToPage = useCallback((page: number) => {
+    const targetPage = Math.max(1, Math.min(page, totalPages));
+    if (targetPage !== currentPage) {
+      setCurrentPage(targetPage);
     }
-  }, [fetchData, hasMore, limit, loading, offset]);
+  }, [currentPage, totalPages]);
 
   // Function to reset and reload data
   const reset = useCallback(() => {
-    setOffset(null);
-    setHasMore(true);
-    fetchData(0, true);
-  }, [fetchData]);
+    setCurrentPage(1);
+  }, []);
 
   return {
     data,
+    otherData,
     loading,
     error,
-    loadMore,
-    hasMore,
+    currentPage,
+    totalPages,
+    goToPage,
     reset
   };
 };
