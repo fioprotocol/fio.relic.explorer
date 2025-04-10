@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 
 import { DataTile } from 'src/components/common/DataTile';
 
+import { formatBlockNumber, formatDate } from 'src/utils/general';
+
 import { ROUTES } from 'src/constants/routes';
 
 import { Producer } from 'src/services/bpmonitor';
@@ -18,11 +20,11 @@ const CurrentBlock: React.FC<{ currentBlock: Block; producer?: Producer }> = ({
       items={[
         {
           title: 'Block Number',
-          value: currentBlock.pk_block_number.toLocaleString(),
+          value: formatBlockNumber(currentBlock.pk_block_number),
         },
         {
           title: 'Date',
-          value: new Date(currentBlock.stamp).toUTCString(),
+          value: formatDate(currentBlock.stamp),
         },
         {
           title: 'Producer',
