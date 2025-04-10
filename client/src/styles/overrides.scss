@@ -1,15 +1,24 @@
 // Colors
-$primary: #765CD6;
-$secondary: #6c757d;
-$success: #28a745;
-$warning: #ffc107;
+$primary: #765cd6;
+$secondary: #969696;
+$success: #baffe8;
+$warning: #ffea95;
 $info: #17a2b8;
 
-$red: #FF0000;
+$red: #ff0000;
 $danger: #dc3545;
 
 $dark: #1f1f1f;
 $light: #f8f9fa;
 
 // Typography
-$font-family-sans-serif: 'Inter Regular', 'Proxima Nova Regular', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-sans-serif:
+  'Inter Regular',
+  'Proxima Nova Regular',
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  sans-serif;
