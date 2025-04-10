@@ -1,1 +1,1 @@
-export { default } from './CurrentBlock';
+export { default } from './CurrentBlockContainer';
