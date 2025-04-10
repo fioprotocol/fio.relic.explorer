@@ -4,29 +4,31 @@ import Spinner from 'react-bootstrap/Spinner';
 import Row from 'react-bootstrap/Row';
 
 import { TableComponent } from 'src/components/layout/TableComponent';
-import { LoadMoreButton } from 'src/components/common/LoadMoreButton';
+import { ActionButton } from 'src/components/common/ActionButton/ActionButton';
 import { AnyObject } from '@shared/types/general';
 
 type LoadableTableProps = {
-  title?: string;
+  actionButtonText?: string;
+  className?: string;
   columns: { key: string; title: string }[];
   data: AnyObject[];
-  loadMore?: () => void;
-  hasMore?: boolean;
   emptyState?: ReactNode;
   isLoading?: boolean;
-  className?: string;
+  onActionButtonClick?: () => void;
+  showActionButton?: boolean;
+  title?: string;
 };
 
 export const LoadableTable: FC<LoadableTableProps> = ({
-  title,
+  actionButtonText,
+  className,
   columns,
   data = [],
-  loadMore,
-  hasMore = false,
   emptyState,
   isLoading = false,
-  className
+  onActionButtonClick,
+  showActionButton,
+  title
 }) => {
   // Show loading state or empty state if needed
   const displayEmptyState = !isLoading && data.length === 0 ? emptyState : undefined;
@@ -41,7 +43,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
       />
       {isLoading && <Spinner animation="border" variant="secondary" />}
       {displayEmptyState}
-      {hasMore && loadMore && <LoadMoreButton actionFn={loadMore} />}
+      {showActionButton && <ActionButton onClick={onActionButtonClick} name={actionButtonText} />}
     </Row>
   );
 };
