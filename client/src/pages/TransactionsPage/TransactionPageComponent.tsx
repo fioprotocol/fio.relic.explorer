@@ -12,17 +12,26 @@ const columns = [
   { key: 'fee', title: 'Fees' },
 ];
 
-export const TransactionPageComponent: FC<{ title?: string }> = ({ title }) => {
-  const { transactions, loading, loadMore, hasMore } = useTransactionsComponentContext();
+type TransactionPageComponentProps = {
+  title?: string;
+  showActionButton?: boolean;
+};
+
+export const TransactionPageComponent: FC<TransactionPageComponentProps> = ({
+  title,
+  showActionButton = false,
+}) => {
+  const { transactions, loading, onActionButtonClick } = useTransactionsComponentContext();
 
   return (
     <LoadableTable
       columns={columns}
       data={transactions || []}
       title={title || 'Transactions'}
-      loadMore={loadMore}
-      hasMore={hasMore}
+      showActionButton={showActionButton}
+      actionButtonText="VIEW ALL TRANSACTIONS"
       isLoading={loading}
+      onActionButtonClick={onActionButtonClick}
     />
   );
 };
