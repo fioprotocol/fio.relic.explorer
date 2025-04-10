@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import { getTransactions } from 'src/services/transactions';
-import { usePaginationData } from 'src/hooks/usePaginationData';
+import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
 import { transformTransactions } from 'src/utils/transactions';
 
 import { TransformedTransaction, Transaction } from '@shared/types/transactions';
@@ -11,15 +11,12 @@ import { ROUTES } from 'src/constants/routes';
 type UseTransactionsComponentContext = {
   onActionButtonClick: () => void;
   transactions: TransformedTransaction[];
-  loading: boolean;
-  error: Error | null;
-};
+} & UsePaginationDefaultProps;
 
 export const useTransactionsComponentContext = (): UseTransactionsComponentContext => {
   const { 
-    data, 
-    loading, 
-    error,
+    data,
+    ...paginationProps
   } = usePaginationData<Transaction>({
     action: getTransactions,
     dataKey: 'transactions',
@@ -36,8 +33,7 @@ export const useTransactionsComponentContext = (): UseTransactionsComponentConte
 
   return { 
     transactions,
-    loading, 
-    error,
+    ...paginationProps,
     onActionButtonClick,
   };
 };
