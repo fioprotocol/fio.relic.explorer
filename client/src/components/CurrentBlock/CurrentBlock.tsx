@@ -1,24 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner } from 'react-bootstrap';
 
 import { DataTile } from 'src/components/common/DataTile';
 
-import { useCurrentBlockContext } from './CurrentBlockContext';
-
 import { ROUTES } from 'src/constants/routes';
 
-const CurrentBlock: React.FC = () => {
-  const { currentBlock, producer } = useCurrentBlockContext();
+import { Producer } from 'src/services/bpmonitor';
+import { Block } from '@shared/types/blocks';
 
-  if (!currentBlock) {
-    return (
-      <div className="d-flex justify-content-center align-items-center m-4">
-        <Spinner color="primary" />
-      </div>
-    );
-  }
-
+const CurrentBlock: React.FC<{ currentBlock: Block; producer?: Producer }> = ({
+  currentBlock,
+  producer,
+}) => {
   return (
     <DataTile
       title="Current block"

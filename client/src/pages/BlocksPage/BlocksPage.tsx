@@ -40,41 +40,46 @@ const BlocksPage: React.FC = () => {
   return (
     <Container className="py-5">
       <h4 className="mb-5">Blocks</h4>
-      <CurrentBlock />
-      <CardComponent title="All Blocks" className="my-5">
-        {blocks.length === 0 ? (
-          <div className="d-flex justify-content-center align-items-center">
-            <Spinner color="primary" />
-          </div>
-        ) : (
-          <TableComponent
-            columns={columns}
-            data={blocks.map((block) => ({
-              pk_block_number: (
-                <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
-                  {block.pk_block_number.toLocaleString()}
-                </Link>
-              ),
-              block_id: (
-                <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
-                  {`${block.block_id.substring(
-                    0,
-                    6
-                  )}...${block.block_id.substring(block.block_id.length - 6)}`}
-                </Link>
-              ),
-              stamp: new Date(block.stamp).toUTCString(),
-              producer: (
-                <Link to={`${ROUTES.accounts.path}/${block.producer_account_name}`}>
-                  {producers.get(block.producer_account_name)?.candidate_name ||
-                    block.producer_account_name}
-                </Link>
-              ),
-              transaction_count: block.transaction_count,
-            }))}
+      {blocks.length === 0 ? (
+        <div className="d-flex justify-content-center align-items-center">
+          <Spinner color="primary" />
+        </div>
+      ) : (
+        <>
+          <CurrentBlock
+            currentBlock={blocks[0]}
+            producer={producers.get(blocks[0]?.producer_account_name)}
           />
-        )}
-      </CardComponent>
+          <CardComponent title="All Blocks" className="my-5">
+            <TableComponent
+              columns={columns}
+              data={blocks.map((block) => ({
+                pk_block_number: (
+                  <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
+                    {block.pk_block_number.toLocaleString()}
+                  </Link>
+                ),
+                block_id: (
+                  <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
+                    {`${block.block_id.substring(
+                      0,
+                      6
+                    )}...${block.block_id.substring(block.block_id.length - 6)}`}
+                  </Link>
+                ),
+                stamp: new Date(block.stamp).toUTCString(),
+                producer: (
+                  <Link to={`${ROUTES.accounts.path}/${block.producer_account_name}`}>
+                    {producers.get(block.producer_account_name)?.candidate_name ||
+                      block.producer_account_name}
+                  </Link>
+                ),
+                transaction_count: block.transaction_count,
+              }))}
+            />
+          </CardComponent>
+        </>
+      )}
     </Container>
   );
 };
