@@ -22,7 +22,9 @@ const HomePage: React.FC = () => {
       />
       <Container>
         <StatisticComponent stats={stats} chartData={chartData} loading={loading} />
-        <TransactionPageComponent />
+        <div className='my-4'>
+          <TransactionPageComponent />
+        </div>
       </Container>
     </>
   );

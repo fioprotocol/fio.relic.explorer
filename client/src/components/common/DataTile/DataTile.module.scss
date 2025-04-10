@@ -11,10 +11,6 @@
     border-bottom: none !important;
   }
 
-  &.dataItemRow {
-    background-color: $snow-drift !important;
-  }
-
   .dataItemTitle {
     @include font-inter-400;
     font-size: $font-size-xxs;

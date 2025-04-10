@@ -27,6 +27,7 @@
       font-size: $font-size-sm;
       color: $dark;
       vertical-align: middle;
+      white-space: pre-wrap;
     }
   }
 }
@@ -55,4 +56,5 @@
   @include font-inter-400;
   font-size: $font-size-xs;
   color: $dark;
+  white-space: pre-wrap;
 }
