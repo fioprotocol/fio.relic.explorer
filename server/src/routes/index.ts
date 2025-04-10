@@ -5,9 +5,9 @@ import { API_PREFIX } from '@shared/constants/network';
 import * as healthCheckRoute from './health-check';
 import * as searchRoute from './search';
 import * as getStatsRoute from './stats';
-import * as transactionsRoute from './transactions';
 import * as blocksRoute from './blocks';
 import * as currentBlockRoute from './current-block';
+import { getTransactionsRoute, getTransactionByIdRoute, getTransactionStatsRoute } from './transactions/index';
 
 interface RouteConfig {
   plugin: FastifyPluginAsync;
@@ -18,9 +18,11 @@ const routes: RouteConfig[] = [
   { plugin: healthCheckRoute.default, prefix: `/${API_PREFIX}/health-check` },
   { plugin: getStatsRoute.default, prefix: `/${API_PREFIX}/stats` },
   { plugin: searchRoute.default, prefix: `/${API_PREFIX}/search` },
-  { plugin: transactionsRoute.default, prefix: `/${API_PREFIX}/transactions` },
   { plugin: blocksRoute.default, prefix: `/${API_PREFIX}/blocks` },
   { plugin: currentBlockRoute.default, prefix: `/${API_PREFIX}/current-block` },
+  { plugin: getTransactionsRoute, prefix: `/${API_PREFIX}/transactions` },
+  { plugin: getTransactionStatsRoute, prefix: `/${API_PREFIX}/transactions/stats` },
+  { plugin: getTransactionByIdRoute, prefix: `/${API_PREFIX}/transactions/:id` },
 ];
 
 export const registerRoutes = async (server: FastifyInstance): Promise<void> => {

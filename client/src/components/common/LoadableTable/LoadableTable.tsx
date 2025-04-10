@@ -32,7 +32,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   const displayEmptyState = !isLoading && data.length === 0 ? emptyState : undefined;
   
   return (
-    <Row className="flex-column align-items-center gap-3 mb-5">
+    <Row className="flex-column align-items-center gap-3">
       <TableComponent 
         columns={columns} 
         data={data} 

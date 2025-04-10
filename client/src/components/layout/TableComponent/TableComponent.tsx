@@ -59,8 +59,10 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
                   key={`mobile-${index}-${column.key}`}
                   className={`d-flex flex-column mb-2 ${styles.mobileItem}`}
                 >
-                  <div className={`mb-1${styles.mobileLabel}`}>{column.title}</div>
-                  <div className={styles.mobileValue}>{record[column.key]}</div>
+                  <div className={`mb-1 ${styles.mobileLabel}`}>{column.title}</div>
+                  <div className={styles.mobileValue}>
+                    {record[column.key]}
+                  </div>
                 </div>
               ))}
             </div>

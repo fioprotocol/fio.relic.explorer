@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import SearchNotFoundPage from './pages/SearchNotFoundPage';
 import HealthCheckPage from './pages/HealthCheckPage';
 import BlocksPage from './pages/BlocksPage';
+import TransactionsPage from './pages/TransactionsPage';
 
 import { ROUTES } from './constants/routes';
 
@@ -17,6 +18,7 @@ const App: React.FC = () => {
           <Route path={ROUTES.searchNotFound.path} element={<SearchNotFoundPage />} />
           <Route path={ROUTES.blocks.path} element={<BlocksPage />} />
           <Route path={ROUTES.healthCheck.path} element={<HealthCheckPage />} />
+          <Route path={ROUTES.transactions.path} element={<TransactionsPage />} />
           <Route
             path="*"
             element={
