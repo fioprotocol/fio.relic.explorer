@@ -51,6 +51,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
                 },
               },
             },
+            total: { type: 'number' },
           },
         },
       },
@@ -88,10 +89,26 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         LIMIT $1
         OFFSET $2
       `;
-      const result = await pool.query(sqlQuery, [limit, offset]);
+
+      // Query for total count
+      const countQuery = {
+        text: `
+        SELECT COUNT(*) as total
+        FROM blocks
+      `,
+        values: []
+      };
+
+      const [result, countResult] = await Promise.all([
+        pool.query(sqlQuery, [limit, offset]),
+        pool.query(countQuery)
+      ]);
+
+      const total = parseInt(countResult.rows[0].total);
 
       return {
         data: result.rows,
+        total,
       };
     }
   );

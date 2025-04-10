@@ -17,8 +17,6 @@ export type Transaction = {
 export type TransactionResponse = {
   transactions: Transaction[];
   total: number;
-  offset: number;
-  limit: number;
 };
 
 export type TransformedTransaction = {
