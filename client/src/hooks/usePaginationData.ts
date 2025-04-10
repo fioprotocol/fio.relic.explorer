@@ -9,24 +9,34 @@ type UsePaginationDataProps = {
   limit?: number;
 };
 
-type UsePaginationDataReturn<T> = {
-  data: T[];
+export type UsePaginationDefaultProps = {
   loading: boolean;
   error: Error | null;
-  loadMore: () => void;
-  hasMore: boolean;
-  reset: () => void;
+  currentPage: number | null;
+  totalPages: number;
+  goToPage?: (page: number) => void;
+  goToFirstPage: () => void;
+  goToPreviousPage: () => void;
+  goToNextPage: () => void;
+  goToLastPage: () => void;
+  reset?: () => void;
 };
 
-export const usePaginationData = <T>({ 
+export type UsePaginationDataReturn<T, O = AnyObject> = {
+  data: T[];
+  otherData: O | null;
+} & UsePaginationDefaultProps;
+
+export const usePaginationData = <T, O = AnyObject>({ 
   action, 
   params = {}, 
   dataKey = 'data',
   limit = DEFAULT_REQUEST_ITEMS_LIMIT
-}: UsePaginationDataProps): UsePaginationDataReturn<T> => {
+}: UsePaginationDataProps): UsePaginationDataReturn<T, O> => {
   const [data, setData] = useState<T[]>([]);
-  const [offset, setOffset] = useState<number | null>(null);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [otherData, setOtherData] = useState<O | null>(null);
+  const [currentPage, setCurrentPage] = useState<number | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   
@@ -34,8 +44,8 @@ export const usePaginationData = <T>({
   const paramsRef = useRef(params);
   const serializedParamsRef = useRef(JSON.stringify(params));
 
-  // Function to fetch data with the given offset
-  const fetchData = useCallback(async (currentOffset: number, isNewSearch: boolean) => {
+  // Function to fetch data for a specific page
+  const fetchData = useCallback(async (page: number) => {
     // Prevent concurrent requests
     if (loading) return;
     
@@ -43,39 +53,48 @@ export const usePaginationData = <T>({
     setError(null);
 
     try {
+      const offset = (page - 1) * limit;
+      
       const queryParams = {
         ...paramsRef.current,
-        offset: currentOffset,
+        offset,
         limit
       };
       
       const response = await action(queryParams);
-      const newItems = (response[dataKey] || []) as T[];
+      const { [dataKey]: newItems = [], total, ...restData } = response || {};
       
-      setData(prevData => {
-        // If this is a new search or the first page, replace the data
-        if (isNewSearch || currentOffset === 0) {
-          return [...newItems];
+      // Calculate total pages if available
+      if (total) {
+        setTotalPages(Math.ceil(total / limit));
+      } else {
+        // If no total count is provided from API, estimate based on current results
+        if (newItems.length < limit) {
+          setTotalPages(page);
+        } else {
+          setTotalPages(Math.max(page + 1, totalPages));
         }
-        // Otherwise append to existing data
-        return [...prevData, ...newItems];
-      });
+      }
       
-      // Update hasMore flag based on returned items count
-      setHasMore(newItems.length >= limit);
+      setData(newItems as T[]);
+      
+      // Store additional data
+      setOtherData(Object.keys(restData).length > 0 ? restData as O : null);
+      
+      setCurrentPage(page);
     } catch (error) {
       setError(error as Error);
     } finally {
       setLoading(false);
     }
-  }, [action, dataKey, limit, loading]);
+  }, [action, dataKey, limit, loading, totalPages]);
 
   // Reset pagination and load initial data when params change
   useEffect(() => {
     const serializedParams = JSON.stringify(params);
     
     // Skip if params haven't actually changed
-    if (serializedParams === serializedParamsRef.current && offset !== null) {
+    if (serializedParams === serializedParamsRef.current && currentPage !== null) {
       return;
     }
     
@@ -83,36 +102,53 @@ export const usePaginationData = <T>({
     paramsRef.current = params;
     serializedParamsRef.current = serializedParams;
     
-    // Reset pagination state
-    setOffset(0);
-    setHasMore(true);
-    
-    // Load first page with new parameters
-    fetchData(0, true);
-  }, [params, fetchData, offset]);
+    // Reset pagination state and load first page
+    setCurrentPage(1);
+    fetchData(1);
+  }, [params, fetchData, currentPage]);
 
-  // Function to load more data
-  const loadMore = useCallback(() => {
-    if (!loading && hasMore && offset !== null) {
-      const nextOffset = offset + limit;
-      setOffset(nextOffset);
-      fetchData(nextOffset, false);
+  // Navigation functions
+  const goToPage = useCallback((page: number) => {
+    const targetPage = Math.max(1, Math.min(page, totalPages));
+    if (targetPage !== currentPage) {
+      fetchData(targetPage);
     }
-  }, [fetchData, hasMore, limit, loading, offset]);
+  }, [currentPage, fetchData, totalPages]);
+
+  const goToFirstPage = useCallback(() => {
+    goToPage(1);
+  }, [goToPage]);
+
+  const goToPreviousPage = useCallback(() => {
+    currentPage && goToPage(currentPage - 1);
+  }, [currentPage, goToPage]);
+
+  const goToNextPage = useCallback(() => {
+    currentPage && goToPage(currentPage + 1);
+  }, [currentPage, goToPage]);
+
+  const goToLastPage = useCallback(() => {
+    goToPage(totalPages);
+  }, [goToPage, totalPages]);
 
   // Function to reset and reload data
   const reset = useCallback(() => {
-    setOffset(null);
-    setHasMore(true);
-    fetchData(0, true);
+    setCurrentPage(1);
+    fetchData(1);
   }, [fetchData]);
 
   return {
     data,
+    otherData,
     loading,
     error,
-    loadMore,
-    hasMore,
+    currentPage,
+    totalPages,
+    goToPage,
+    goToFirstPage,
+    goToPreviousPage,
+    goToNextPage,
+    goToLastPage,
     reset
   };
 };
