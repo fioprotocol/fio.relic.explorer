@@ -3,9 +3,8 @@ import { Link } from 'react-router';
 import { Spinner } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
-import { TableComponent } from 'src/components/layout/TableComponent';
 import CurrentBlock from 'src/components/CurrentBlock/CurrentBlock';
-import { CardComponent } from 'src/components/layout/CardComponent';
+import { LoadableTable } from 'src/components/common/LoadableTable';
 
 import { useBlocksPageContext } from './BlocksPageContext';
 
@@ -35,7 +34,7 @@ const columns = [
 ];
 
 const BlocksPage: React.FC = () => {
-  const { blocks, producers } = useBlocksPageContext();
+  const { blocks, producers, ...paginationProps } = useBlocksPageContext();
 
   return (
     <Container className="py-5">
@@ -50,10 +49,10 @@ const BlocksPage: React.FC = () => {
             currentBlock={blocks[0]}
             producer={producers.get(blocks[0]?.producer_account_name)}
           />
-          <CardComponent title="All Blocks" className="my-5">
-            <TableComponent
-              columns={columns}
-              data={blocks.map((block) => ({
+          <LoadableTable
+            columns={columns}
+            data={
+              blocks.map((block) => ({
                 pk_block_number: (
                   <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
                     {block.pk_block_number.toLocaleString()}
@@ -75,9 +74,11 @@ const BlocksPage: React.FC = () => {
                   </Link>
                 ),
                 transaction_count: block.transaction_count,
-              }))}
-            />
-          </CardComponent>
+              }))
+            }
+            title="All Blocks"
+            {...paginationProps}
+          />
         </>
       )}
     </Container>

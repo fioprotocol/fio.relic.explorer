@@ -8,6 +8,7 @@ import { ActionButton } from 'src/components/common/ActionButton/ActionButton';
 import { Pagination } from 'src/components/common/Pagination';
 import { AnyObject } from '@shared/types/general';
 import { UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import { CardComponent } from 'src/components/layout/CardComponent';
 
 type LoadableTableProps = {
   actionButtonText?: string;
@@ -18,6 +19,7 @@ type LoadableTableProps = {
   onActionButtonClick?: () => void;
   showActionButton?: boolean;
   title?: string;
+  showInCardComponent?: boolean;
   // Pagination props
   showPagination?: boolean;
 } & UsePaginationDefaultProps;
@@ -32,29 +34,40 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   onActionButtonClick,
   showActionButton,
   title,
+  showInCardComponent = true,
   // Pagination props
   showPagination = true,
   ...paginationProps
 }) => {
   // Show loading state or empty state if needed
   const displayEmptyState = !loading && data.length === 0 ? emptyState : undefined;
-  
-  return (
+
+  const tableRender = (): ReactNode => (
     <Row className="flex-column align-items-center gap-3">
-      <TableComponent 
-        columns={columns} 
-        data={data} 
+      <TableComponent
+        columns={columns}
+        data={data}
         title={title}
         className={className}
       />
       {loading && <Spinner animation="border" variant="secondary" />}
       {displayEmptyState}
-      
+
       {showPagination && (
         <Pagination {...paginationProps} loading={loading} />
       )}
-      
+
       {showActionButton && <ActionButton onClick={onActionButtonClick} name={actionButtonText} />}
     </Row>
   );
+
+  if (showInCardComponent) {
+    return (
+      <CardComponent className="my-4">
+        {tableRender()}
+      </CardComponent>
+    );
+  }
+
+  return <>{tableRender()}</>;
 };
