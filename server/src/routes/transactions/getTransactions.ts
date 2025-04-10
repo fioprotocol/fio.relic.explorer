@@ -113,8 +113,6 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
     const response: TransactionResponse = {
       transactions,
       total,
-      offset,
-      limit
     };
     
     return response;

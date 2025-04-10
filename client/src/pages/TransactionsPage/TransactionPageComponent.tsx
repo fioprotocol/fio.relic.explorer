@@ -15,11 +15,15 @@ const columns = [
 type TransactionPageComponentProps = {
   title?: string;
   showActionButton?: boolean;
+  showInCardComponent?: boolean;
+  className?: string;
 };
 
 export const TransactionPageComponent: FC<TransactionPageComponentProps> = ({
   title,
   showActionButton = false,
+  showInCardComponent = true,
+  className,
 }) => {
   const { 
     transactions, 
@@ -30,15 +34,18 @@ export const TransactionPageComponent: FC<TransactionPageComponentProps> = ({
   // On homepage: show action button, no pagination
   // On transactions page: show pagination, no action button
   return (
-    <LoadableTable
-      columns={columns}
-      data={transactions || []}
-      title={title || 'Transactions'}
-      showActionButton={showActionButton}
-      actionButtonText="VIEW ALL TRANSACTIONS"
-      onActionButtonClick={onActionButtonClick}
-      showPagination={!showActionButton}
-      {...paginationProps}
-    />
+    <div className={className}>
+      <LoadableTable
+        columns={columns}
+        data={transactions || []}
+        title={title || 'Transactions'}
+        showActionButton={showActionButton}
+        actionButtonText="VIEW ALL TRANSACTIONS"
+        onActionButtonClick={onActionButtonClick}
+        showPagination={!showActionButton}
+        showInCardComponent={showInCardComponent}
+        {...paginationProps}
+      />
+    </div>
   );
 };

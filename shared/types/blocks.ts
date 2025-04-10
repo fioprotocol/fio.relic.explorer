@@ -9,6 +9,7 @@ export interface Block {
 
 export interface BlocksResponse {
   data: Block[];
+  total: number;
 }
 
 export interface CurrentBlockResponse {
