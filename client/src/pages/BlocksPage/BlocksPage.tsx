@@ -34,20 +34,20 @@ const columns = [
 ];
 
 const BlocksPage: React.FC = () => {
-  const { blocks, producers, ...paginationProps } = useBlocksPageContext();
+  const { blocks, currentBlock, producers, ...paginationProps } = useBlocksPageContext();
 
   return (
     <Container className="py-5">
       <h4 className="mb-5">Blocks</h4>
-      {blocks.length === 0 ? (
+      {blocks.length === 0 || !currentBlock ? (
         <div className="d-flex justify-content-center align-items-center">
           <Spinner color="primary" />
         </div>
       ) : (
         <>
           <CurrentBlock
-            currentBlock={blocks[0]}
-            producer={producers.get(blocks[0]?.producer_account_name)}
+            currentBlock={currentBlock}
+            producer={producers.get(currentBlock.producer_account_name)}
           />
           <LoadableTable
             columns={columns}

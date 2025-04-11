@@ -51,6 +51,17 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
                 },
               },
             },
+            current_block: {
+              type: 'object',
+              properties: {
+                pk_block_number: { type: 'number' },
+                stamp: { type: 'string' },
+                block_id: { type: 'string' },
+                producer_account_name: { type: 'string' },
+                schedule_version: { type: 'number' },
+                transaction_count: { type: 'number' },
+              },
+            },
             total: { type: 'number' },
           },
         },
@@ -96,18 +107,43 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         SELECT COUNT(*) as total
         FROM blocks
       `,
-        values: []
+        values: [],
       };
 
-      const [result, countResult] = await Promise.all([
+      // Query for total count
+      const currentBlockQuery = {
+        text: `
+        SELECT
+          b.pk_block_number,
+          b.stamp,
+          b.block_id,
+          b.producer_account_name,
+          b.schedule_version,
+          (
+            SELECT COUNT(*)
+            FROM transactions t
+            WHERE t.fk_block_number = b.pk_block_number
+          ) as transaction_count
+        FROM
+          blocks b
+        ORDER BY
+          b.pk_block_number DESC
+        LIMIT 1
+      `,
+        values: [],
+      };
+
+      const [result, countResult, currentBlockResult] = await Promise.all([
         pool.query(sqlQuery, [limit, offset]),
-        pool.query(countQuery)
+        pool.query(countQuery),
+        offset === 0 ? Promise.resolve({ rows: [] }) : pool.query(currentBlockQuery),
       ]);
 
       const total = parseInt(countResult.rows[0].total);
 
       return {
         data: result.rows,
+        current_block: offset === 0 ? result.rows[0] : currentBlockResult.rows[0],
         total,
       };
     }
