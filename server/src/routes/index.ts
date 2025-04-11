@@ -8,6 +8,7 @@ import * as getStatsRoute from './stats';
 import * as blocksRoute from './blocks';
 import * as blockRoute from './block';
 import * as currentBlockRoute from './current-block';
+import * as handlesRoute from './handles';
 import { getTransactionsRoute, getTransactionByIdRoute, getTransactionStatsRoute } from './transactions/index';
 
 interface RouteConfig {
@@ -25,6 +26,7 @@ const routes: RouteConfig[] = [
   { plugin: getTransactionsRoute, prefix: `/${API_PREFIX}/transactions` },
   { plugin: getTransactionStatsRoute, prefix: `/${API_PREFIX}/transactions/stats` },
   { plugin: getTransactionByIdRoute, prefix: `/${API_PREFIX}/transactions/:id` },
+  { plugin: handlesRoute.default, prefix: `/${API_PREFIX}/handles` },
 ];
 
 export const registerRoutes = async (server: FastifyInstance): Promise<void> => {
