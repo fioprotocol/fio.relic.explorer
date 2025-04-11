@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner, Badge, Tab, Tabs } from 'react-bootstrap';
+import { Spinner, Badge, Tab, Tabs, Alert, Col } from 'react-bootstrap';
+import { InfoCircleFill } from 'react-bootstrap-icons';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
 import { DataTile } from 'src/components/common/DataTile';
 import { TableComponent } from 'src/components/layout/TableComponent';
+import { BackButton } from 'src/components/common/BackButton';
 
 import { useBlockDetailsContext } from './BlockDetailsContext';
 
@@ -37,6 +39,7 @@ const BlockDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
+      <BackButton to={ROUTES.blocks.path} />
       <h4>Block: #{formatBlockNumber(block_number || 0)}</h4>
       {!block || loading ? (
         <div className="d-flex justify-content-center align-items-center">
@@ -130,12 +133,28 @@ const BlockDetailsPage: React.FC = () => {
             ]}
           />
           <CardComponent title="Block Details">
-            <Tabs defaultActiveKey="transactions" id="uncontrolled-tab-example" className="mb-3">
+            <Tabs
+              defaultActiveKey="transactions"
+              id="block-details-tabs"
+              variant="underline"
+              className="mb-3"
+            >
               <Tab eventKey="transactions" title="Transactions">
-                <TableComponent
-                  columns={txColumns}
-                  data={transactions.map(transformTransactions)}
-                />
+                {transactions.length > 0 ? (
+                  <TableComponent
+                    columns={txColumns}
+                    data={transactions.map(transformTransactions)}
+                  />
+                ) : (
+                  <Col xs={12} lg={4}>
+                    <Alert
+                      variant="info"
+                      className="text-white bg-info fw-bold f-size-sm d-flex justify-content-start align-items-center pe-5"
+                    >
+                      <InfoCircleFill size={16} className="me-2" /> No transactions found
+                    </Alert>
+                  </Col>
+                )}
               </Tab>
             </Tabs>
           </CardComponent>
