@@ -1,10 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 
 import { DataItem } from 'src/components/common/DataTile';
 import { DEFAULT_DAYS } from 'src/constants/stats';
 import { getStats } from 'src/services/stats';
 import { TransactionDataPoint } from 'src/components/TransactionChart/types';
-import { useGetData } from 'src/hooks/useGetData';
+import { DEFAULT_REFRESH_INTERVAL } from 'src/constants/general';
+
+import useInterval from 'src/hooks/useInterval';
+import { StatsResponse } from '@shared/types/stats';
 
 type UseHomePageContext = {
   stats: DataItem[];
@@ -13,10 +16,23 @@ type UseHomePageContext = {
 }
 
 export const useHomePageContext = (): UseHomePageContext => {
-  const { loading, response } = useGetData({
-    action: getStats,
-    params: { days: DEFAULT_DAYS, useLastRecord: true }
-  });
+  const [response, setResponse] = useState<StatsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await getStats({ days: DEFAULT_DAYS, useLastRecord: true });
+      setResponse(result);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Refresh data every 5 seconds
+  useInterval(fetchStats, DEFAULT_REFRESH_INTERVAL, { callImmediately: true });
 
   const stats = useMemo(() => {
     const {
@@ -37,5 +53,9 @@ export const useHomePageContext = (): UseHomePageContext => {
     ]
   }, [response?.data]);
 
-  return { chartData: response?.data?.transactions || [], stats, loading };
+  return { 
+    chartData: response?.data?.transactions as TransactionDataPoint[] || [], 
+    stats: stats as DataItem[], 
+    loading: loading && !response?.data
+  };
 };
