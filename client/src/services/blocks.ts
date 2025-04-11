@@ -2,8 +2,8 @@ import { Block, BlocksResponse, CurrentBlockResponse } from '@shared/types/block
 
 import { apiClient } from './api-client';
 
-export const getBlocks = async (): Promise<BlocksResponse> => {
-  const response = await apiClient.get<BlocksResponse>('/blocks');
+export const getBlocks = async (params: { offset: number, limit: number }): Promise<BlocksResponse> => {
+  const response = await apiClient.get<BlocksResponse>('/blocks', { params });
   return response.data;
 };
 
