@@ -13,7 +13,10 @@ type UseHomePageContext = {
 }
 
 export const useHomePageContext = (): UseHomePageContext => {
-  const { loading, response } = useGetData({ action: getStats, params: { days: DEFAULT_DAYS } });
+  const { loading, response } = useGetData({
+    action: getStats,
+    params: { days: DEFAULT_DAYS, useLastRecord: true }
+  });
 
   const stats = useMemo(() => {
     const {

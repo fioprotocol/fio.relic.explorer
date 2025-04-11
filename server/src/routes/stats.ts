@@ -14,7 +14,8 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          days: { type: 'integer', default: 7, minimum: 1, maximum: 90 }
+          days: { type: 'integer', default: 7, minimum: 1, maximum: 90 },
+          useLastRecord: { type: 'boolean', default: false }
         }
       },
       response: {
@@ -49,15 +50,21 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
   };
 
   server.get('/', getStatsOpts, async (request: FastifyRequest, reply: FastifyReply) => {
-    const { days = 7 } = request.query as { days?: number };
+    const { days = 7, useLastRecord = false } = request.query as { days?: number, useLastRecord?: boolean };
     
     // Query for transactions by date
     const transactionsQuery = {
       text: `
         WITH date_series AS (
           SELECT generate_series(
-            CURRENT_DATE - ($1 || ' days')::INTERVAL,
-            CURRENT_DATE,
+            CASE 
+              WHEN $2 = true THEN (SELECT DATE(block_timestamp) FROM transactions ORDER BY block_timestamp DESC LIMIT 1) - ($1 || ' days')::INTERVAL
+              ELSE CURRENT_DATE - ($1 || ' days')::INTERVAL
+            END,
+            CASE 
+              WHEN $2 = true THEN (SELECT DATE(block_timestamp) FROM transactions ORDER BY block_timestamp DESC LIMIT 1)
+              ELSE CURRENT_DATE
+            END,
             INTERVAL '1 day'
           )::DATE AS date
         ),
@@ -66,7 +73,10 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
             DATE(block_timestamp) as date,
             COUNT(*) as transactions
           FROM transactions
-          WHERE block_timestamp >= CURRENT_DATE - ($2 || ' days')::INTERVAL
+          WHERE block_timestamp >= CASE 
+            WHEN $2 = true THEN (SELECT block_timestamp FROM transactions ORDER BY block_timestamp DESC LIMIT 1) - ($1 || ' days')::INTERVAL
+            ELSE CURRENT_DATE - ($1 || ' days')::INTERVAL
+          END
           GROUP BY DATE(block_timestamp)
         )
         SELECT
@@ -76,7 +86,7 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
         LEFT JOIN daily_counts dc ON ds.date = dc.date
         ORDER BY ds.date ASC
       `,
-      values: [days - 1, days]
+      values: [days, useLastRecord]
     };
     
     // Query for FIO metrics
