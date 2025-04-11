@@ -17,13 +17,13 @@ export const useGetData = ({ action, params = {} }: UseGetDataProps): UseGetData
   const [response, setResponse] = useState<AnyObject>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  
+
   // Create a ref to track if the component is mounted
   const isMounted = useRef(true);
-  
+
   // Use a ref to store the stringified params to detect changes
   const paramsRef = useRef<string>('');
-  
+
   // Stringify params safely
   const getParamsString = (): string => {
     try {
@@ -33,13 +33,13 @@ export const useGetData = ({ action, params = {} }: UseGetDataProps): UseGetData
       return '{}';
     }
   };
-  
+
   const paramsString = getParamsString();
-  
+
   const getData = useCallback(async () => {
     // Skip if params haven't changed
     if (paramsRef.current === paramsString) return;
-    
+
     paramsRef.current = paramsString;
     setLoading(true);
     setError(null);
@@ -62,9 +62,10 @@ export const useGetData = ({ action, params = {} }: UseGetDataProps): UseGetData
   useEffect(() => {
     getData();
   }, [getData]);
-  
+
   // Cleanup function to prevent memory leaks
   useEffect(() => {
+    isMounted.current = true;
     return () => {
       isMounted.current = false;
     };

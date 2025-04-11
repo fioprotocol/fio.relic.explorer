@@ -10,7 +10,7 @@ export interface TableColumn {
 
 export interface TableProps {
   columns: TableColumn[];
-  data: { [key: string]: string | number | React.ReactElement }[];
+  data: { [key: string]: string | number | React.ReactElement | React.ReactNode }[];
   title?: string;
   className?: string;
 }
@@ -60,9 +60,7 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
                   className={`d-flex flex-column mb-2 ${styles.mobileItem}`}
                 >
                   <div className={`mb-1 ${styles.mobileLabel}`}>{column.title}</div>
-                  <div className={styles.mobileValue}>
-                    {record[column.key]}
-                  </div>
+                  <div className={styles.mobileValue}>{record[column.key]}</div>
                 </div>
               ))}
             </div>

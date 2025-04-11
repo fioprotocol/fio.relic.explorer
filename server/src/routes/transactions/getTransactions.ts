@@ -1,9 +1,9 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 import pool from '../../config/database';
-import { 
-  DEFAULT_REQUEST_ITEMS_LIMIT, 
-  DEFAULT_REQUEST_ITEMS_OFFSET, 
-  DEFAULT_MAX_REQUEST_ITEMS_LIMIT 
+import {
+  DEFAULT_REQUEST_ITEMS_LIMIT,
+  DEFAULT_REQUEST_ITEMS_OFFSET,
+  DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
 import { TransactionResponse, Transaction } from '@shared/types/transactions';
 
@@ -18,8 +18,14 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
         type: 'object',
         properties: {
           offset: { type: 'integer', default: DEFAULT_REQUEST_ITEMS_OFFSET, minimum: 0 },
-          limit: { type: 'integer', default: DEFAULT_REQUEST_ITEMS_LIMIT, minimum: 1, maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT }
-        }
+          limit: {
+            type: 'integer',
+            default: DEFAULT_REQUEST_ITEMS_LIMIT,
+            minimum: 1,
+            maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
+          },
+          block_number: { type: 'integer' },
+        },
       },
       response: {
         200: {
@@ -42,14 +48,14 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                   fee: { type: 'number' },
                   request_data: { type: 'string' },
                   response_data: { type: 'string' },
-                  result_status: { type: 'string' }
-                }
-              }
+                  result_status: { type: 'string' },
+                },
+              },
             },
             total: { type: 'number' },
             offset: { type: 'number' },
-            limit: { type: 'number' }
-          }
+            limit: { type: 'number' },
+          },
         },
       },
       tags: ['transactions'],
@@ -59,14 +65,16 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
   };
 
   server.get('/', getTransactionsOpts, async (request: FastifyRequest, reply: FastifyReply) => {
-    const { 
-      offset = DEFAULT_REQUEST_ITEMS_OFFSET, 
-      limit = DEFAULT_REQUEST_ITEMS_LIMIT
-    } = request.query as { 
+    const {
+      offset = DEFAULT_REQUEST_ITEMS_OFFSET,
+      limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+      block_number,
+    } = request.query as {
       offset?: number;
       limit?: number;
+      block_number?: number;
     };
-        
+
     // Query for transactions
     const transactionsQuery = {
       text: `
@@ -86,35 +94,37 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
           t.result_status
         FROM transactions t
         LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id
+        ${block_number ? `WHERE t.fk_block_number = $3` : ''}
         ORDER BY t.block_timestamp DESC
         LIMIT $1 OFFSET $2
       `,
-      values: [limit, offset]
+      values: [limit, offset, block_number],
     };
-    
+
     // Query for total count
     const countQuery = {
       text: `
         SELECT COUNT(*) as total
         FROM transactions
+        ${block_number ? `WHERE fk_block_number = $1` : ''}
       `,
-      values: []
+      values: [block_number],
     };
-    
+
     // Execute both queries
     const [transactionsResult, countResult] = await Promise.all([
       pool.query(transactionsQuery),
-      pool.query(countQuery)
+      pool.query(countQuery),
     ]);
 
     const transactions = transactionsResult.rows as Transaction[];
     const total = parseInt(countResult.rows[0].total);
-    
+
     const response: TransactionResponse = {
       transactions,
       total,
     };
-    
+
     return response;
   });
 };

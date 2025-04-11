@@ -10,4 +10,7 @@ export const formatDate = (date: string): string => {
 };
 
 export const truncateLongText = (text: string): string =>
-  text.length > 12 ? `${text.substring(0, 6)}…${text.substring(text.length - 6)}`: text;
+  text.length > 12 ? `${text.substring(0, 6)}…${text.substring(text.length - 6)}` : text;
+
+export const formatBlockNumber = (block_number: number): string =>
+  block_number.toLocaleString();
