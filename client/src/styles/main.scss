@@ -87,3 +87,21 @@ a {
 .text-truncate-max-w {
   max-width: 30rem;
 }
+
+// Custom styles for nav-underline
+.nav-underline {
+  border-bottom: var(--bs-border-width) solid $border-color;
+  .nav-item {
+    .nav-link {
+      padding-right: 1.5rem;
+      padding-left: 1.5rem;
+      color: $secondary;
+
+      &.active {
+        color: $dark;
+        font-weight: 400;
+        border-color: $primary;
+      }
+    }
+  }
+}
