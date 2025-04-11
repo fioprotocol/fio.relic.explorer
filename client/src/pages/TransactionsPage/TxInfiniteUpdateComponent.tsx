@@ -1,0 +1,25 @@
+import { FC } from 'react';
+import { LoadableTable } from 'src/components/common/LoadableTable';
+
+import { columns } from './TxComponent';
+import { useTxInfiniteUpdateConext } from './TxInfiniteUpdateComponentConext';
+
+export const TxInfiniteUpdateComponent: FC = () => {
+  const {
+    transactions,
+    onActionButtonClick,
+  } = useTxInfiniteUpdateConext();
+  
+  return <div className='my-4'>
+    <LoadableTable
+      columns={columns}
+      data={transactions || []}
+      title="Transactions"
+      showActionButton
+      actionButtonText="VIEW ALL TRANSACTIONS"
+      onActionButtonClick={onActionButtonClick}
+      showPagination={false}
+      showInCardComponent={true}
+    />
+  </div>;
+};

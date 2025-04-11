@@ -12,17 +12,17 @@ type UsePaginationDataProps = {
 };
 
 export type UsePaginationDefaultProps = {
-  loading: boolean;
-  error: Error | null;
-  currentPage: number | null;
-  totalPages: number;
-  goToPage: (page: number) => void;
-  reset?: () => void;
+  currentPage?: number | null;
+  totalPages?: number;
+  goToPage?: (page: number) => void;
 };
 
 export type UsePaginationDataReturn<T, O = AnyObject> = {
   data: T[];
+  loading: boolean;
+  error: Error | null;
   otherData: O | null;
+  reset?: () => void;
 } & UsePaginationDefaultProps;
 
 const PAGE_PARAM_NAME = QUERY_PARAMS_NAMES.PAGE;

@@ -16,13 +16,14 @@ type LoadableTableProps = {
   columns: { key: string; title: string }[];
   data: AnyObject[];
   emptyState?: ReactNode;
+  loading?: boolean;
   onActionButtonClick?: () => void;
   showActionButton?: boolean;
   title?: string;
   showInCardComponent?: boolean;
   // Pagination props
   showPagination?: boolean;
-} & UsePaginationDefaultProps;
+} & Partial<UsePaginationDefaultProps>;
 
 export const LoadableTable: FC<LoadableTableProps> = ({
   actionButtonText,
@@ -54,7 +55,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
       {displayEmptyState}
 
       {showPagination && (
-        <Pagination {...paginationProps} loading={loading} />
+        <Pagination {...paginationProps} />
       )}
 
       {showActionButton && <ActionButton onClick={onActionButtonClick} name={actionButtonText} />}

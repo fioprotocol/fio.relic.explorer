@@ -15,14 +15,14 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
       <div className="d-flex flex-wrap gap-3 w-100 justify-content-center">
         <Button
           variant={isFirstPage ? "outline-secondary" : "primary"}
-          onClick={(): void => goToPage(1)}
+          onClick={(): void => goToPage?.(1)}
           disabled={isFirstPage}
         >
           First
         </Button>
         <Button
           variant={isFirstPage ? "outline-secondary" : "primary"}
-          onClick={(): void => goToPage((currentPage ?? 1) - 1)}
+          onClick={(): void => goToPage?.(currentPage ?? 1 - 1)}
           disabled={isFirstPage}
         >
           &lt;
@@ -32,14 +32,14 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
         </div>
         <Button
           variant={isLastPage ? "outline-secondary" : "primary"}
-          onClick={(): void => goToPage((currentPage ?? 1) + 1)}
+          onClick={(): void => goToPage?.(currentPage ?? 1 + 1)}
           disabled={isLastPage}
         >
           &gt;
         </Button>
         <Button
           variant={isLastPage ? "outline-secondary" : "primary"}
-          onClick={(): void => goToPage(totalPages)}
+          onClick={(): void => goToPage?.(totalPages ?? 1)}
           disabled={isLastPage}
         >
           Last
