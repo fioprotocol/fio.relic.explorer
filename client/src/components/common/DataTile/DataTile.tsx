@@ -26,7 +26,7 @@ interface RowLayoutProps {
 }
 
 const RowLayout: React.FC<RowLayoutProps> = ({ items }) => (
-  <Row className="d-flex flex-row gap-3 flex-wrap m-0">
+  <Row className="d-flex flex-row gap-3 flex-wrap m-0 w-100">
     {items.map((item, index) => (
       <Col key={index} className={`flex-grow-1 p-0 ${styles.dataItemCol}`}>
         <div
@@ -126,9 +126,21 @@ export const DataTile: React.FC<DataTileProps> = ({
   return (
     <CardComponent title={title} className={className}>
       <Card.Body className="d-flex flex-column gap-3 p-0">
-        {renderItems()}
-        {loading && <Spinner animation="border" variant="secondary" className="align-self-center" />}
-        {children ? children : null}
+        <div className="w-100 d-flex flex-column flex-md-row gap-4">
+          <div className="w-100">
+            {renderItems()}
+          </div>
+          {children && (
+            <div className={`w-100 border-start border-1 border-mercury ${styles.childrenContainer}`}>
+              {children}
+            </div>
+          )}
+        </div>
+        {loading && (
+          <div className="d-flex justify-content-center align-items-center w-100">
+            <Spinner animation="border" variant="secondary" />
+          </div>
+        )}
       </Card.Body>
     </CardComponent>
   );

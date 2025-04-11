@@ -5,14 +5,12 @@ import { DEFAULT_DAYS } from '../../constants/stats';
 
 import { TransactionChartProps } from './types';
 
-import styles from './TransactionChart.module.scss';
-
 export const TransactionChart: FC<TransactionChartProps> = ({
   chartData,
   title = `Transaction History in ${DEFAULT_DAYS} Days`,
 }) => {
   const formatDate = (date: string): string => {
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const formatTransactions = (value: number, index?: number): string => {
@@ -33,7 +31,7 @@ export const TransactionChart: FC<TransactionChartProps> = ({
   };
 
   return (
-    <div className={`${styles.transactionChart} border border-1 pt-4 px-3 rounded-3`}>
+    <div className="border border-0 pt-2 ps-0 px-3 rounded-3 w-100">
       <Chart
         data={chartData}
         title={title}
