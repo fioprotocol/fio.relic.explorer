@@ -13,7 +13,7 @@ type StatisticComponentProps = {
 
 export const StatisticComponent: React.FC<StatisticComponentProps> = ({ stats, chartData, loading }) => {
   return (
-    <DataTile title="Statistics" items={stats} columns={2} layout="multi-column" loading={loading}>
+    <DataTile items={stats} columns={2} layout="multi-column" loading={loading}>
       <TransactionChart chartData={chartData} />
     </DataTile>
   );

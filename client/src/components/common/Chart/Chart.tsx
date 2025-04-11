@@ -51,12 +51,12 @@ const Chart: React.FC<ChartProps> = ({
   yAxisFormatter = defaultFormatter,
   tooltipFormatter = defaultFormatter,
   lineColor = COLOR_LINE,
-  height = 300,
+  height = 150,
   margin = { top: 20, right: 20, left: 0, bottom: 20 },
 }) => {
   return (
     <div className={styles.chart}>
-      {title && <h6>{title}</h6>}
+      {title && <h6 className="mb-3 ps-4">{title}</h6>}
       <div>
         <ResponsiveContainer width="100%" height={height}>
           <RechartsLineChart data={data} margin={margin}>
@@ -68,7 +68,7 @@ const Chart: React.FC<ChartProps> = ({
               tickLine={false}
               className="f-size-xs"
               tick={{ fill: COLOR_LINE }}
-              dy={10}
+              dy={15}
             />
             <YAxis
               tickFormatter={yAxisFormatter}
@@ -99,9 +99,9 @@ const Chart: React.FC<ChartProps> = ({
               type="monotone"
               dataKey={yAxisKey}
               stroke={lineColor}
-              strokeWidth={2}
+              strokeWidth={1}
               dot={{ r: 0 }}
-              activeDot={{ r: 10, fill: COLOR_SECONDARY, strokeWidth: 0 }}
+              activeDot={{ r: 8, fill: COLOR_SECONDARY, strokeWidth: 0 }}
             />
           </RechartsLineChart>
         </ResponsiveContainer>

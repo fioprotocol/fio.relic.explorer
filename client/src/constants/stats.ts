@@ -1,1 +1,1 @@
-export const DEFAULT_DAYS = 20;
+export const DEFAULT_DAYS = 7;
