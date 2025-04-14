@@ -6,6 +6,7 @@ import { InfoCircleFill } from 'react-bootstrap-icons';
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
 import { DataTile } from 'src/components/common/DataTile';
+import { ProducerTile } from 'src/components/ProducerTile';
 import { TableComponent } from 'src/components/layout/TableComponent';
 import { BackButton } from 'src/components/common/BackButton';
 
@@ -103,27 +104,11 @@ const BlockDetailsPage: React.FC = () => {
               {
                 title: 'Producer',
                 value: (
-                  <div className="text-secondary d-flex justify-content-start align-items-center gap-2 text-nowrap">
-                    <Link to={`${ROUTES.accounts.path}/${block.producer_account_name}`}>
-                      {producer?.candidate_name || '-'}
-                    </Link>{' '}
-                    <div className="border-start ps-2">
-                      Account:{' '}
-                      <Link to={`${ROUTES.accounts.path}/${block.producer_account_name}`}>
-                        {block.producer_account_name}
-                      </Link>
-                    </div>
-                    <div className="border-start ps-2 overflow-hidden text-truncate text-truncate-max-w">
-                      FIO Handle:{' '}
-                      {producer?.fio_address ? (
-                        <Link to={`${ROUTES.handles.path}/${producer?.fio_address}`}>
-                          {producer?.fio_address}
-                        </Link>
-                      ) : (
-                        '-'
-                      )}
-                    </div>
-                  </div>
+                  <ProducerTile
+                    name={producer?.candidate_name}
+                    account={block.producer_account_name}
+                    handle={producer?.fio_address}
+                  />
                 ),
               },
               {
