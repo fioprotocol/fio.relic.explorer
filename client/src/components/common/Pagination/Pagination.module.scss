@@ -1,0 +1,42 @@
+@import '../../../styles/variables.scss';
+
+.pagination {
+  button {
+    width: 92px;
+    height: 34px;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    text-transform: uppercase;
+
+    &:first-child,
+    &:last-child {
+      width: 70px;
+    }
+
+    span {
+      margin: 0 0.25rem;
+      line-height: 18px;
+    }
+
+    &:hover {
+      svg {
+        path {
+          stroke: $white;
+        }
+      }
+    }
+
+    &:disabled {
+      svg {
+        path {
+          stroke: $gray-500;
+        }
+      }
+    }
+  }
+}

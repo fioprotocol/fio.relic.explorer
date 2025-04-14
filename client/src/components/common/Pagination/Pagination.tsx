@@ -1,6 +1,13 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import { ReactComponent as ChevronLeft } from '../../../assets/icons/chevron-left.svg';
+import { ReactComponent as ChevronDoubleLeft } from '../../../assets/icons/chevron-double-left.svg';
+import { ReactComponent as ChevronRight } from '../../../assets/icons/chevron-right.svg';
+import { ReactComponent as ChevronDoubleRight } from '../../../assets/icons/chevron-double-right.svg';
+
 import { UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+
+import styles from './Pagination.module.scss';
 
 export const Pagination: React.FC<UsePaginationDefaultProps> = ({
   currentPage = 1,
@@ -12,39 +19,40 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
 
   return (
     <div className="d-flex align-items-center justify-content-center my-3 w-100">
-      <div className="d-flex flex-wrap gap-3 w-100 justify-content-center">
+      <div
+        className={`d-flex flex-wrap gap-3 w-100 justify-content-end text-uppercase ${styles.pagination}`}
+      >
         <Button
-          variant={isFirstPage ? 'outline-secondary' : 'primary'}
+          variant={isFirstPage ? 'outline-secondary' : 'outline-primary'}
           onClick={(): void => goToPage?.(1)}
           disabled={isFirstPage}
         >
-          First
+          <ChevronDoubleLeft />
+          <span>First</span>
         </Button>
         <Button
-          variant={isFirstPage ? 'outline-secondary' : 'primary'}
+          variant={isFirstPage ? 'outline-secondary' : 'outline-primary'}
           onClick={(): void => goToPage?.((currentPage ?? 1) - 1)}
           disabled={isFirstPage}
         >
-          &lt;
+          <ChevronLeft />
+          <span>Previous</span>
         </Button>
-        <div className="d-flex align-self-center justify-content-center">
-          <span>
-            {currentPage ?? 1} of {totalPages || 1}
-          </span>
-        </div>
         <Button
           variant={isLastPage ? 'outline-secondary' : 'primary'}
           onClick={(): void => goToPage?.((currentPage ?? 1) + 1)}
           disabled={isLastPage}
         >
-          &gt;
+          <span>Next</span>
+          <ChevronRight />
         </Button>
         <Button
           variant={isLastPage ? 'outline-secondary' : 'primary'}
           onClick={(): void => goToPage?.(totalPages ?? 1)}
           disabled={isLastPage}
         >
-          Last
+          <span>Last</span>
+          <ChevronDoubleRight />
         </Button>
       </div>
     </div>
