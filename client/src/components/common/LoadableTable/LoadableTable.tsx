@@ -44,30 +44,24 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   const displayEmptyState = !loading && data.length === 0 ? emptyState : undefined;
 
   const tableRender = (): ReactNode => (
-    <Row className="flex-column align-items-center gap-3">
-      <TableComponent
-        columns={columns}
-        data={data}
-        title={title}
-        className={className}
-      />
-      {loading && <Spinner animation="border" variant="secondary" />}
+    <Row className="position-relative flex-column align-items-center gap-3">
+      <TableComponent columns={columns} data={data} title={title} className={className} />
+
+      {loading && (
+        <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50">
+          <Spinner animation="border" variant="secondary" />
+        </div>
+      )}
       {displayEmptyState}
 
-      {showPagination && (
-        <Pagination {...paginationProps} />
-      )}
+      {showPagination && <Pagination {...paginationProps} />}
 
       {showActionButton && <ActionButton onClick={onActionButtonClick} name={actionButtonText} />}
     </Row>
   );
 
   if (showInCardComponent) {
-    return (
-      <CardComponent className="my-4">
-        {tableRender()}
-      </CardComponent>
-    );
+    return <CardComponent className="my-4">{tableRender()}</CardComponent>;
   }
 
   return <>{tableRender()}</>;
