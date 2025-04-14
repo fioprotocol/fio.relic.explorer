@@ -104,7 +104,7 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
     // Query for total count
     const countQuery = {
       text: `
-        SELECT COUNT(*) as total
+        SELECT COUNT(pk_transaction_id) as total
         FROM transactions
         ${block_number ? `WHERE fk_block_number = $1` : ''}
       `,
