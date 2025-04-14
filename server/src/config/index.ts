@@ -21,7 +21,7 @@ interface Config {
 const config: Config = {
   server: {
     port: parseInt(process.env.PORT || '9090', 10),
-    host: process.env.HOST || 'localhost',
+    host: process.env.HOST || '0.0.0.0',
     nodeEnv: process.env.NODE_ENV || devEnv,
     clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
   },
