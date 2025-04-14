@@ -104,7 +104,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
       // Query for total count
       const countQuery = {
         text: `
-        SELECT COUNT(*) as total
+        SELECT COUNT(pk_block_number) as total
         FROM blocks
       `,
         values: [],
