@@ -1,10 +1,11 @@
 import { useCallback, useState, useEffect, useRef } from 'react';
-
+import useInterval from './useInterval';
 import { AnyObject } from '@shared/types/general';
 
 type UseGetDataProps = {
   action: (params: AnyObject) => Promise<AnyObject>;
   params?: AnyObject;
+  interval?: number;
 };
 
 type UseGetDataReturnProps = {
@@ -13,17 +14,18 @@ type UseGetDataReturnProps = {
   response: AnyObject;
 };
 
-export const useGetData = ({ action, params = {} }: UseGetDataProps): UseGetDataReturnProps => {
+export const useGetData = ({
+  action,
+  params = {},
+  interval,
+}: UseGetDataProps): UseGetDataReturnProps => {
   const [response, setResponse] = useState<AnyObject>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  
+
   // Create a ref to track if the component is mounted
   const isMounted = useRef(true);
-  
-  // Use a ref to store the stringified params to detect changes
-  const paramsRef = useRef<string>('');
-  
+
   // Stringify params safely
   const getParamsString = (): string => {
     try {
@@ -33,38 +35,42 @@ export const useGetData = ({ action, params = {} }: UseGetDataProps): UseGetData
       return '{}';
     }
   };
-  
+
   const paramsString = getParamsString();
-  
+
   const getData = useCallback(async () => {
-    // Skip if params haven't changed
-    if (paramsRef.current === paramsString) return;
-    
-    paramsRef.current = paramsString;
     setLoading(true);
     setError(null);
 
     try {
-      const result = await action(JSON.parse(paramsRef.current));
+      const result = await action(JSON.parse(paramsString));
 
       // Only update state if component is still mounted
-      // Always set the response on first load, then check if mounted for subsequent updates
-      if (response === null || isMounted.current) {
+      if (isMounted.current) {
         setResponse(result);
       }
     } catch (error) {
-      setError(error as Error);
+      if (isMounted.current) {
+        setError(error as Error);
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
-  }, [action, paramsString, response]);
+  }, [action, paramsString]);
 
+  // Initial fetch when params change
   useEffect(() => {
     getData();
   }, [getData]);
-  
+
+  // Set up interval if provided
+  useInterval(getData, interval || null, { callImmediately: false });
+
   // Cleanup function to prevent memory leaks
   useEffect(() => {
+    isMounted.current = true;
     return () => {
       isMounted.current = false;
     };
