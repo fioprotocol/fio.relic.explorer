@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner, Badge, Tab, Tabs, Alert, Col } from 'react-bootstrap';
+import { Spinner, Tab, Tabs, Alert, Col } from 'react-bootstrap';
 import { InfoCircleFill } from 'react-bootstrap-icons';
 
 import Container from 'src/components/layout/Container';
@@ -9,6 +9,7 @@ import { DataTile } from 'src/components/common/DataTile';
 import { ProducerTile } from 'src/components/ProducerTile';
 import { TableComponent } from 'src/components/layout/TableComponent';
 import { BackButton } from 'src/components/common/BackButton';
+import { Badge } from 'src/components/common/Badge';
 
 import { useBlockDetailsContext } from './BlockDetailsContext';
 
@@ -53,13 +54,9 @@ const BlockDetailsPage: React.FC = () => {
                 <span className="me-2">Status:</span>
                 {block_number && last_irreversible_block_num ? (
                   block_number > last_irreversible_block_num ? (
-                    <Badge bg="warning" text="secondary" className="p-2 rounded-1">
-                      Irreversible
-                    </Badge>
+                    <Badge variant="warning">Irreversible</Badge>
                   ) : (
-                    <Badge bg="success" text="secondary" className="p-2 rounded-1">
-                      Executed
-                    </Badge>
+                    <Badge variant="success">Executed</Badge>
                   )
                 ) : (
                   '-'
