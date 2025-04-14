@@ -16,15 +16,7 @@ import { formatBlockNumber, formatDate } from 'src/utils/general';
 import { transformTransactions } from 'src/utils/transactions';
 
 import { ROUTES } from 'src/constants/routes';
-
-const txColumns = [
-  { key: 'transactionId', title: 'Transaction ID' },
-  { key: 'account', title: 'Account' },
-  { key: 'date', title: 'Date' },
-  { key: 'action', title: 'Action' },
-  { key: 'details', title: 'Details / Items' },
-  { key: 'fee', title: 'Fees' },
-];
+import { TX_TABLE_COLUMNS } from 'src/pages/TransactionsPage/TxComponent';
 
 const BlockDetailsPage: React.FC = () => {
   const {
@@ -127,7 +119,7 @@ const BlockDetailsPage: React.FC = () => {
               <Tab eventKey="transactions" title="Transactions">
                 {transactions.length > 0 ? (
                   <TableComponent
-                    columns={txColumns}
+                    columns={TX_TABLE_COLUMNS}
                     data={transactions.map(transformTransactions)}
                   />
                 ) : (

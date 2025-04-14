@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { LoadableTable } from 'src/components/common/LoadableTable';
 import { useTxComponentContext } from './TxComponentContext';
 
-export const columns = [
+export const TX_TABLE_COLUMNS = [
   { key: 'transactionId', title: 'Transaction ID' },
   { key: 'account', title: 'Account' },
   { key: 'date', title: 'Date' },
@@ -20,7 +20,7 @@ export const TxComponent: FC = () => {
 
   return (
     <LoadableTable
-      columns={columns}
+      columns={TX_TABLE_COLUMNS}
       data={transactions || []}
       title="All Transactions"        
       showPagination
