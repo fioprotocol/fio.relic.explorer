@@ -1,4 +1,5 @@
 @import '../../../styles/variables.scss';
+@import '~bootstrap/scss/mixins';
 
 .pagination {
   button {
@@ -36,6 +37,19 @@
         path {
           stroke: $gray-500;
         }
+      }
+    }
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .pagination {
+    button {
+      width: 50px;
+
+      &:first-child,
+      &:last-child {
+        width: 50px;
       }
     }
   }

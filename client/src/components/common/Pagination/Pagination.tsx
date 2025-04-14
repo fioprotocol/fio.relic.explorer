@@ -20,7 +20,7 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
   return (
     <div className="d-flex align-items-center justify-content-center my-3 w-100">
       <div
-        className={`d-flex flex-wrap gap-3 w-100 justify-content-end text-uppercase ${styles.pagination}`}
+        className={`d-flex flex-wrap gap-3 w-100 justify-content-center justify-content-md-end text-uppercase ${styles.pagination}`}
       >
         <Button
           variant={isFirstPage ? 'outline-secondary' : 'outline-primary'}
@@ -28,7 +28,7 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
           disabled={isFirstPage}
         >
           <ChevronDoubleLeft />
-          <span>First</span>
+          <span className="d-none d-md-block">First</span>
         </Button>
         <Button
           variant={isFirstPage ? 'outline-secondary' : 'outline-primary'}
@@ -36,14 +36,14 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
           disabled={isFirstPage}
         >
           <ChevronLeft />
-          <span>Previous</span>
+          <span className="d-none d-md-block">Previous</span>
         </Button>
         <Button
           variant={isLastPage ? 'outline-secondary' : 'primary'}
           onClick={(): void => goToPage?.((currentPage ?? 1) + 1)}
           disabled={isLastPage}
         >
-          <span>Next</span>
+          <span className="d-none d-md-block">Next</span>
           <ChevronRight />
         </Button>
         <Button
@@ -51,7 +51,7 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
           onClick={(): void => goToPage?.(totalPages ?? 1)}
           disabled={isLastPage}
         >
-          <span>Last</span>
+          <span className="d-none d-md-block">Last</span>
           <ChevronDoubleRight />
         </Button>
       </div>
