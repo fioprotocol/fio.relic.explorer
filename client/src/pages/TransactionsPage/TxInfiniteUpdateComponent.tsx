@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { LoadableTable } from 'src/components/common/LoadableTable';
 
-import { columns } from './TxComponent';
+import { TX_TABLE_COLUMNS } from './TxComponent';
 import { useTxInfiniteUpdateConext } from './TxInfiniteUpdateComponentConext';
 
 export const TxInfiniteUpdateComponent: FC = () => {
@@ -12,7 +12,7 @@ export const TxInfiniteUpdateComponent: FC = () => {
   
   return <div className='my-4'>
     <LoadableTable
-      columns={columns}
+      columns={TX_TABLE_COLUMNS}
       data={transactions || []}
       title="Transactions"
       showActionButton
