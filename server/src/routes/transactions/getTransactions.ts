@@ -98,7 +98,7 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
         ORDER BY t.block_timestamp DESC
         LIMIT $1 OFFSET $2
       `,
-      values: [limit, offset, block_number],
+      values: block_number ? [limit, offset, block_number] : [limit, offset],
     };
 
     // Query for total count
@@ -108,7 +108,7 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
         FROM transactions
         ${block_number ? `WHERE fk_block_number = $1` : ''}
       `,
-      values: [block_number],
+      values: block_number ? [block_number] : [],
     };
 
     // Execute both queries
