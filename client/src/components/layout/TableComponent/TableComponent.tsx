@@ -10,7 +10,7 @@ export interface TableColumn {
 
 export interface TableProps {
   columns: TableColumn[];
-  data: { [key: string]: string | number | React.ReactElement | React.ReactNode }[];
+  data: { [key: string]: string | number | React.ReactNode }[];
   title?: string;
   className?: string;
 }
