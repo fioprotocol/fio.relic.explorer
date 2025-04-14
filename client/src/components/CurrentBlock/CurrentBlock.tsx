@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 
 import { DataTile } from 'src/components/common/DataTile';
+import { ProducerTile } from '../ProducerTile';
 
 import { formatBlockNumber, formatDate } from 'src/utils/general';
 
@@ -29,27 +30,11 @@ const CurrentBlock: React.FC<{ currentBlock: Block; producer?: Producer }> = ({
         {
           title: 'Producer',
           value: (
-            <div className="text-secondary d-flex justify-content-start align-items-center gap-2 text-nowrap">
-              <Link to={`${ROUTES.accounts.path}/${currentBlock.producer_account_name}`}>
-                {producer?.candidate_name || '-'}
-              </Link>{' '}
-              <div className="border-start ps-2">
-                Account:{' '}
-                <Link to={`${ROUTES.accounts.path}/${currentBlock.producer_account_name}`}>
-                  {currentBlock.producer_account_name}
-                </Link>
-              </div>
-              <div className="border-start ps-2 overflow-hidden text-truncate text-truncate-max-w">
-                FIO Handle:{' '}
-                {producer?.fio_address ? (
-                  <Link to={`${ROUTES.handles.path}/${producer?.fio_address}`}>
-                    {producer?.fio_address}
-                  </Link>
-                ) : (
-                  '-'
-                )}
-              </div>
-            </div>
+            <ProducerTile
+              name={producer?.candidate_name}
+              account={currentBlock.producer_account_name}
+              handle={producer?.fio_address}
+            />
           ),
         },
         {
