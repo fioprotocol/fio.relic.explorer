@@ -5,7 +5,7 @@ export interface Handle {
   is_encrypt_key_set: boolean;
   bundled_tx_count: number;
   expiration_stamp: string;
-  handle_status: string;
+  handle_status: 'active' | 'burnt';
   owner_account_name: string;
   owner_account_id: string;
   domain_name: string;
