@@ -6,12 +6,12 @@ import { ROUTES } from 'src/constants/routes';
 
 type BackButtonProps = {
   to?: string;
-  actionFn?: () => void;
+  onClick?: () => void;
 };
 
-export const BackButton: FC<BackButtonProps> = ({ actionFn, to = ROUTES.home.path }) => {
+export const BackButton: FC<BackButtonProps> = ({ onClick, to = ROUTES.home.path }) => {
   return (
-    <Link to={to} onClick={actionFn} className="btn btn-primary mb-5 p-2 lh-1">
+    <Link to={to} onClick={onClick} className="btn btn-primary mb-5 p-2 lh-1">
       <ChevronLeft size={16} className="m-1" />
     </Link>
   );
