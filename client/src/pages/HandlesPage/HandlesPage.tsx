@@ -9,6 +9,7 @@ import { useHandlesPageContext } from './HandlesPageContext';
 
 import { ROUTES } from 'src/constants/routes';
 import { formatDate } from 'src/utils/general';
+import { Badge } from 'src/components/common/Badge';
 
 const columns = [
   {
@@ -69,9 +70,12 @@ const HandlesPage: React.FC = () => {
                 </Link>
               ),
               status: (
-                <div className="d-inline-block border border-secondary rounded-3 px-2 py-1 text-uppercase">
+                <Badge
+                  variant={handle.handle_status === 'active' ? 'success' : 'warning'}
+                  className="text-uppercase"
+                >
                   {handle.handle_status}
-                </div>
+                </Badge>
               ),
               date: formatDate(handle.expiration_stamp),
             }))}
