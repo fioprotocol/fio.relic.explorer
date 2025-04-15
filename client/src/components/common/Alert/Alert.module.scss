@@ -1,0 +1,15 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/font-mixins.scss';
+
+.alertComponent {
+  color: $white;
+}
+
+.alertContent {
+  @include font-proxima-nova-400;
+  font-size: $font-size-xs;
+}
+
+.alertTitle {
+  @include font-proxima-nova-800;
+}
