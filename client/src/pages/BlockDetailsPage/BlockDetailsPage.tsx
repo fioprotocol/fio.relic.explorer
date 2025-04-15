@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner, Tab, Tabs, Alert, Col } from 'react-bootstrap';
-import { InfoCircleFill } from 'react-bootstrap-icons';
+import { Spinner, Tab, Tabs } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
@@ -10,6 +9,7 @@ import { ProducerTile } from 'src/components/ProducerTile';
 import { TableComponent } from 'src/components/layout/TableComponent';
 import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
+import { Alert } from 'src/components/common/Alert';
 
 import { useBlockDetailsContext } from './BlockDetailsContext';
 
@@ -120,14 +120,7 @@ const BlockDetailsPage: React.FC = () => {
                     data={transactions.map(transformTransactions)}
                   />
                 ) : (
-                  <Col xs={12} lg={4}>
-                    <Alert
-                      variant="info"
-                      className="text-white bg-info fw-bold f-size-sm d-flex justify-content-start align-items-center pe-5"
-                    >
-                      <InfoCircleFill size={16} className="me-2" /> No transactions found
-                    </Alert>
-                  </Col>
+                  <Alert hasDash={false} title="No transactions found" />
                 )}
               </Tab>
             </Tabs>
