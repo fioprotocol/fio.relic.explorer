@@ -1,0 +1,1 @@
+export const SOCIALS_CHAIN_CODE = 'SOCIALS';

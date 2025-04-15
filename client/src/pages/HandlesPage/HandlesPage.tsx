@@ -58,7 +58,14 @@ const HandlesPage: React.FC = () => {
             title="All Handles"
             columns={columns}
             data={handles.map((handle) => ({
-              handle: <div className="text-truncate text-truncate-max-w">{handle.handle}</div>,
+              handle: (
+                <Link
+                  to={`${ROUTES.handles.path}/${handle.handle}`}
+                  className="text-truncate text-truncate-max-w"
+                >
+                  {handle.handle}
+                </Link>
+              ),
               domain: (
                 <Link to={`${ROUTES.domains.path}/${handle.domain_name}`}>
                   {handle.domain_name}

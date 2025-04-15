@@ -1,6 +1,6 @@
-import { Handle, HandlesResponse } from '@shared/types/handles';
-
 import { apiClient } from './api-client';
+
+import { Handle, HandlesResponse, HandleTransaction } from '@shared/types/handles';
 
 export const getHandles = async (params: {
   offset: number;
@@ -10,8 +10,18 @@ export const getHandles = async (params: {
   return response.data;
 };
 
-export const getHandle = async ({ name }: { name: string }): Promise<Handle> => {
-  const { data } = await apiClient.get<Handle>(`/handles/${name}`);
+export const getHandle = async ({ handle }: { handle: string }): Promise<Handle> => {
+  const { data } = await apiClient.get<Handle>(`/handles/${handle}`);
+
+  return data;
+};
+
+export const getHandleTransactions = async ({
+  handle,
+}: {
+  handle: string;
+}): Promise<HandleTransaction[]> => {
+  const { data } = await apiClient.get<HandleTransaction[]>(`/handles/${handle}/transactions`);
 
   return data;
 };

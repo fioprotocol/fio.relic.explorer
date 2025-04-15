@@ -9,7 +9,13 @@ import * as blocksRoute from './blocks';
 import * as blockRoute from './block';
 import * as currentBlockRoute from './current-block';
 import * as handlesRoute from './handles';
-import { getTransactionsRoute, getTransactionByIdRoute, getTransactionStatsRoute } from './transactions/index';
+import * as handleRoute from './handle';
+import * as handleTransactionsRoute from './handles/transactions';
+import {
+  getTransactionsRoute,
+  getTransactionByIdRoute,
+  getTransactionStatsRoute,
+} from './transactions/index';
 
 interface RouteConfig {
   plugin: FastifyPluginAsync;
@@ -27,6 +33,11 @@ const routes: RouteConfig[] = [
   { plugin: getTransactionStatsRoute, prefix: `/${API_PREFIX}/transactions/stats` },
   { plugin: getTransactionByIdRoute, prefix: `/${API_PREFIX}/transactions/:id` },
   { plugin: handlesRoute.default, prefix: `/${API_PREFIX}/handles` },
+  { plugin: handleRoute.default, prefix: `/${API_PREFIX}/handles/:handle` },
+  {
+    plugin: handleTransactionsRoute.default,
+    prefix: `/${API_PREFIX}/handles/:handle/transactions`,
+  },
 ];
 
 export const registerRoutes = async (server: FastifyInstance): Promise<void> => {
