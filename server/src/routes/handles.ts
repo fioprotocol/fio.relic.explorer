@@ -113,7 +113,6 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         values: [],
       };
 
-      // Execute both queries
       const [handlesResult, countResult, activeResult] = await Promise.all([
         pool.query(sqlQuery, [limit, offset]),
         pool.query(countQuery),

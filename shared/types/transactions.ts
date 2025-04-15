@@ -8,7 +8,7 @@ export type Transaction = {
   account_name: string;
   action_name: string;
   tpid: string;
-  fee: number;
+  fee: string;
   request_data: string;
   response_data: string;
   result_status: string;

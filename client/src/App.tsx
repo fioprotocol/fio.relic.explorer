@@ -8,6 +8,7 @@ import BlocksPage from './pages/BlocksPage';
 import BlockDetailsPage from './pages/BlockDetailsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import HandlesPage from './pages/HandlesPage';
+import HandleDetailsPage from './pages/HandleDetailsPage';
 
 import { ROUTES } from './constants/routes';
 
@@ -23,6 +24,7 @@ const App: React.FC = () => {
           <Route path={ROUTES.healthCheck.path} element={<HealthCheckPage />} />
           <Route path={ROUTES.transactions.path} element={<TransactionsPage />} />
           <Route path={ROUTES.handles.path} element={<HandlesPage />} />
+          <Route path={ROUTES.handle.path} element={<HandleDetailsPage />} />
           <Route
             path="*"
             element={
