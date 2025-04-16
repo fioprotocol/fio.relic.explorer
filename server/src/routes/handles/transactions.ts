@@ -66,6 +66,7 @@ const handleTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                 },
               },
             },
+            total: { type: 'number' },
           },
         },
       },

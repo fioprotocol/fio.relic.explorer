@@ -14,8 +14,8 @@ export const Pagination: React.FC<UsePaginationDefaultProps> = ({
   totalPages,
   goToPage,
 }) => {
-  const isFirstPage = currentPage === 1;
-  const isLastPage = currentPage === totalPages;
+  const isFirstPage = currentPage === 1 || !currentPage;
+  const isLastPage = (currentPage || 1) === totalPages;
 
   return (
     <div className="d-flex align-items-center justify-content-center my-3 w-100">
