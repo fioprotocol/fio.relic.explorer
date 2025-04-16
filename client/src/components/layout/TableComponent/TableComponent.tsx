@@ -53,7 +53,7 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
 
         <div className="d-block d-lg-none">
           {data.map((record, index) => (
-            <div key={index} className={`p-3 border-bottom ${styles.mobileRow}`}>
+            <div key={index} className={`p-3 border-bottom d-flex flex-row flex-wrap gap-4 ${styles.mobileRow}`}>
               {columns.map((column) => (
                 <div
                   key={`mobile-${index}-${column.key}`}
