@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import CurrentBlock from 'src/components/CurrentBlock/CurrentBlock';
 import { LoadableTable } from 'src/components/common/LoadableTable';
+import { Loader } from 'src/components/common/Loader';
 
 import { useBlocksPageContext } from './BlocksPageContext';
 
@@ -42,9 +42,7 @@ const BlocksPage: React.FC = () => {
     <Container className="py-5">
       <h4 className="mb-5">Blocks</h4>
       {blocks.length === 0 || !currentBlock ? (
-        <div className="d-flex justify-content-center align-items-center">
-          <Spinner color="primary" />
-        </div>
+        <Loader fullScreen noBg />
       ) : (
         <>
           <CurrentBlock
@@ -53,28 +51,26 @@ const BlocksPage: React.FC = () => {
           />
           <LoadableTable
             columns={columns}
-            data={
-              blocks.map((block) => ({
-                pk_block_number: (
-                  <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
-                    {formatBlockNumber(block.pk_block_number)}
-                  </Link>
-                ),
-                block_id: (
-                  <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
-                    {truncateLongText(block.block_id)}
-                  </Link>
-                ),
-                stamp: formatDate(block.stamp),
-                producer: (
-                  <Link to={`${ROUTES.accounts.path}/${block.producer_account_name}`}>
-                    {producers.get(block.producer_account_name)?.candidate_name ||
-                      block.producer_account_name}
-                  </Link>
-                ),
-                transaction_count: block.transaction_count,
-              }))
-            }
+            data={blocks.map((block) => ({
+              pk_block_number: (
+                <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
+                  {formatBlockNumber(block.pk_block_number)}
+                </Link>
+              ),
+              block_id: (
+                <Link to={`${ROUTES.blocks.path}/${block.pk_block_number}`}>
+                  {truncateLongText(block.block_id)}
+                </Link>
+              ),
+              stamp: formatDate(block.stamp),
+              producer: (
+                <Link to={`${ROUTES.accounts.path}/${block.producer_account_name}`}>
+                  {producers.get(block.producer_account_name)?.candidate_name ||
+                    block.producer_account_name}
+                </Link>
+              ),
+              transaction_count: block.transaction_count,
+            }))}
             title="All Blocks"
             {...paginationProps}
           />

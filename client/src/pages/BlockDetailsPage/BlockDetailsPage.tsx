@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner, Tab, Tabs } from 'react-bootstrap';
+import { Tab, Tabs } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
@@ -10,6 +10,7 @@ import { TableComponent } from 'src/components/layout/TableComponent';
 import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
 import { Alert } from 'src/components/common/Alert';
+import { Loader } from 'src/components/common/Loader';
 
 import { useBlockDetailsContext } from './BlockDetailsContext';
 
@@ -36,9 +37,7 @@ const BlockDetailsPage: React.FC = () => {
       <BackButton to={ROUTES.blocks.path} />
       <h4>Block: #{formatBlockNumber(block_number || 0)}</h4>
       {!block || loading ? (
-        <div className="d-flex justify-content-center align-items-center">
-          <Spinner color="primary" />
-        </div>
+        <Loader fullScreen noBg />
       ) : (
         <>
           <div className="d-block d-lg-flex justify-content-between align-items-center mb-4 gap-5 f-size-sm lh-1">

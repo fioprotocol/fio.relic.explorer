@@ -1,11 +1,11 @@
 import { FC, ReactNode } from 'react';
 
-import Spinner from 'react-bootstrap/Spinner';
 import Row from 'react-bootstrap/Row';
 
 import { TableComponent } from 'src/components/layout/TableComponent';
 import { ActionButton } from 'src/components/common/ActionButton/ActionButton';
 import { Pagination } from 'src/components/common/Pagination';
+import { Loader } from 'src/components/common/Loader';
 import { AnyObject } from '@shared/types/general';
 import { UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
 import { CardComponent } from 'src/components/layout/CardComponent';
@@ -47,11 +47,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
     <Row className="position-relative flex-column align-items-center gap-3">
       <TableComponent columns={columns} data={data} title={title} className={className} />
 
-      {loading && (
-        <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50">
-          <Spinner animation="border" variant="secondary" />
-        </div>
-      )}
+      {loading && <Loader absolute fullScreen />}
       {displayEmptyState}
 
       {showPagination && <Pagination {...paginationProps} />}
