@@ -8,9 +8,7 @@ import * as getStatsRoute from './stats';
 import * as blocksRoute from './blocks';
 import * as blockRoute from './block';
 import * as currentBlockRoute from './current-block';
-import * as handlesRoute from './handles';
-import * as handleRoute from './handle';
-import * as handleTransactionsRoute from './handles/transactions';
+import { handleTransactionsRoute, handlesRoute, handleRoute } from './handles/index';
 import {
   getTransactionsRoute,
   getTransactionByIdRoute,
@@ -32,10 +30,10 @@ const routes: RouteConfig[] = [
   { plugin: getTransactionsRoute, prefix: `/${API_PREFIX}/transactions` },
   { plugin: getTransactionStatsRoute, prefix: `/${API_PREFIX}/transactions/stats` },
   { plugin: getTransactionByIdRoute, prefix: `/${API_PREFIX}/transactions/:id` },
-  { plugin: handlesRoute.default, prefix: `/${API_PREFIX}/handles` },
-  { plugin: handleRoute.default, prefix: `/${API_PREFIX}/handles/:handle` },
+  { plugin: handlesRoute, prefix: `/${API_PREFIX}/handles` },
+  { plugin: handleRoute, prefix: `/${API_PREFIX}/handles/:handle` },
   {
-    plugin: handleTransactionsRoute.default,
+    plugin: handleTransactionsRoute,
     prefix: `/${API_PREFIX}/handles/:handle/transactions`,
   },
 ];
