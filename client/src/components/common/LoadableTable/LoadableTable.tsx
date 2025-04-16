@@ -57,7 +57,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   );
 
   if (showInCardComponent) {
-    return <CardComponent className="my-4">{tableRender()}</CardComponent>;
+    return <CardComponent className="mt-4 mb-4">{tableRender()}</CardComponent>;
   }
 
   return <>{tableRender()}</>;
