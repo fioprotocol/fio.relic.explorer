@@ -1,9 +1,9 @@
 import { FC } from 'react';
-import { Spinner } from 'react-bootstrap';
 
 import { useTransactionsContext } from './TransactionsContext';
 
 import { Alert } from 'src/components/common/Alert';
+import { Loader } from 'src/components/common/Loader';
 import { LoadableTable } from 'src/components/common/LoadableTable';
 
 import { transformTransactions } from 'src/utils/transactions';
@@ -19,7 +19,7 @@ TRANSACTIONS_TABLE_COLUMNS.splice(
 export const Transactions: FC<{ handle: string }> = ({ handle }) => {
   const { transactions, loading, paginationData } = useTransactionsContext({ handle });
 
-  if (!transactions) return <Spinner />;
+  if (!transactions) return <Loader />;
   if (!transactions.length) return <Alert hasDash={false} title="No transactions found" />;
 
   return (
