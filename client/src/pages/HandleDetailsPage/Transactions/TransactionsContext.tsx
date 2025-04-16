@@ -4,23 +4,27 @@ import { getHandleTransactions } from 'src/services/handles';
 import { HandleTransaction } from '@shared/types/handles';
 
 type UseTransactionsContext = {
-  transactions: HandleTransaction[];
+  transactions?: HandleTransaction[];
+  loading: boolean;
   paginationData: UsePaginationDefaultProps;
 };
 
 export const useTransactionsContext = ({ handle }: { handle: string }): UseTransactionsContext => {
   const {
     data: transactions,
-    loading: txLoading,
+    fetched,
+    loading,
     ...paginationData
   } = usePaginationData<HandleTransaction>({
     dataKey: 'transactions',
     action: getHandleTransactions,
     params: { handle },
+    withNavigation: false,
   });
 
   return {
-    transactions: transactions || [],
+    transactions: fetched ? transactions : undefined,
+    loading,
     paginationData,
   };
 };

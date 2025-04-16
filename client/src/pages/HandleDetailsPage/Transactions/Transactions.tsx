@@ -1,7 +1,9 @@
 import { FC } from 'react';
+import { Spinner } from 'react-bootstrap';
 
 import { useTransactionsContext } from './TransactionsContext';
 
+import { Alert } from 'src/components/common/Alert';
 import { LoadableTable } from 'src/components/common/LoadableTable';
 
 import { transformTransactions } from 'src/utils/transactions';
@@ -15,9 +17,12 @@ TRANSACTIONS_TABLE_COLUMNS.splice(
 );
 
 export const Transactions: FC<{ handle: string }> = ({ handle }) => {
-  const { transactions, ...paginationProps } = useTransactionsContext({ handle });
+  const { transactions, loading, paginationData } = useTransactionsContext({ handle });
 
-  return transactions.length > 0 ? (
+  if (!transactions) return <Spinner />;
+  if (!transactions.length) return <Alert hasDash={false} title="No transactions found" />;
+
+  return (
     <LoadableTable
       columns={TRANSACTIONS_TABLE_COLUMNS}
       data={transactions.map(({ pk_handle_activity_id, ...rest }) =>
@@ -28,10 +33,9 @@ export const Transactions: FC<{ handle: string }> = ({ handle }) => {
       )}
       showPagination
       showInCardComponent={false}
-      {...paginationProps}
+      loading={loading}
+      {...paginationData}
     />
-  ) : (
-    <span>No transactions found</span>
   );
 };
 
