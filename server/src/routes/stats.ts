@@ -3,6 +3,7 @@ import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions
 import pool from '../config/database';
 
 import { ChainInfoResponse } from '@shared/types/fio-api-server';
+import { NODE_URLS } from '@shared/constants/fio';
 
 const getStatsRoute: FastifyPluginAsync = async (fastify) => {
   // Cast instance to use the type provider
@@ -112,7 +113,7 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
     };
 
     try {
-      const chainInfoResponse = await fetch('https://fio.eosusa.io/v1/chain/get_info'); 
+      const chainInfoResponse = await fetch(`${NODE_URLS[0]}chain/get_info`); 
       const chainInfoData = await chainInfoResponse.json() as ChainInfoResponse;
       
       chainInfo.latestBlock = chainInfoData.head_block_num;

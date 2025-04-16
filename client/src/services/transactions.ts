@@ -6,7 +6,7 @@ export const getTransactions = async (params: { offset: number, limit: number, b
   return response.data;
 };
 
-export const getTransactionById = async (id: string): Promise<Transaction> => {
+export const getTransactionById = async ({ id }: { id: string }): Promise<Transaction> => {
   const response = await apiClient.get<Transaction>(`/transactions/${id}`);
   return response.data;
 };

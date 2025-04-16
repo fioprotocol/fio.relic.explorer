@@ -28,8 +28,8 @@ const routes: RouteConfig[] = [
   { plugin: blockRoute.default, prefix: `/${API_PREFIX}/blocks/:block_number` },
   { plugin: currentBlockRoute.default, prefix: `/${API_PREFIX}/current-block` },
   { plugin: getTransactionsRoute, prefix: `/${API_PREFIX}/transactions` },
-  { plugin: getTransactionStatsRoute, prefix: `/${API_PREFIX}/transactions/stats` },
   { plugin: getTransactionByIdRoute, prefix: `/${API_PREFIX}/transactions/:id` },
+  { plugin: getTransactionStatsRoute, prefix: `/${API_PREFIX}/transactions/stats` },
   { plugin: handlesRoute, prefix: `/${API_PREFIX}/handles` },
   { plugin: handleRoute, prefix: `/${API_PREFIX}/handles/:handle` },
   {
