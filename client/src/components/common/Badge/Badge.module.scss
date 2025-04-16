@@ -1,0 +1,7 @@
+@import '../../../styles/variables.scss';
+
+.white {
+  border: 0.5px solid $gainsboro !important;
+  background-color: $white !important;
+  color: $caviar !important;
+}

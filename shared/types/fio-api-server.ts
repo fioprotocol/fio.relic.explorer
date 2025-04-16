@@ -1,3 +1,5 @@
+import { AnyObject } from "./general";
+
 export type ChainInfoResponse = {
   server_version: string;
   chain_id: string;
@@ -14,4 +16,76 @@ export type ChainInfoResponse = {
   server_version_string: string;
   fork_db_head_block_num: number;
   fork_db_head_block_id: string;
+};
+
+export type TransactionHistoryResponse = {
+  id: string;
+  trx: {
+    receipt: {
+      status: string;
+      cpu_usage_us: number;
+      net_usage_words: number;
+      trx: [
+        number,
+        {
+          signatures: string;
+          compression: string;
+          packed_context_free_data: string;
+          packed_trx: string;
+        }
+      ]
+    };
+    trx: {
+      expiration: string;
+      ref_block_num: number;
+      ref_block_prefix: number;
+      max_net_usage_words: number;
+      max_cpu_usage_ms: number;
+      delay_sec: number;
+      context_free_actions: AnyObject[];
+      actions: AnyObject[];
+      transaction_extensions: AnyObject[];
+      signatures: string[];
+      context_free_data: AnyObject[];
+    };
+  };
+  block_num: number;
+  block_time: string;
+  last_irreversible_block: number;
+  traces: Array<{
+    receipt: {
+      receiver: string;
+      global_sequence: string;
+      recv_sequence: string;
+      auth_sequence: Array<{
+        account: string;
+        sequence: string;
+      }>;
+    };
+    act: {
+      account: string;
+      name: string;
+      authorization: Array<{
+        actor: string;
+        permission: string;
+      }>;
+      data: AnyObject;
+    };
+    account_ram_deltas: Array<{
+      account: string;
+      delta: string;
+    }>;
+    context_free: boolean;
+    block_num: number;
+    block_time: string;
+    console: string;
+    elapsed: number;
+    except: null | AnyObject;
+    inline_traces: AnyObject[];
+    producer_block_id: string;
+    trx_id: string;
+  }>;
+  query_time_ms: number;
+  last_indexed_block: number;
+  last_indexed_block_time: string;
 };
