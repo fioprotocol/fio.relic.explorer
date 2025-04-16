@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner, Tab, Tabs } from 'react-bootstrap';
+import { Tab, Tabs } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
 import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
+import { Loader } from 'src/components/common/Loader';
 import { Transactions } from './Transactions/Transactions';
 import MappedPubAddresses from './MappedPubAddresses/MappedPubAddresses';
 import SignedNFTs from './SignedNFTs';
@@ -25,9 +26,7 @@ const HandleDetailsPage: React.FC = () => {
       <BackButton to={ROUTES.handles.path} />
       <h4>FIO Handle: {handle?.handle || handleParam}</h4>
       {!handle?.handle || loading ? (
-        <div className="d-flex justify-content-center align-items-center">
-          <Spinner color="primary" />
-        </div>
+        <Loader fullScreen noBg />
       ) : (
         <>
           <div className="d-block d-lg-flex justify-content-end align-items-center mb-4 gap-5 f-size-sm lh-1">

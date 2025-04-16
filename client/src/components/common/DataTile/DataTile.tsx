@@ -1,6 +1,9 @@
 import React, { ReactNode, ReactElement } from 'react';
-import { Card, ListGroup, Row, Col, Spinner } from 'react-bootstrap';
+import { Card, ListGroup, Row, Col } from 'react-bootstrap';
+
 import { CardComponent } from '../../layout/CardComponent';
+import { Loader } from '../Loader';
+
 import styles from './DataTile.module.scss';
 
 export interface DataItem {
@@ -127,20 +130,16 @@ export const DataTile: React.FC<DataTileProps> = ({
     <CardComponent title={title} className={className}>
       <Card.Body className="d-flex flex-column gap-3 p-0">
         <div className="w-100 d-flex flex-column flex-md-row gap-4">
-          <div className="w-100">
-            {renderItems()}
-          </div>
+          <div className="w-100">{renderItems()}</div>
           {children && (
-            <div className={`w-100 border-start border-1 border-mercury ${styles.childrenContainer}`}>
+            <div
+              className={`w-100 border-start border-1 border-mercury ${styles.childrenContainer}`}
+            >
               {children}
             </div>
           )}
         </div>
-        {loading && (
-          <div className="d-flex justify-content-center align-items-center w-100">
-            <Spinner animation="border" variant="secondary" />
-          </div>
-        )}
+        {loading && <Loader fullScreen />}
       </Card.Body>
     </CardComponent>
   );

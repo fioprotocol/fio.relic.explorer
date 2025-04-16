@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Spinner } from 'react-bootstrap';
 
+import { Badge } from 'src/components/common/Badge';
+import { Loader } from 'src/components/common/Loader';
 import Container from 'src/components/layout/Container';
 import { LoadableTable } from 'src/components/common/LoadableTable';
 
@@ -9,7 +10,6 @@ import { useHandlesPageContext } from './HandlesPageContext';
 
 import { ROUTES } from 'src/constants/routes';
 import { formatDate } from 'src/utils/general';
-import { Badge } from 'src/components/common/Badge';
 
 const columns = [
   {
@@ -37,9 +37,7 @@ const HandlesPage: React.FC = () => {
     <Container className="py-5">
       <h4 className="mb-2">Handles</h4>
       {handles.length === 0 ? (
-        <div className="d-flex justify-content-center align-items-center">
-          <Spinner color="primary" />
-        </div>
+        <Loader fullScreen noBg />
       ) : (
         <>
           <div className="d-flex justify-content-start align-items-center gap-3 text-secondary">
