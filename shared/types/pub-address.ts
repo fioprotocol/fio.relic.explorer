@@ -21,5 +21,11 @@ export type TokenCode = {
   coingecko_token_id: string;
 };
 
+export type SocialMediaIdItem = {
+  tokenName: string;
+  name: string;
+  link: string;
+};
+
 export type ChainCodeMap = Record<string, ChainCode>;
 export type TokenCodeMap = Record<string, TokenCode>;
