@@ -12,6 +12,7 @@ export type AlertProps = {
   variant?: Variant;
   className?: string;
   hasDash?: boolean;
+  icon?: React.ReactNode;
   children?: React.ReactNode;
 };
 
@@ -21,6 +22,7 @@ export const Alert: FC<AlertProps> = ({
   variant = 'info',
   className,
   hasDash = true,
+  icon,
   children,
 }) => {
   return (
@@ -28,7 +30,7 @@ export const Alert: FC<AlertProps> = ({
       variant={variant}
       className={`d-flex flex-row align-items-center p-3 w-100 gap-3 mb-0 rounded-3 border-0 bg-${variant} ${styles.alertComponent} ${className || ''}`}
     >
-      <ExclamationCircleFill size={20} />
+      {icon || <ExclamationCircleFill size={20} />}
       <div className={`d-flex flex-row gap-2 w-100 ${styles.alertContent}`}>
         {title && <p className={`${styles.alertTitle} m-0 p-0`}>{title}</p>}
         {hasDash && <span className="m-0 p-0">&ndash;</span>}

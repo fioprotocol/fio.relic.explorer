@@ -1,0 +1,16 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/font-mixins.scss';
+@import '~bootstrap/scss/mixins/breakpoints.scss';
+
+.loadMoreButton {
+  width: 335px;
+  height: 40px;
+  @include font-inter-600;
+  font-size: $font-size-sm;
+}
+
+@include media-breakpoint-down(md) {
+  .loadMoreButton {
+    width: 100%;
+  }
+}
