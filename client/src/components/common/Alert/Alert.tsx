@@ -12,6 +12,7 @@ export type AlertProps = {
   variant?: Variant;
   className?: string;
   hasDash?: boolean;
+  children?: React.ReactNode;
 };
 
 export const Alert: FC<AlertProps> = ({
@@ -20,6 +21,7 @@ export const Alert: FC<AlertProps> = ({
   variant = 'info',
   className,
   hasDash = true,
+  children,
 }) => {
   return (
     <BootstrapAlert
@@ -31,6 +33,7 @@ export const Alert: FC<AlertProps> = ({
         {title && <p className={`${styles.alertTitle} m-0 p-0`}>{title}</p>}
         {hasDash && <span className="m-0 p-0">&ndash;</span>}
         {message && <p className="m-0 p-0">{message}</p>}
+        {children}
       </div>
     </BootstrapAlert>
   );

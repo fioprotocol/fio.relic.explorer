@@ -82,7 +82,7 @@ const HandleDetailsPage: React.FC = () => {
                 <Transactions handle={handle?.handle} />
               </Tab>
               <Tab eventKey="pub_addresses" title="Mapped Public Addresses">
-                <MappedPubAddresses mappedPubAddresses={chainData?.addresses || []} />
+                <MappedPubAddresses mappedPubAddresses={chainData?.addresses || []} fch={handle?.handle} />
               </Tab>
               <Tab eventKey="nfts" title="Signed NFTs">
                 <SignedNFTs handle={handle?.handle} />

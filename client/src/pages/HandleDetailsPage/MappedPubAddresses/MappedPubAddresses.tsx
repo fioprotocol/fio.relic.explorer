@@ -1,18 +1,20 @@
 import { FC } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import { ReactComponent as ChevronRight } from 'src/assets/icons/chevron-right-lg.svg';
 
 import { Alert } from 'src/components/common/Alert';
 import { TokenCodeLogo } from 'src/components/TokenCodeLogo';
 import { TokenTitle } from './TokenTitle';
+import { PubAddressDetailsModal } from './PubAddressDetailsModal';
 
 import { useMappedPubAddressesContext } from './MappedPubAddressesContext';
 
 import { PubAddress } from '@shared/types/pub-address';
 
-export const MappedPubAddresses: FC<{ mappedPubAddresses: PubAddress[] }> = ({
+export const MappedPubAddresses: FC<{ mappedPubAddresses: PubAddress[]; fch: string }> = ({
   mappedPubAddresses,
+  fch,
 }) => {
   const { pubAddresses, selectedAddress, showModal, handleCloseModal, handleShowModal } =
     useMappedPubAddressesContext({ mappedPubAddresses });
@@ -42,14 +44,12 @@ export const MappedPubAddresses: FC<{ mappedPubAddresses: PubAddress[] }> = ({
         </Button>
       ))}
 
-      <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>{selectedAddress?.token_code}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div>{selectedAddress?.public_address}</div>
-        </Modal.Body>
-      </Modal>
+      <PubAddressDetailsModal
+        showModal={showModal}
+        handleCloseModal={handleCloseModal}
+        pubAddress={selectedAddress}
+        fch={fch}
+      />
     </div>
   );
 };
