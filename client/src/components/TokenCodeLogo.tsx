@@ -15,6 +15,7 @@ import { ReactComponent as MATIC_MATIC } from 'src/assets/icons/token-codes/MATI
 import { ReactComponent as SOL_SOL } from 'src/assets/icons/token-codes/SOL-SOL.svg';
 import { ReactComponent as TRX_TRX } from 'src/assets/icons/token-codes/TRX-TRX.svg';
 import { ReactComponent as XRP_XRP } from 'src/assets/icons/token-codes/XRP-XRP.svg';
+import { ReactComponent as OTHER } from 'src/assets/icons/token-codes/OTHER.svg';
 
 import { TOKEN_CODE_MAP } from 'src/constants/token-codes';
 
@@ -33,7 +34,8 @@ const TOKEN_CODE_LOGO_MAP = {
   [`${TOKEN_CODE_MAP.SOL_SOL.chain_code}_${TOKEN_CODE_MAP.SOL_SOL.token_code}`]: SOL_SOL,
   [`${TOKEN_CODE_MAP.TRX_TRX.chain_code}_${TOKEN_CODE_MAP.TRX_TRX.token_code}`]: TRX_TRX,
   [`${TOKEN_CODE_MAP.XRP_XRP.chain_code}_${TOKEN_CODE_MAP.XRP_XRP.token_code}`]: XRP_XRP,
-  other: MATIC_MATIC,
+  MATIC_MATIC: MATIC_MATIC,
+  OTHER: OTHER,
 };
 
 export const TokenCodeLogo: FC<{ chainCode: string; tokenCode: string }> = ({
@@ -41,7 +43,7 @@ export const TokenCodeLogo: FC<{ chainCode: string; tokenCode: string }> = ({
   tokenCode,
 }) => {
   const key = tokenCode === '*' ? `${chainCode}_${chainCode}` : `${chainCode}_${tokenCode}`;
-  const Logo = TOKEN_CODE_LOGO_MAP[key] || TOKEN_CODE_LOGO_MAP.other;
+  const Logo = TOKEN_CODE_LOGO_MAP[key] || TOKEN_CODE_LOGO_MAP.OTHER;
 
   return <Logo width={34} height={34} />;
 };
