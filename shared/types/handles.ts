@@ -21,7 +21,13 @@ export interface HandleChainData {
 }
 
 export interface HandleNFT {
+  chain_code: string;
+  contract_address: string;
+  token_id: string;
   url: string;
+  hash: string;
+  metadata: string;
+  fio_address?: string;
 }
 
 export interface HandleTransaction {
