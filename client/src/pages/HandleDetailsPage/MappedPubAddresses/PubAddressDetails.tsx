@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Card } from 'react-bootstrap';
 
 import { Alert } from 'src/components/common/Alert';
+import { CopyIcon } from 'src/components/common/CopyIcon';
 
 import { TOKEN_CODE_MAP } from 'src/constants/token-codes';
 import { CHAIN_CODE_MAP } from 'src/constants/chain-codes';
@@ -39,13 +40,16 @@ export const PubAddressDetails: FC<{ pubAddress: PubAddress | null; fch: string 
       <p className="fw-bold my-4">
         FIO Handle: <span>{fch}</span>
       </p>
-      <Card className="mb-2 bg-white shadow-sm d-inline-block" border='0'>
+      <Card className="mb-2 bg-white shadow-sm d-inline-block" border="0">
         <Card.Body>
           <QRCodeSVG value={public_address} />
         </Card.Body>
       </Card>
       <p className="my-3">Mapped Address</p>
-      <p className="copy">{public_address}</p>
+      <div className="d-flex justify-content-between align-items-center gap-4 bg-white shadow-sm p-3 rounded-3">
+        <div className="mb-0 text-break fw-bold">{public_address}</div>
+        <CopyIcon data={public_address} variant="dark" />
+      </div>
     </>
   );
 };
