@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { DataItem } from 'src/components/common/DataTile';
-import { DEFAULT_DAYS } from 'src/constants/stats';
+import { DEFAULT_DAYS } from '@shared/constants/stats';
 import { getStats } from 'src/services/stats';
 import { TransactionDataPoint } from 'src/components/TransactionChart/types';
 import { DEFAULT_REFRESH_INTERVAL } from 'src/constants/general';
