@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import Chart  from '../common/Chart/Chart';
 
-import { DEFAULT_DAYS } from '../../constants/stats';
+import { DEFAULT_DAYS } from '@shared/constants/stats';
 
 import { TransactionChartProps } from './types';
 

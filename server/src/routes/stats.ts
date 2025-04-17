@@ -4,6 +4,7 @@ import pool from '../config/database';
 
 import { ChainInfoResponse } from '@shared/types/fio-api-server';
 import { NODE_URLS } from '@shared/constants/fio';
+import { DEFAULT_DAYS } from '@shared/constants/stats';
 
 const getStatsRoute: FastifyPluginAsync = async (fastify) => {
   // Cast instance to use the type provider
@@ -15,7 +16,7 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          days: { type: 'integer', default: 7, minimum: 1, maximum: 90 },
+          days: { type: 'integer', default: DEFAULT_DAYS, minimum: 1, maximum: 90 },
           useLastRecord: { type: 'boolean', default: false }
         }
       },
@@ -51,7 +52,7 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
   };
 
   server.get('/', getStatsOpts, async (request: FastifyRequest, reply: FastifyReply) => {
-    const { days = 7, useLastRecord = false } = request.query as { days?: number, useLastRecord?: boolean };
+    const { days = DEFAULT_DAYS, useLastRecord = false } = request.query as { days?: number, useLastRecord?: boolean };
     
     // Query for transactions by date
     const transactionsQuery = {
