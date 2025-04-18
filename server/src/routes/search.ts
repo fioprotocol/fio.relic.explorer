@@ -3,6 +3,8 @@ import { Ecc } from '@fioprotocol/fiojs';
 
 import pool from '../config/database';
 
+import { validateHandleRegex } from '@shared/util/fio';
+
 import { SearchResponse, SearchResultType } from '@shared/types/search';
 
 // Define the query interface
@@ -22,7 +24,7 @@ const queryByType: Record<SearchResultType, string> = {
   `,
   handle: `
     SELECT * FROM handles 
-    WHERE handle = $1
+    WHERE handle = LOWER($1)
     LIMIT 1
   `,
   account: `
@@ -32,7 +34,7 @@ const queryByType: Record<SearchResultType, string> = {
   `,
   domain: `
     SELECT * FROM domains 
-    WHERE domain_name = $1
+    WHERE domain_name = LOWER($1)
     LIMIT 1
   `,
   tx: `
@@ -45,10 +47,7 @@ const queryByType: Record<SearchResultType, string> = {
 const validateType = (q: string): SearchResultType => {
   // Validation patterns
   const isFioPublicAddress = /^FIO[a-zA-Z0-9]{42,}$/i.test(q) && Ecc.PublicKey.isValid(q);
-  const isFioHandle =
-    /^(?=.{3,64}$)[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?@[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?$/gim.test(
-      q
-    );
+  const isFioHandle = new RegExp(validateHandleRegex, 'gim').test(q);
   const isAccount =
     /^[a-zA-Z0-9]{12}$/.test(q) ||
     [

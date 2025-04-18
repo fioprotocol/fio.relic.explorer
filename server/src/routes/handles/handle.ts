@@ -3,6 +3,8 @@ import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions
 import pool from 'src/config/database';
 import { setTableRowsParams, getTableRows } from 'src/services/external/fio';
 
+import { validateHandleRegex } from '@shared/util/fio';
+
 import { HandleResponse } from '@shared/types/handles';
 
 interface handleQuery {
@@ -21,8 +23,11 @@ const handleRoute: FastifyPluginAsync = async (fastify) => {
       params: {
         type: 'object',
         properties: {
-          handle: { type: 'string' },
+          handle: {
+            type: 'string',
+          },
         },
+        required: ['handle'],
       },
       response: {
         200: {
@@ -78,6 +83,10 @@ const handleRoute: FastifyPluginAsync = async (fastify) => {
     async (request: FastifyRequest<handleQuery>, reply: FastifyReply): Promise<HandleResponse> => {
       const { handle } = request.params;
 
+      if (!new RegExp(validateHandleRegex, 'gim').test(handle)) {
+        return reply.status(400).send({ error: 'Invalid handle' });
+      }
+
       const sqlQuery = `
         SELECT
           h.pk_handle_id,
@@ -92,8 +101,8 @@ const handleRoute: FastifyPluginAsync = async (fastify) => {
           d.pk_domain_id
         FROM
           handles h
-          JOIN accounts a ON h.fk_owner_account_id = a.pk_account_id
-          JOIN domains d ON h.fk_domain_id = d.pk_domain_id
+          LEFT JOIN accounts a ON h.fk_owner_account_id = a.pk_account_id
+          LEFT JOIN domains d ON h.fk_domain_id = d.pk_domain_id
         WHERE
           h.handle = $1
       `;
