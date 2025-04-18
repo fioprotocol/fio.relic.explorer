@@ -22,7 +22,7 @@ type UseTransactionDetailsPageContext = {
 
 export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageContext => {
   const { id } = useParams();
-  
+
   const { response, loading } = useGetData({
     action: getTransactionById,
     params: { id },
@@ -37,7 +37,7 @@ export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageCon
   const isIrreversible =
     block_number &&
     chainInfo?.last_irreversible_block_num &&
-    new Big(block_number).lt(chainInfo?.last_irreversible_block_num);
+    new Big(block_number).gt(chainInfo?.last_irreversible_block_num);
 
   const actionInfo = transformActionInfo(action_name);
 
@@ -48,12 +48,12 @@ export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageCon
     },
     {
       title: 'Details/Item',
-      value: loading ? null: transformDetails({ actionInfo, request_data }) || ' - ' ,
+      value: loading ? null : transformDetails({ actionInfo, request_data }) || ' - ',
     },
     { title: 'Account', value: account_name },
     { title: 'Fees', value: formatFioAmount(fee) },
   ];
-  
+
   return {
     id,
     loading: loading || rawDataLoading || chainInfoLoading,
