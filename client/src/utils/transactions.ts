@@ -9,8 +9,8 @@ import { ROUTES } from 'src/constants/routes';
 import { ACTION_NAMES, ActionInfo } from 'src/constants/actionNames';
 
 export const transformAccountName = (account_name: string): React.ReactNode => {
-  return React.createElement(Link, { 
-    to: `${ROUTES.accounts.path}/${account_name}`, 
+  return React.createElement(Link, {
+    to: `${ROUTES.accounts.path}/${account_name}`,
     className: 'text-primary text-decoration-none',
   }, account_name);
 };
@@ -27,6 +27,7 @@ export const transformDetails = ({
   request_data?: string;
 }): string | null => {
   let details = null;
+
   if (actionInfo.formatDetails && request_data) {
     details = actionInfo.formatDetails(JSON.parse(request_data));
   } else if (actionInfo.details && request_data) {
@@ -64,7 +65,7 @@ export const transformTransactions = ({
   );
 
   const actionInfo = transformActionInfo(action_name);
-  
+
   return {
     id: pk_transaction_id,
     transactionId: transactionData,
