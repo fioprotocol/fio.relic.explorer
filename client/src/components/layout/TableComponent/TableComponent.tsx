@@ -13,9 +13,10 @@ export interface TableProps {
   data: { [key: string]: string | number | React.ReactNode }[];
   title?: string;
   className?: string;
+  customMobileDesign?: React.ReactNode;
 }
 
-export const TableComponent: React.FC<TableProps> = ({ columns, data, title, className }) => {
+export const TableComponent: React.FC<TableProps> = ({ columns, data, title, className, customMobileDesign }) => {
   return (
     <Card className={`bg-transparent border-0 rounded-0 mb-4 overflow-hidden ${className || ''}`}>
       {title && (
@@ -52,7 +53,8 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
         </div>
 
         <div className="d-block d-lg-none">
-          {data.map((record, index) => (
+          {customMobileDesign ? customMobileDesign : 
+          data.map((record, index) => (
             <div key={index} className={`p-3 border-bottom d-flex flex-row flex-wrap gap-4 ${styles.mobileRow}`}>
               {columns.map((column) => (
                 <div
@@ -64,7 +66,8 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
                 </div>
               ))}
             </div>
-          ))}
+          ))
+        }
         </div>
       </Card.Body>
     </Card>

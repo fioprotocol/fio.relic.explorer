@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 import { NODE_URLS } from '@shared/constants/fio';
-
-import { AnyObject } from '@shared/types/general';
+import { BlockProducerResponse, TransactionHistoryResponse } from '@shared/types/fio-api-server';
 
 export interface ChainInfo {
   last_irreversible_block_num: number;
@@ -22,15 +21,21 @@ export const fetchPrice = async (): Promise<string> => {
 };
 
 export const getInfo = async (): Promise<ChainInfo> => {
-  const response = await axios.get(`${NODE_URLS[0]}chain/get_info`);
+  const response = await axios.get<ChainInfo>(`${NODE_URLS[0]}chain/get_info`);
 
   return response.data;
 };
 
-export const getTransactionHistoryData = async ({ id }: { id: string }): Promise<AnyObject> => {
-  const response = await axios.post(`${NODE_URLS[0]}history/get_transaction`, {
+export const getTransactionHistoryData = async ({ id }: { id: string }): Promise<TransactionHistoryResponse> => {
+  const response = await axios.post<TransactionHistoryResponse>(`${NODE_URLS[0]}history/get_transaction`, {
     id,
   });
+
+  return response.data;
+};
+
+export const getBlockProducers = async (): Promise<BlockProducerResponse> => {
+  const response = await axios.post<BlockProducerResponse>(`${NODE_URLS[0]}chain/get_producers`);
 
   return response.data;
 };

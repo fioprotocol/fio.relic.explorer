@@ -88,6 +88,19 @@ a {
   max-width: 30rem;
 }
 
+.icon-24 {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-w-24 {
+  width: 24px;
+}
+
+.icon-h-24 {
+  height: 24px;
+}
+
 // Custom styles for nav-underline
 .nav-underline {
   border-bottom: var(--bs-border-width) solid $border-color;

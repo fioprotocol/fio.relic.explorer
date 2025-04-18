@@ -55,6 +55,14 @@
 }
 
 @font-face {
+  font-family: 'Proxima Nova Bold';
+  src: url('./fonts/Proxima-Nova-Bold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Proxima Nova ExtraBold';
   src: url('./fonts/Proxima-Nova-ExtraBold.otf') format('opentype');
   font-weight: 700;

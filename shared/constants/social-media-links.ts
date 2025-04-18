@@ -16,80 +16,98 @@ export const SOCIAL_MEDIA_IDS = {
   YOUTUBE: 'YOUTUBE',
 };
 
+export const SOCIAL_MEDIA_URLS = {
+  [SOCIAL_MEDIA_IDS.DISCORD]: 'https://discordapp.com/users/',
+  [SOCIAL_MEDIA_IDS.DISCORDSER]: 'https://discord.gg/',
+  [SOCIAL_MEDIA_IDS.FACEBOOK]: 'https://facebook.com/',
+  [SOCIAL_MEDIA_IDS.FARCASTER]: 'https://warpcast.com/',
+  [SOCIAL_MEDIA_IDS.HIVE]: 'https://peakd.com/@',
+  [SOCIAL_MEDIA_IDS.INSTAGRAM]: 'https://instagram.com/',
+  [SOCIAL_MEDIA_IDS.LINKEDIN]: 'https://www.linkedin.com/in/',
+  [SOCIAL_MEDIA_IDS.LINKEDINCO]: 'https://www.linkedin.com/company/',
+  [SOCIAL_MEDIA_IDS.MASTODON]: 'https://mastodon.social/@',
+  [SOCIAL_MEDIA_IDS.NOSTR]: 'https://iris.to/',
+  [SOCIAL_MEDIA_IDS.REDDIT]: 'https://www.reddit.com/user/',
+  [SOCIAL_MEDIA_IDS.TWITTER]: 'https://twitter.com/',
+  [SOCIAL_MEDIA_IDS.TELEGRAM]: 'https://t.me/',
+  [SOCIAL_MEDIA_IDS.WHATSAPP]: 'https://wa.me/',
+  [SOCIAL_MEDIA_IDS.YOUTUBE]: 'https://www.youtube.com/@',
+};
+
 export const SOCIAL_MEDIA_MAP = {
   [SOCIAL_MEDIA_IDS.DISCORD]: {
     tokenName: SOCIAL_MEDIA_IDS.DISCORD,
     name: 'discord',
-    link: 'https://discordapp.com/users/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.DISCORD],
   },
   [SOCIAL_MEDIA_IDS.DISCORDSER]: {
     tokenName: SOCIAL_MEDIA_IDS.DISCORDSER,
     name: 'discord Server',
-    link: 'https://discord.gg/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.DISCORDSER],
   },
   [SOCIAL_MEDIA_IDS.FACEBOOK]: {
     tokenName: SOCIAL_MEDIA_IDS.FACEBOOK,
     name: 'facebook',
-    link: 'https://facebook.com/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.FACEBOOK],
   },
   [SOCIAL_MEDIA_IDS.FARCASTER]: {
     tokenName: SOCIAL_MEDIA_IDS.FARCASTER,
     name: 'farcaster',
-    link: 'https://warpcast.com/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.FARCASTER],
   },
   [SOCIAL_MEDIA_IDS.HIVE]: {
     tokenName: SOCIAL_MEDIA_IDS.HIVE,
     name: 'hive',
-    link: 'https://peakd.com/@',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.HIVE],
   },
   [SOCIAL_MEDIA_IDS.INSTAGRAM]: {
     tokenName: SOCIAL_MEDIA_IDS.INSTAGRAM,
     name: 'instagram',
-    link: 'https://instagram.com/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.INSTAGRAM],
   },
   [SOCIAL_MEDIA_IDS.LINKEDIN]: {
     tokenName: SOCIAL_MEDIA_IDS.LINKEDIN,
     name: 'linkedin',
-    link: 'https://www.linkedin.com/in/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.LINKEDIN],
   },
   [SOCIAL_MEDIA_IDS.LINKEDINCO]: {
     tokenName: SOCIAL_MEDIA_IDS.LINKEDINCO,
     name: 'linkedin Company',
-    link: 'https://www.linkedin.com/company/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.LINKEDINCO],
   },
   [SOCIAL_MEDIA_IDS.MASTODON]: {
     tokenName: SOCIAL_MEDIA_IDS.MASTODON,
     name: 'mastodon',
-    link: 'https://mastodon.social/@',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.MASTODON],
   },
   [SOCIAL_MEDIA_IDS.NOSTR]: {
     tokenName: SOCIAL_MEDIA_IDS.NOSTR,
     name: 'nostr',
-    link: 'https://iris.to/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.NOSTR],
   },
   [SOCIAL_MEDIA_IDS.REDDIT]: {
     tokenName: SOCIAL_MEDIA_IDS.REDDIT,
     name: 'reddit',
-    link: 'https://www.reddit.com/user/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.REDDIT],
   },
   [SOCIAL_MEDIA_IDS.TELEGRAM]: {
     tokenName: SOCIAL_MEDIA_IDS.TELEGRAM,
     name: 'telegram',
-    link: 'https://t.me/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TELEGRAM],
   },
   [SOCIAL_MEDIA_IDS.TWITTER]: {
     tokenName: SOCIAL_MEDIA_IDS.TWITTER,
     name: 'twitter',
-    link: 'https://twitter.com/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TWITTER],
   },
   [SOCIAL_MEDIA_IDS.WHATSAPP]: {
     tokenName: SOCIAL_MEDIA_IDS.WHATSAPP,
     name: 'whatsapp',
-    link: 'https://wa.me/',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.WHATSAPP],
   },
   [SOCIAL_MEDIA_IDS.YOUTUBE]: {
     tokenName: SOCIAL_MEDIA_IDS.YOUTUBE,
     name: 'youtube',
-    link: 'https://www.youtube.com/@',
+    link: SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.YOUTUBE],
   },
 };

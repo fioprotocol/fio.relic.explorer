@@ -20,7 +20,11 @@ export const Badge: FC<BadgeProps> = ({
   const isWhite = variant === 'white';
   
   return (
-    <BootstrapBadge bg={variant} text={textVariant} className={`p-2 rounded-1 ${isWhite ? styles.white : ''} ${className ? className : ''}`}>
+    <BootstrapBadge
+      bg={variant}
+      text={textVariant}
+      className={`p-2 rounded-1 ${isWhite ? styles.white : ''} ${className ? className : ''}`}
+    >
       {children}
     </BootstrapBadge>
   );
