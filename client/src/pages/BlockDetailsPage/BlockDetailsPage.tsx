@@ -49,17 +49,14 @@ const BlockDetailsPage: React.FC = () => {
                 <span className="me-2">Date:</span>
                 <span className="text-dark fw-bold">{formatDate(block?.stamp)}</span>
               </div>
-              <div className="text-secondary d-flex justify-content-between align-items-center mb-0">
-                <span className="me-2">Status:</span>
-                {block_number && last_irreversible_block_num ? (
-                  block_number > last_irreversible_block_num ? (
-                    <Badge variant="warning">Irreversible</Badge>
-                  ) : (
-                    <Badge variant="success">Executed</Badge>
-                  )
-                ) : (
-                  '-'
-                )}
+              <div className="text-secondary d-flex justify-content-between align-items-center mb-0 gap-2">
+                <span>Status:</span>
+                <Badge variant="success">Executed</Badge>
+                {block_number &&
+                last_irreversible_block_num &&
+                block_number > last_irreversible_block_num ? (
+                  <Badge variant="warning">Irreversible</Badge>
+                ) : null}
               </div>
             </div>
           </div>
