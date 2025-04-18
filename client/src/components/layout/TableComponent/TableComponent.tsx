@@ -6,6 +6,7 @@ import styles from './TableComponent.module.scss';
 export interface TableColumn {
   key: string;
   title: string;
+  align?: 'start' | 'center' | 'end';
 }
 
 export interface TableProps {
@@ -32,7 +33,10 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
             <thead>
               <tr className={styles.thead}>
                 {columns.map((column) => (
-                  <th key={column.key} className="py-3 px-4 bg-transparent">
+                  <th
+                    key={column.key}
+                    className={`py-3 px-4 bg-transparent ${column.align ? `text-${column.align}` : ''}`}
+                  >
                     {column.title}
                   </th>
                 ))}
@@ -42,7 +46,10 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
               {data.map((record, index) => (
                 <tr key={index}>
                   {columns.map((column) => (
-                    <td key={`${index}-${column.key}`} className="py-3 px-4 bg-transparent">
+                    <td
+                      key={`${index}-${column.key}`}
+                      className={`py-3 px-4 bg-transparent ${column.align ? `text-${column.align}` : ''}`}
+                    >
                       {record[column.key]}
                     </td>
                   ))}
@@ -53,21 +60,23 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, cla
         </div>
 
         <div className="d-block d-lg-none">
-          {customMobileDesign ? customMobileDesign : 
-          data.map((record, index) => (
-            <div key={index} className={`p-3 border-bottom d-flex flex-row flex-wrap gap-4 ${styles.mobileRow}`}>
-              {columns.map((column) => (
-                <div
-                  key={`mobile-${index}-${column.key}`}
-                  className={`d-flex flex-column mb-2 ${styles.mobileItem}`}
-                >
-                  <div className={`mb-1 ${styles.mobileLabel}`}>{column.title}</div>
-                  <div className={styles.mobileValue}>{record[column.key]}</div>
-                </div>
-              ))}
-            </div>
-          ))
-        }
+          {customMobileDesign ? customMobileDesign :
+            data.map((record, index) => (
+              <div key={index} className={`p-3 border-bottom d-flex flex-row flex-wrap gap-4 ${styles.mobileRow}`}>
+                {columns.map((column) => (
+                  <div
+                    key={`mobile-${index}-${column.key}`}
+                    className={`d-flex flex-column mb-2 ${styles.mobileItem}`}
+                  >
+                    <div className={`mb-1 ${styles.mobileLabel}`}>{column.title}</div>
+                    <div className={styles.mobileValue}>
+                      {record[column.key]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))
+          }
         </div>
       </Card.Body>
     </Card>

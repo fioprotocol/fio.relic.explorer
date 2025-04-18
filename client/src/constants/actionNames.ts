@@ -77,7 +77,7 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   recordobt: {
     description: 'Record FIO Data',
-    formatDetails: (data: AnyObject): string => 
+    formatDetails: (data: AnyObject): string =>
       `From ${data?.payer_fio_address || ''} to ${data?.payee_fio_address || ''}`,
   },
   addaddress: {
@@ -151,13 +151,12 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   trnsfiopubky: {
     description: 'Transfer FIO Tokens',
-    formatDetails: (data: AnyObject): string =>
-      `${formatFioAmount(data?.amount)} to ${truncateLongText(data?.fio_public_key || '')}`,
+    formatDetails: (data: AnyObject): string => `${formatFioAmount(data?.amount)} to ${truncateLongText(data?.payee_public_key || '')}`,
   },
   trnsloctoks: {
     description: 'Transfer and lock FIO Tokens',
     formatDetails: (data: AnyObject): string =>
-      `${formatFioAmount(data?.amount)} to ${truncateLongText(data?.fio_public_key || '')}`,
+      `${formatFioAmount(data?.amount)} to ${truncateLongText(data?.payee_public_key || '')}`,
   },
   stakefio: {
     description: 'Stake FIO Tokens',
