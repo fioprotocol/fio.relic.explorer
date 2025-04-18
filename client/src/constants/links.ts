@@ -10,24 +10,76 @@ interface FooterLink {
 export const FIO_DAPP_LINK = 'https://app.fio.net';
 
 export const SOCIAL_LINKS: FooterLink[] = [
-  { href: 'https://discord.gg/fio', icon: 'discord', label: 'Discord' },
-  { href: '/', icon: 'hive', label: 'Hive' },
-  { href: 'https://x.com/fioprotocol', icon: 'x', label: 'X (Twitter)' },
-  { href: 'https://facebook.com/fioprotocol', icon: 'facebook', label: 'Facebook' },
-  { href: 'https://github.com/fioprotocol', icon: 'github', label: 'GitHub' },
-  { href: 'https://instagram.com/fioprotocol', icon: 'instagram', label: 'Instagram' },
-  { href: 'https://linkedin.com/company/fioprotocol', icon: 'linkedin', label: 'LinkedIn' },
-  { href: 'https://medium.com/fioprotocol', icon: 'medium', label: 'Medium' },
-  { href: 'https://mastodon.social/@fioprotocol', icon: 'mastodon', label: 'Mastodon' },
-  { href: 'https://binance.com', icon: 'binance', label: 'Binance' },
-  { href: 'https://nostr.com', icon: 'nostr', label: 'Nostr' },
-  { href: 'https://reddit.com/r/fioprotocol', icon: 'reddit', label: 'Reddit' },
-  { href: 'https://t.me/fioprotocol', icon: 'telegram', label: 'Telegram' },
-  { href: 'https://twitter.com/fioprotocol', icon: 'twitter', label: 'Twitter' },
-  { href: 'https://tiktok.com/@fioprotocol', icon: 'tt', label: 'TikTok' },
-  { href: 'https://whatsapp.com/fioprotocol', icon: 'whatsapp', label: 'WhatsApp' },
-  { href: 'https://youtube.com/fioprotocol', icon: 'youtube', label: 'YouTube' },
-  { href: 'https://farcaster.xyz/fioprotocol', icon: 'farcaster', label: 'Farcaster' },
+  {
+    href: 'https://discord.gg/pHBmJCc',
+    icon: 'discord',
+    label: 'Discord',
+  },
+  {
+    href: 'https://twitter.com/joinFIO',
+    icon: 'x',
+    label: 'X (Twitter)',
+  },
+  {
+    href: 'https://www.facebook.com/officialFIO',
+    icon: 'facebook',
+    label: 'Facebook',
+  },
+  {
+    href: 'https://github.com/fioprotocol',
+    icon: 'github',
+    label: 'GitHub',
+  },
+  {
+    href: 'https://www.instagram.com/join.fio/',
+    icon: 'instagram',
+    label: 'Instagram',
+  },
+  {
+    href: 'https://www.linkedin.com/company/fioprotocol/',
+    icon: 'linkedin',
+    label: 'LinkedIn',
+  },
+  {
+    href: 'https://medium.com/fio-blog',
+    icon: 'medium',
+    label: 'Medium',
+  },
+  {
+    href: 'https://www.binance.com/en/square/profile/fioprotocol',
+    icon: 'binance',
+    label: 'Binance',
+  },
+  {
+    href: 'https://www.reddit.com/r/officialFIO',
+    icon: 'reddit',
+    label: 'Reddit',
+  },
+  {
+    href: 'https://t.me/joinFIO',
+    icon: 'telegram',
+    label: 'Telegram',
+  },
+  {
+    href: 'https://www.tiktok.com/@join_fio',
+    icon: 'tt',
+    label: 'TikTok',
+  },
+  {
+    href: 'https://www.youtube.com/@FIOprotocol',
+    icon: 'youtube',
+    label: 'YouTube',
+  },
+  {
+    href: 'https://warpcast.com/joinfio',
+    icon: 'farcaster',
+    label: 'Farcaster',
+  },
+  // Add when needed
+  // { href: 'https://mastodon.social/@fioprotocol', icon: 'mastodon', label: 'Mastodon' },
+  // { href: 'https://nostr.com', icon: 'nostr', label: 'Nostr' },
+  // { href: 'https://whatsapp.com/fioprotocol', icon: 'whatsapp', label: 'WhatsApp' },
+  // { href: '/', icon: 'hive', label: 'Hive' },
 ];
 
 export const EXPLORER_LINKS: FooterLink[] = [
