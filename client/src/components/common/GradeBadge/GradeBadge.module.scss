@@ -1,0 +1,38 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/font-mixins.scss';
+@import '~bootstrap/scss/mixins';
+
+.container {
+  width: 40px;
+  height: 34px;
+  color: $white;
+  background-color: $briquette-grey;
+  @include font-proxima-nova-600;
+
+  &.isGreen {
+    background-color: $benzol-green;
+  }
+
+  &.isYellow {
+    background-color: $golden-foil;
+  }
+  
+  &.isOrange {
+    background-color: $saffron-gold;
+  }
+  
+  &.isRose {
+    background-color: $bright-pink;
+  }
+  
+  &.isRed {
+    background-color: $blood-burst;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .container {
+    height: 24px;
+    width: 28px;
+  }
+}

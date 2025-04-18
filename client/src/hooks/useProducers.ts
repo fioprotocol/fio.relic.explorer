@@ -10,41 +10,56 @@ interface UseProducersOptions {
 interface UseProducersReturn {
   producers: ProducerMap;
   producer?: Producer;
+  loading: boolean;
 }
 
 let sharedProducersMap: ProducerMap = new Map();
-let isLoading = false;
 
 export const useProducers = (options: UseProducersOptions = {}): UseProducersReturn => {
   const { refresh = false, name } = options;
 
   const [producersMap, setProducersMap] = useState<ProducerMap>(sharedProducersMap);
+  const [loading, setIsLoading] = useState(false);
 
-  const loadProducers = useCallback(async (refresh = false): Promise<void> => {
-    if (isLoading || (!refresh && sharedProducersMap.size > 0)) {
+  const loadProducers = useCallback(async (): Promise<void> => {
+    try {
+      const producers = await getProducers();
+      const newProducersMap = new Map<string, Producer>();
+      producers.forEach((producer) => {
+        newProducersMap.set(producer.owner, producer);
+      });
+
+      sharedProducersMap = newProducersMap;
+      setProducersMap(sharedProducersMap);
+    } catch (error) {
+      console.error('Failed to load producers:', error);
+    }
+  }, []);
+
+  const fetchProducers = useCallback(async (forceRefresh = false) => {
+    if (!forceRefresh && sharedProducersMap.size > 0) {
       return;
     }
 
-    // prevent multiple requests
-    isLoading = true;
-    const producers = await getProducers();
-    const newProducersMap = new Map<string, Producer>();
-    producers.forEach((producer) => {
-      newProducersMap.set(producer.owner, producer);
-    });
+    try {
+      setIsLoading(true);
 
-    sharedProducersMap = newProducersMap;
-    setProducersMap(sharedProducersMap);
-    isLoading = false;
-  }, []);
+      await loadProducers();
+    } catch (error) {
+      console.error('Failed to load producers:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadProducers]);
 
   useEffect(() => {
-    loadProducers(refresh);
-  }, [refresh, loadProducers]);
+    fetchProducers(refresh);
+  }, [fetchProducers, refresh]);
 
   return {
     producers: producersMap,
     producer: name ? producersMap.get(name) : undefined,
+    loading,
   };
 };
 

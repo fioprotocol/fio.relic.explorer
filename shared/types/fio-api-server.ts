@@ -89,3 +89,24 @@ export type TransactionHistoryResponse = {
   last_indexed_block: number;
   last_indexed_block_time: string;
 };
+
+export type BlockProducer = {
+  addresshash: string;
+  fio_address: string;
+  id: number;
+  is_active: number;
+  last_bpclaim: number;
+  last_claim_time: string;
+  location: number;
+  owner: string;
+  producer_public_key: string;
+  total_votes: string;
+  unpaid_blocks: number;
+  url: string;
+};
+
+export type BlockProducerResponse = {
+  more: boolean;
+  producers: BlockProducer[];
+  total_producer_vote_weight: string;
+};

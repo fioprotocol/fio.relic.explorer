@@ -21,6 +21,7 @@ type LoadableTableProps = {
   showActionButton?: boolean;
   title?: string;
   showInCardComponent?: boolean;
+  customMobileDesign?: ReactNode;
   // Pagination props
   showPagination?: boolean;
 } & Partial<UsePaginationDefaultProps>;
@@ -36,6 +37,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   showActionButton,
   title,
   showInCardComponent = true,
+  customMobileDesign,
   // Pagination props
   showPagination = true,
   ...paginationProps
@@ -45,7 +47,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
 
   const tableRender = (): ReactNode => (
     <Row className="position-relative flex-column align-items-center gap-3">
-      <TableComponent columns={columns} data={data} title={title} className={className} />
+      <TableComponent columns={columns} data={data} title={title} customMobileDesign={customMobileDesign} className={className} />
 
       {loading && <Loader absolute fullScreen />}
       {displayEmptyState}

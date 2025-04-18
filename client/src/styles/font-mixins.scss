@@ -28,6 +28,10 @@
   font-family: 'Proxima Nova Regular', sans-serif;
 }
 
+@mixin font-proxima-nova-600 {
+  font-family: 'Proxima Nova Bold', sans-serif;
+}
+
 @mixin font-proxima-nova-800 {
   font-family: 'Proxima Nova ExtraBold', sans-serif;
 }
