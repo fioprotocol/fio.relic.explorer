@@ -32,6 +32,7 @@ export const MappedPubAddresses: FC<{ mappedPubAddresses: PubAddress[]; fch: str
     <div className="d-flex flex-column gap-2">
       {pubAddresses.map((address) => (
         <Button
+          key={`${address.chain_code}_${address.token_code}`}
           className="d-flex justify-content-between align-items-center px-3 py-3 border-0"
           variant="light"
           onClick={(): void => handleShowModal(address)}
