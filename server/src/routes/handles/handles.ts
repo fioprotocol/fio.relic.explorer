@@ -89,8 +89,8 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
           d.domain_name
         FROM
           handles h
-          JOIN accounts a ON h.fk_owner_account_id = a.pk_account_id
-          JOIN domains d ON h.fk_domain_id = d.pk_domain_id
+          LEFT JOIN accounts a ON h.fk_owner_account_id = a.pk_account_id
+          LEFT JOIN domains d ON h.fk_domain_id = d.pk_domain_id
         ORDER BY h.pk_handle_id DESC
         LIMIT $1
         OFFSET $2

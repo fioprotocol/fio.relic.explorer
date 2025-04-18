@@ -69,10 +69,12 @@ const HandlesPage: React.FC = () => {
                   {handle.domain_name}
                 </Link>
               ),
-              account: (
+              account: handle.owner_account_name ? (
                 <Link to={`${ROUTES.accounts.path}/${handle.owner_account_name}`}>
                   {handle.owner_account_name}
                 </Link>
+              ) : (
+                '-'
               ),
               status: (
                 <Badge

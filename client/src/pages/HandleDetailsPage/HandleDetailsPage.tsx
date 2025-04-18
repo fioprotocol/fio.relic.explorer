@@ -7,6 +7,7 @@ import { CardComponent } from 'src/components/layout/CardComponent';
 import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
 import { Loader } from 'src/components/common/Loader';
+import { Alert } from 'src/components/common/Alert';
 import { Transactions } from './Transactions/Transactions';
 import MappedPubAddresses from './MappedPubAddresses/MappedPubAddresses';
 import SignedNFTs from './SignedNFTs';
@@ -19,7 +20,18 @@ import { formatDate } from 'src/utils/general';
 import { ROUTES } from 'src/constants/routes';
 
 const HandleDetailsPage: React.FC = () => {
-  const { handleParam, handle, chainData, loading } = useHandleDetailsContext();
+  const { handleParam, handle, chainData, loading, error } = useHandleDetailsContext();
+
+  if (error) {
+    return (
+      <Container className="py-5">
+        <BackButton to={ROUTES.handles.path} />
+        <Alert variant="danger" title="Not found">
+          Handle <span className="fw-bold">{handleParam}</span> is not found
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-5">
@@ -38,10 +50,14 @@ const HandleDetailsPage: React.FC = () => {
             </div>
             <div className="text-secondary d-flex justify-content-between align-items-center mb-0">
               <span className="me-2">Account:</span>
-              <span className="text-dark fw-bold"> 
-                <Link to={`${ROUTES.accounts.path}/${chainData?.owner_account}`}>
-                  {handle?.owner_account_name}
-                </Link>
+              <span className="text-dark fw-bold">
+                {chainData?.owner_account ? (
+                  <Link to={`${ROUTES.accounts.path}/${chainData?.owner_account}`}>
+                    {chainData?.owner_account}
+                  </Link>
+                ) : (
+                  '-'
+                )}
               </span>
             </div>
             <div className="text-secondary d-flex justify-content-between align-items-center mb-0">
@@ -82,7 +98,10 @@ const HandleDetailsPage: React.FC = () => {
                 <Transactions handle={handle?.handle} />
               </Tab>
               <Tab eventKey="pub_addresses" title="Mapped Public Addresses">
-                <MappedPubAddresses mappedPubAddresses={chainData?.addresses || []} fch={handle?.handle} />
+                <MappedPubAddresses
+                  mappedPubAddresses={chainData?.addresses || []}
+                  fch={handle?.handle}
+                />
               </Tab>
               <Tab eventKey="nfts" title="Signed NFTs">
                 <SignedNFTs handle={handle?.handle} />
