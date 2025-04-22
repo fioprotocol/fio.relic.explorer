@@ -8,7 +8,7 @@ export const getBlocks = async (params: { offset: number, limit: number }): Prom
 };
 
 export const getCurrent = async (): Promise<Block> => {
-  const { data } = await apiClient.get<CurrentBlockResponse>('/current-block');
+  const { data } = await apiClient.get<CurrentBlockResponse>('/blocks/current');
 
   return data.data;
 };
