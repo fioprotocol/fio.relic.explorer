@@ -78,6 +78,11 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
     async (request: FastifyRequest<BlocksQuery>, reply: FastifyReply): Promise<BlocksResponse> => {
       const { offset = 0, limit = DEFAULT_REQUEST_ITEMS_LIMIT } = request.query;
 
+      // pagination here implemented by pk_block_number calculations assuming that
+      // pk_block_number is increamenting by 1 from 1 to MAX(pk_block_number) and there would be no deletions.
+      // COUNT(*) executes too long when we have such amount of data (hundreds of millions)
+      // todo: check if there could be missing records and if they could be deleted. 
+      // if so we need to create one more table to store count and update it using triggers.
       const sqlQuery = `
         SELECT
           b.pk_block_number,
@@ -89,6 +94,8 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         FROM
           blocks b
           LEFT JOIN transactions t ON t.fk_block_number = b.pk_block_number
+        WHERE
+          b.pk_block_number <= (SELECT MAX(pk_block_number) - $2 FROM blocks)
         GROUP BY
           b.pk_block_number,
           b.stamp,
@@ -98,13 +105,11 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         ORDER BY
           b.pk_block_number DESC
         LIMIT $1
-        OFFSET $2
       `;
 
-      // Query for total count
-      const countQuery = {
+       const countQuery = {
         text: `
-        SELECT COUNT(pk_block_number) as total
+        SELECT MAX(pk_block_number) as total
         FROM blocks
       `,
         values: [],
@@ -133,9 +138,9 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         values: [],
       };
 
-      const [result, countResult, currentBlockResult] = await Promise.all([
-        pool.query(sqlQuery, [limit, offset]),
+      const [countResult, result, currentBlockResult] = await Promise.all([
         pool.query(countQuery),
+        pool.query(sqlQuery, [limit, offset]),
         offset === 0 ? Promise.resolve({ rows: [] }) : pool.query(currentBlockQuery),
       ]);
 
