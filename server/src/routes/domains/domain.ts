@@ -3,6 +3,8 @@ import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions
 import pool from 'src/config/database';
 import { setTableRowsParams, getTableRows } from 'src/services/external/fio';
 
+import { validateDomainRegex } from '@shared/util/fio';
+
 import { DomainResponse } from '@shared/types/domains';
 
 interface domainQuery {
@@ -22,7 +24,7 @@ const domainRoute: FastifyPluginAsync = async (fastify) => {
         properties: {
           domain: {
             type: 'string',
-            pattern: '^[a-zA-Z0-9-]{1,62}(?<!-)$',
+            pattern: validateDomainRegex,
           },
         },
         required: ['domain'],
