@@ -1,3 +1,5 @@
+import { Handle } from './handles';
+
 export interface Domain {
   pk_domain_id: number;
   domain_name: string;
@@ -29,4 +31,26 @@ export interface DomainsResponse {
   total: number;
   all: number;
   active: number;
+}
+
+export interface DomainTransaction {
+  pk_handle_activity_id: number;
+  handle_activity_type: string;
+  block_timestamp: string;
+  transaction_id: string;
+  action_name: string;
+  tpid: string;
+  fee: string;
+  result_status: string;
+  account_name: string;
+}
+
+export interface DomainTransactionsResponse {
+  transactions: DomainTransaction[];
+  total: number;
+}
+
+export interface DomainHandlesResponse {
+  handles: Handle[];
+  total: number;
 }

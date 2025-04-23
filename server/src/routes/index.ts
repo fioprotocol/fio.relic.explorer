@@ -7,7 +7,7 @@ import * as searchRoute from './search';
 import * as getStatsRoute from './stats';
 import { blocksRoute, blockRoute, currentBlockRoute } from './blocks/index';
 import { handleTransactionsRoute, handlesRoute, handleRoute } from './handles/index';
-import { domainsRoute, domainRoute } from './domains/index';
+import { domainsRoute, domainRoute, domainsTransactionsRoute, domainsHandlesRoute } from './domains/index';
 import {
   getTransactionsRoute,
   getTransactionByIdRoute,
@@ -37,6 +37,8 @@ const routes: RouteConfig[] = [
   },
   { plugin: domainsRoute, prefix: `/${API_PREFIX}/domains` },
   { plugin: domainRoute, prefix: `/${API_PREFIX}/domains/:domain` },
+  { plugin: domainsTransactionsRoute, prefix: `/${API_PREFIX}/domains/:domain/transactions` },
+  { plugin: domainsHandlesRoute, prefix: `/${API_PREFIX}/domains/:domain/handles` },
 ];
 
 export const registerRoutes = async (server: FastifyInstance): Promise<void> => {

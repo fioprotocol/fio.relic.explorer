@@ -1,6 +1,7 @@
 import { apiClient } from './api-client';
 
-import { Domain, DomainsResponse } from '@shared/types/domains';
+import { Domain, DomainsResponse, DomainTransactionsResponse } from '@shared/types/domains';
+import { Handle } from '@shared/types/handles';
 
 export const getDomains = async (params: {
   offset: number;
@@ -15,6 +16,29 @@ export const getDomains = async (params: {
 
 export const getDomain = async ({ domain }: { domain: string }): Promise<Domain> => {
   const { data } = await apiClient.get<Domain>(`/domains/${domain}`);
+
+  return data;
+};
+
+export const getDomainHandles = async ({ domain }: { domain: string }): Promise<Handle[]> => {
+  const { data } = await apiClient.get<Handle[]>(`/domains/${domain}/handles`);
+
+  return data;
+};
+
+export const getDomainTransactions = async ({
+  domain,
+  offset,
+  limit,
+}: {
+  domain: string;
+  offset?: number;
+  limit?: number;
+}): Promise<DomainTransactionsResponse> => {
+  const { data } = await apiClient.get<DomainTransactionsResponse>(
+    `/domains/${domain}/transactions`,
+    { params: { offset, limit } }
+  );
 
   return data;
 };
