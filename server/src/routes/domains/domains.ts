@@ -22,7 +22,6 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
   // Cast instance to use the type provider
   const server = fastify.withTypeProvider();
 
-  // Health check endpoint
   const getDomainsOpts: RouteShorthandOptions = {
     schema: {
       querystring: {
@@ -34,7 +33,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
             maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
           },
-          order: { type: 'string', default: 'desc', enum: ['asc', 'desc'] },
+          order: { type: 'string', enum: ['asc', 'desc'] },
           sort: {
             type: 'string',
             default: 'pk_domain_id',
@@ -85,10 +84,14 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
       const {
         offset = 0,
         limit = DEFAULT_REQUEST_ITEMS_LIMIT,
-        order = 'desc',
         sort = 'pk_domain_id',
         only_public = false,
       } = request.query;
+
+      let order = request.query.order;
+      if (!order) {
+        order = sort === 'expiration_timestamp' ? 'asc' : 'desc';
+      }
 
       const sqlQuery = `
         SELECT
@@ -103,7 +106,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         FROM domains d
         LEFT JOIN accounts a ON d.fk_owner_account_id = a.pk_account_id
         LEFT JOIN handles h ON d.pk_domain_id = h.fk_domain_id
-        WHERE d.domain_status = 'active' ${only_public ? 'AND d.is_public = true' : ''}
+        WHERE d.domain_status = 'active'${only_public ? ' AND d.is_public = true' : ''}
         GROUP BY d.pk_domain_id, d.domain_name, d.is_public, d.expiration_timestamp, d.domain_status, a.account_name, a.pk_account_id
         ORDER BY ${sort} ${order}
         LIMIT $1
@@ -112,6 +115,14 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
 
       // Query for total count
       const countQuery = {
+        text: `
+        SELECT COUNT(*) as total
+        FROM domains
+        WHERE domain_status = 'active'${only_public ? ' AND is_public = true' : ''}
+      `,
+        values: [],
+      };
+      const allQuery = {
         text: `
         SELECT COUNT(*) as total
         FROM domains
@@ -127,16 +138,17 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         values: [],
       };
 
-      const [handlesResult, countResult, activeResult] = await Promise.all([
+      const [handlesResult, countResult, allResult, activeResult] = await Promise.all([
         pool.query(sqlQuery, [limit, offset]),
         pool.query(countQuery),
+        pool.query(allQuery),
         pool.query(activeQuery),
       ]);
 
       return {
         data: handlesResult.rows,
         total: parseInt(countResult.rows[0].total),
-        all: parseInt(countResult.rows[0].total),
+        all: parseInt(allResult.rows[0].total),
         active: parseInt(activeResult.rows[0].total),
       };
     }

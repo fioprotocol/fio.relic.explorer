@@ -18,6 +18,12 @@ export interface DomainResponse {
   chainData: DomainChainData;
 }
 
+export type DomainSortOption =
+  | 'pk_domain_id'
+  | 'domain_name'
+  | 'expiration_timestamp'
+  | 'handle_count';
+
 export interface DomainsResponse {
   data: Domain[];
   total: number;

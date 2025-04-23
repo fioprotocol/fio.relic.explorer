@@ -15,7 +15,6 @@ const domainRoute: FastifyPluginAsync = async (fastify) => {
   // Cast instance to use the type provider
   const server = fastify.withTypeProvider();
 
-  // Health check endpoint
   const getDomainsOpts: RouteShorthandOptions = {
     schema: {
       params: {

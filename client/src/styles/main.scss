@@ -81,8 +81,16 @@ body {
   font-size: $font-size-sm;
 }
 
+.fw-normal-inter {
+  @include font-inter-400;
+}
+
 a {
   text-decoration: none;
+}
+
+.box-shadow-default {
+  box-shadow: $box-shadow-default;
 }
 
 .text-truncate-max-w {
@@ -100,6 +108,10 @@ a {
 
 .icon-h-24 {
   height: 24px;
+}
+
+.green-icon {
+  color: $green;
 }
 
 // Custom styles for nav-underline
