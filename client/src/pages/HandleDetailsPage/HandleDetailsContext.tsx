@@ -4,7 +4,7 @@ import { getHandle } from 'src/services/handles';
 
 import { useGetData } from 'src/hooks/useGetData';
 
-import { Handle, HandleChainData } from '@shared/types/handles';
+import { Handle, HandleChainData, HandleResponse } from '@shared/types/handles';
 
 type UseHandleDetailsContext = {
   handleParam?: string;
@@ -16,7 +16,7 @@ type UseHandleDetailsContext = {
 
 export const useHandleDetailsContext = (): UseHandleDetailsContext => {
   const { id: handle } = useParams();
-  const { response, loading, error } = useGetData({ action: getHandle, params: { handle } });
+  const { response, loading, error } = useGetData<HandleResponse>({ action: getHandle, params: { handle } });
 
   return {
     handleParam: handle,

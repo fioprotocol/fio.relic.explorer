@@ -5,17 +5,18 @@ import { getBlock } from 'src/services/blocks';
 import useProducers from 'src/hooks/useProducers';
 import { useGetData } from 'src/hooks/useGetData';
 
-import { Block } from '@shared/types/blocks';
-import { Transaction } from '@shared/types/transactions';
 import { Producer } from 'src/services/bpmonitor';
-import { getInfo } from 'src/services/fio';
+import { ChainInfo, getInfo } from 'src/services/fio';
 import { getTransactions } from 'src/services/transactions';
+
+import { Block, BlockResponseData } from '@shared/types/blocks';
+import { Transaction, TransactionResponse } from '@shared/types/transactions';
 
 type UseBlockDetailsContext = {
   block_number?: number;
   block?: Block;
-  previous_block_number?: number;
-  next_block_number?: number;
+  previous_block_number: number | null;
+  next_block_number: number | null;
   producer?: Producer;
   loading?: boolean;
   last_irreversible_block_num?: number;
@@ -25,12 +26,12 @@ type UseBlockDetailsContext = {
 export const useBlockDetailsContext = (): UseBlockDetailsContext => {
   const { id: block_number } = useParams();
   const { producers } = useProducers();
-  const { response, loading } = useGetData({ action: getBlock, params: { block_number } });
-  const { response: txResponse } = useGetData({
+  const { response, loading } = useGetData<BlockResponseData>({ action: getBlock, params: { block_number } });
+  const { response: txResponse } = useGetData<TransactionResponse>({
     action: getTransactions,
     params: { block_number },
   });
-  const { response: chainInfo } = useGetData({ action: getInfo, params: { block_number } });
+  const { response: chainInfo } = useGetData<ChainInfo>({ action: getInfo, params: { block_number } });
 
   return {
     block_number: Number(block_number),

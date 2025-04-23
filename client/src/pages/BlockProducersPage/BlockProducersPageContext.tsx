@@ -1,6 +1,6 @@
 import BigNumber from 'big.js';
 
-import { BlockProducer } from '@shared/types/fio-api-server';
+import { BlockProducer, BlockProducerResponse } from '@shared/types/fio-api-server';
 import { useGetData } from 'src/hooks/useGetData';
 import { getBlockProducers } from 'src/services/fio';
 import useProducers from 'src/hooks/useProducers';
@@ -20,7 +20,7 @@ type UseBlockProducersPageContextType = {
 };
 
 export const useBlockProducersPageContext = (): UseBlockProducersPageContextType => {
-  const { response: fioChainblockProducers, loading } = useGetData({
+  const { response: fioChainblockProducers, loading } = useGetData<BlockProducerResponse>({
     action: getBlockProducers,
   });
 
@@ -31,13 +31,13 @@ export const useBlockProducersPageContext = (): UseBlockProducersPageContextType
   const activeFioChainProducers =
     fioChainblockProducers?.producers?.length && bpMonitorProducers?.size > 0
       ? fioChainblockProducers?.producers?.filter(
-          (blockProducer: BlockProducer) =>
-            blockProducer?.is_active === 1 && new BigNumber(blockProducer?.total_votes).gt(0)
-        )
+        (blockProducer: BlockProducer) =>
+          blockProducer?.is_active === 1 && new BigNumber(blockProducer?.total_votes).gt(0)
+      )
       : [];
 
   const producers: BlockProducerProps[] = activeFioChainProducers
-    ?.map((blockProducer: BlockProducer) => {
+    ?.map(blockProducer => {
       const bpMonitorProducer = bpMonitorProducers.get(blockProducer?.owner);
 
       const { branding, candidate_name, flagIconUrl, score, socials, url } =
@@ -74,14 +74,14 @@ export const useBlockProducersPageContext = (): UseBlockProducersPageContextType
         fioHandle: blockProducer?.fio_address,
         votes: blockProducer?.total_votes,
         links,
-        flagIconUrl,
-        grade: score?.grade,
+        flagIconUrl: flagIconUrl || '',
+        grade: score?.grade || '',
         name: candidate_name || 'N/A',
         logo: branding?.logo_svg || branding?.logo_256 || defaultLogo,
         ranks: score?.score || 0,
       };
     })
-    .sort((a: BlockProducerProps, b: BlockProducerProps) => b.ranks - a.ranks);
+    .sort((a, b) => b.ranks - a.ranks);
 
   const columns = [
     { key: 'name', title: 'Block Producer' },

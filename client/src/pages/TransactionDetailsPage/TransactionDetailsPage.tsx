@@ -42,14 +42,14 @@ const TransactionDetailsPage: FC = () => {
       <DetailsPagesHeaderItem title="Date:" value={formatDate(transaction?.block_timestamp)} />
       <DetailsPagesHeaderItem title="Block #" value={<Link to={`${ROUTES.blocks.path}/${transaction?.block_number}`}>
         {transaction?.block_number}
-        </Link>
-      }/>
+      </Link>
+      } />
       <DetailsPagesHeaderItem title="Status:" value={
         <div className='d-flex flex-row gap-2'>
           <Badge variant="success" className='text-capitalize'>{transaction?.result_status}</Badge>
           {isIrreversible && <Badge variant="warning">Irreversible</Badge>}
         </div>
-      }/>
+      } />
     </div>
     <DataTile items={stats} layout='row' loading={loading} />
     <CardComponent title="Transaction Details" className="mt-4">
@@ -90,7 +90,7 @@ const TransactionDetailsPage: FC = () => {
               className='mb-3'
             />
             <div className='ps-3'>
-              <JsonSyntaxHighlighter json={rawData} />
+              <JsonSyntaxHighlighter json={rawData || {}} />
             </div>
             <CopyButton
               data={rawData}

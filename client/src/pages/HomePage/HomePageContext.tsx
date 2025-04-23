@@ -5,7 +5,7 @@ import { DEFAULT_DAYS } from '@shared/constants/stats';
 import { getStats } from 'src/services/stats';
 import { TransactionDataPoint } from 'src/components/TransactionChart/types';
 import { DEFAULT_REFRESH_INTERVAL } from 'src/constants/general';
-
+import { StatsResponse } from '@shared/types/stats';
 import { useGetData } from 'src/hooks/useGetData';
 
 type UseHomePageContext = {
@@ -15,7 +15,7 @@ type UseHomePageContext = {
 };
 
 export const useHomePageContext = (): UseHomePageContext => {
-  const { response, loading } = useGetData({
+  const { response, loading } = useGetData<StatsResponse>({
     action: getStats,
     params: { days: DEFAULT_DAYS, useLastRecord: true },
     interval: DEFAULT_REFRESH_INTERVAL,

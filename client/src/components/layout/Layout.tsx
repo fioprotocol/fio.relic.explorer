@@ -14,8 +14,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [network, setNetwork] = useState('mainnet');
-  const { response: price } = useGetData({ action: fetchPrice });
-  const { response: chainInfo }: { response: ChainInfo } = useGetData({ action: getInfo });
+  const { response: price } = useGetData<string>({ action: fetchPrice });
+  const { response: chainInfo } = useGetData<ChainInfo>({ action: getInfo });
   const chainId = chainInfo?.chain_id || '-';
 
   const onNetworkChange = (network: string): void => {
