@@ -13,18 +13,20 @@ export interface TableProps {
   columns: TableColumn[];
   data: { [key: string]: string | number | React.ReactNode }[];
   title?: string;
+  header?: React.ReactNode;
   className?: string;
   customMobileDesign?: React.ReactNode;
 }
 
-export const TableComponent: React.FC<TableProps> = ({ columns, data, title, className, customMobileDesign }) => {
+export const TableComponent: React.FC<TableProps> = ({ columns, data, title, header, className, customMobileDesign }) => {
   return (
     <Card className={`bg-transparent border-0 rounded-0 mb-4 overflow-hidden ${className || ''}`}>
-      {title && (
+      {(title || header) && (
         <Card.Header
           className={`bg-transparent border-bottom py-3 px-4 text-dark ${styles.tableHeader}`}
         >
           {title}
+          {header}
         </Card.Header>
       )}
       <Card.Body className="p-0">

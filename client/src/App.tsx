@@ -10,6 +10,7 @@ import TransactionsPage from './pages/TransactionsPage';
 import TransactionDetailsPage from './pages/TransactionDetailsPage';
 import HandlesPage from './pages/HandlesPage';
 import HandleDetailsPage from './pages/HandleDetailsPage';
+import DomainsPage from './pages/DomainsPage';
 import BlockProducersPage from './pages/BlockProducersPage';
 
 import { ROUTES } from './constants/routes';
@@ -28,6 +29,7 @@ const App: React.FC = () => {
           <Route path={ROUTES.transaction.path} element={<TransactionDetailsPage />} />
           <Route path={ROUTES.handles.path} element={<HandlesPage />} />
           <Route path={ROUTES.handle.path} element={<HandleDetailsPage />} />
+          <Route path={ROUTES.domains.path} element={<DomainsPage />} />
           <Route path={ROUTES.producers.path} element={<BlockProducersPage />} />
           <Route
             path="*"

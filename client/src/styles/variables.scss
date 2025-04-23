@@ -21,6 +21,7 @@ $golden-foil: #CCD000;
 
 $malachite: #13ce66;
 $benzol-green: #00D26D;
+$green: #00ff00;
 
 $gainsboro: #dcdcdc;
 $mercury: #e6e6e6;
@@ -46,3 +47,9 @@ $font-size-xxs: $font-size-base * 0.625; // 10px
 $box-shadow-default:
   0px 2px 10px 0px rgba(0, 0, 0, 0.08),
   0px 18px 80px 0px rgba(0, 0, 0, 0.04);
+
+$custom-colors: (
+  'green': #00B045,
+);
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
