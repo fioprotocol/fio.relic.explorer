@@ -13,12 +13,13 @@ export interface BlocksResponse {
   total: number;
 }
 
+export interface BlockResponseData {
+  block: Block;
+  previous_block_number: number | null;
+  next_block_number: number | null;
+}
 export interface BlockResponse {
-  data: {
-    block: Block;
-    previous_block_number: number | null;
-    next_block_number: number | null;
-  };
+  data: BlockResponseData;
 }
 
 export interface CurrentBlockResponse {

@@ -8,18 +8,18 @@ type UseGetDataProps = {
   interval?: number;
 };
 
-type UseGetDataReturnProps = {
+type UseGetDataReturnProps<T> = {
   loading: boolean;
   error: Error | null;
-  response: AnyObject;
+  response: T;
 };
 
-export const useGetData = ({
+export const useGetData = <T>({
   action,
   params = {},
   interval,
-}: UseGetDataProps): UseGetDataReturnProps => {
-  const [response, setResponse] = useState<AnyObject>(null);
+}: UseGetDataProps): UseGetDataReturnProps<T> => {
+  const [response, setResponse] = useState<T>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -77,7 +77,7 @@ export const useGetData = ({
   }, []);
 
   return {
-    response,
+    response: response as T,
     loading,
     error,
   };

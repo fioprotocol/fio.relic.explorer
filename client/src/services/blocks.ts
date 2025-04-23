@@ -1,4 +1,4 @@
-import { Block, BlocksResponse, CurrentBlockResponse } from '@shared/types/blocks';
+import { Block, BlocksResponse, CurrentBlockResponse, BlockResponse, BlockResponseData } from '@shared/types/blocks';
 
 import { apiClient } from './api-client';
 
@@ -13,8 +13,8 @@ export const getCurrent = async (): Promise<Block> => {
   return data.data;
 };
 
-export const getBlock = async ({ block_number }: { block_number: number }): Promise<Block> => {
-  const { data } = await apiClient.get<CurrentBlockResponse>(`/blocks/${block_number}`);
+export const getBlock = async ({ block_number }: { block_number: number }): Promise<BlockResponseData> => {
+  const { data } = await apiClient.get<BlockResponse>(`/blocks/${block_number}`);
 
   return data.data;
 };

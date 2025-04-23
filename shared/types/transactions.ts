@@ -35,6 +35,10 @@ export type TransactionStats = {
   avgTransactionFee: string;
 };
 
+export type TransactionDetailResponse = {
+  data: TransactionDetails;
+};
+
 export type TransactionDetails = {
   transaction_id: string;
   block_timestamp: string;

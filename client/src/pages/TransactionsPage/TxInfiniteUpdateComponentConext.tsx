@@ -9,7 +9,7 @@ import { useGetData } from 'src/hooks/useGetData';
 import { DEFAULT_REFRESH_INTERVAL } from 'src/constants/general';
 
 import { DEFAULT_REQUEST_ITEMS_LIMIT } from '@shared/constants/network';
-import { TransformedTransaction, Transaction } from '@shared/types/transactions';
+import { TransformedTransaction, Transaction, TransactionResponse } from '@shared/types/transactions';
 
 type UseTxInfiniteUpdateConextProps = {
   transactions: TransformedTransaction[];
@@ -24,7 +24,7 @@ export const useTxInfiniteUpdateConext = (): UseTxInfiniteUpdateConextProps => {
     navigate(ROUTES.transactions.path);
   }, [navigate]);
 
-  const { response, loading } = useGetData({
+  const { response, loading } = useGetData<TransactionResponse>({
     action: getTransactions,
     params: { limit: DEFAULT_REQUEST_ITEMS_LIMIT, offset: 0 },
     interval: DEFAULT_REFRESH_INTERVAL,

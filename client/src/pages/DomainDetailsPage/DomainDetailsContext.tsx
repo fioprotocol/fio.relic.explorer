@@ -4,7 +4,7 @@ import { getDomain } from 'src/services/domains';
 
 import { useGetData } from 'src/hooks/useGetData';
 
-import { Domain, DomainChainData } from '@shared/types/domains';
+import { Domain, DomainChainData, DomainResponse } from '@shared/types/domains';
 
 type UseDomainDetailsContext = {
   domainParam?: string;
@@ -17,7 +17,7 @@ type UseDomainDetailsContext = {
 
 export const useDomainDetailsContext = (): UseDomainDetailsContext => {
   const { id: domain } = useParams();
-  const { response, loading, error } = useGetData({ action: getDomain, params: { domain } });
+  const { response, loading, error } = useGetData<DomainResponse>({ action: getDomain, params: { domain } });
   const navigate = useNavigate();
 
   const onBack = (): void => {

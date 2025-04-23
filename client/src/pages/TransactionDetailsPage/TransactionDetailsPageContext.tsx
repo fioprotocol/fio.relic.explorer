@@ -2,14 +2,14 @@ import { useParams } from 'react-router';
 import Big from 'big.js';
 
 import { useGetData } from 'src/hooks/useGetData';
-import { getInfo, getTransactionHistoryData } from 'src/services/fio';
+import { getInfo, getTransactionHistoryData, ChainInfo } from 'src/services/fio';
 import { getTransactionById } from 'src/services/transactions';
 import { transformActionInfo, transformDetails } from 'src/utils/transactions';
 import { DataItem } from 'src/components/common/DataTile';
 import { formatFioAmount } from 'src/utils/fio';
 
 import { TransactionHistoryResponse } from '@shared/types/fio-api-server';
-import { TransactionDetails } from '@shared/types/transactions';
+import { TransactionDetailResponse, TransactionDetails } from '@shared/types/transactions';
 
 type UseTransactionDetailsPageContext = {
   id: string | undefined;
@@ -23,25 +23,25 @@ type UseTransactionDetailsPageContext = {
 export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageContext => {
   const { id } = useParams();
 
-  const { response, loading } = useGetData({
+  const { response, loading } = useGetData<TransactionDetailResponse>({
     action: getTransactionById,
     params: { id },
   });
 
-  const { response: chainInfo, loading: chainInfoLoading } = useGetData({ action: getInfo });
+  const { response: chainInfo, loading: chainInfoLoading } = useGetData<ChainInfo>({ action: getInfo });
 
-  const { response: rawData, loading: rawDataLoading } = useGetData({ action: getTransactionHistoryData, params: { id } });
+  const { response: rawData, loading: rawDataLoading } = useGetData<TransactionHistoryResponse>({ action: getTransactionHistoryData, params: { id } });
 
   const { action_name, account_name, block_number, fee, request_data } = response?.data || {};
 
   const isIrreversible =
-    block_number &&
-    chainInfo?.last_irreversible_block_num &&
+    !!block_number &&
+    !!chainInfo?.last_irreversible_block_num &&
     new Big(block_number).gt(chainInfo?.last_irreversible_block_num);
 
   const actionInfo = transformActionInfo(action_name);
 
-  const stats = [
+  const stats: DataItem[] = [
     {
       title: 'Action',
       value: actionInfo.description,
