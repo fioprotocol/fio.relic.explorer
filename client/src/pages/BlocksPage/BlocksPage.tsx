@@ -72,6 +72,7 @@ const BlocksPage: React.FC = () => {
               transaction_count: block.transaction_count,
             }))}
             title="All Blocks"
+            showInCardComponent
             {...paginationProps}
           />
         </>

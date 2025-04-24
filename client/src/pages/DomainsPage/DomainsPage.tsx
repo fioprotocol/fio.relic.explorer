@@ -81,26 +81,24 @@ const DomainsPage: React.FC = () => {
   }
 
   return (
-    <Container className="py-5">
+    <Container className="py-3 py-md-5">
       <h4 className="mb-2">Domains</h4>
-      <div className="d-flex justify-content-start align-items-center gap-3 text-secondary">
-        <div>
-          <span>
-            Registered Domains: <span className="text-dark">{total}</span>
-          </span>
+      <div className="d-flex justify-content-start align-items-start align-items-md-center gap-2 gap-md-3 text-secondary flex-wrap mb-3 mb-md-0">
+        <div className="d-flex justify-content-between align-items-center gap-1 pe-5 pe-md-0 flex-grow-1 flex-sm-grow-0">
+          <span>Registered Domains:</span>
+          <span className="text-dark">{total}</span>
         </div>
-        <div>
-          <span>
-            Active Domains: <span className="text-dark">{totalActive}</span>
-          </span>
+        <div className="d-flex justify-content-between align-items-center gap-1 pe-5 pe-md-0 flex-grow-1 flex-sm-grow-0">
+          <span>Active Domains:</span>
+          <span className="text-dark">{totalActive}</span>
         </div>
       </div>
       <LoadableTable
         header={
-          <div className="d-flex justify-content-between align-items-center gap-3">
-            <div>All Domains</div>
-            <div className="d-flex justify-content-between align-items-center gap-5">
-              <div className="d-flex justify-content-between align-items-center gap-2 rounded-2 p-2 border border-light">
+          <div className="d-flex justify-content-between align-items-center gap-1 flex-wrap">
+            <div className="text-nowrap">All Domains</div>
+            <div className="d-flex justify-content-md-between justify-content-end align-items-center gap-2 gap-md-5 flex-wrap">
+              <div className="d-flex justify-content-between align-items-center gap-2 rounded-2 p-2 border">
                 <Switch
                   id="only-public"
                   handleDiameter={16}
@@ -111,17 +109,20 @@ const DomainsPage: React.FC = () => {
                   uncheckedIcon={false}
                   checkedIcon={false}
                 />
-                <label htmlFor="only-public" className="f-size-sm">
+                <label htmlFor="only-public" className="f-size-sm d-none d-sm-block">
                   Only Show Public Domains
                 </label>
+                <label htmlFor="only-public" className="f-size-sm d-sm-none">
+                  Only Public
+                </label>
               </div>
-              <Dropdown align="end" className="d-none d-md-flex">
+              <Dropdown align="end" className="d-flex">
                 <Dropdown.Toggle as={DropdownToggle} className="text-dark rounded-2 gap-2">
                   <SortDown size={20} className="color-primary" />
                   <span className="f-size-sm ms-2">Sort</span>
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu className="rounded-3 py-2 px-3 border border-light box-shadow-default">
+                <Dropdown.Menu className="rounded-3 py-2 px-3 border box-shadow-default">
                   {SORT_OPTIONS.map(({ label, value }) => (
                     <Dropdown.Item
                       key={value}
@@ -170,6 +171,7 @@ const DomainsPage: React.FC = () => {
         }))}
         loading={loading}
         {...paginationProps}
+        showInCardComponent
         className="mb-5"
       />
     </Container>

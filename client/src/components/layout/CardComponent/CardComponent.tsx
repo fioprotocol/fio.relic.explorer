@@ -7,11 +7,19 @@ type CardComponentProps = {
   children: React.ReactNode;
   title?: string;
   className?: string;
+  useMobileStyle?: boolean;
 };
 
-export const CardComponent: FC<CardComponentProps> = ({ children, title, className }) => {
+export const CardComponent: FC<CardComponentProps> = ({
+  children,
+  title,
+  className,
+  useMobileStyle,
+}) => {
   return (
-    <Card className={`p-4 w-100 mb-0 rounded-4 bg-white ${styles.cardComponent} ${className}`}>
+    <Card
+      className={`w-100 mb-0 rounded-4 ${styles.cardComponent} ${useMobileStyle ? `${styles.cardComponentMobile} p-0 p-md-4` : 'p-4'} ${className || ''}`}
+    >
       {title && (
         <Card.Header className={`mb-3 p-0 border-0 bg-transparent ${styles.cardTitle}`}>
           {title}

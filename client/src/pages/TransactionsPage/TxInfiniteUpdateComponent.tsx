@@ -19,7 +19,6 @@ export const TxInfiniteUpdateComponent: FC = () => {
       actionButtonText="VIEW ALL TRANSACTIONS"
       onActionButtonClick={onActionButtonClick}
       showPagination={false}
-      showInCardComponent={false}
     />
   </div>;
 };

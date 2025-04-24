@@ -67,7 +67,6 @@ export const RegisteredHandles: FC<{ domain: string }> = ({ domain }) => {
         ),
       }))}
       showPagination
-      showInCardComponent={false}
       loading={loading}
       {...paginationData}
     />

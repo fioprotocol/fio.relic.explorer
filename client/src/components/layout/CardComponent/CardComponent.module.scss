@@ -1,12 +1,30 @@
 @import '../../../styles/variables.scss';
 @import '../../../styles/font-mixins.scss';
+@import '~bootstrap/scss/mixins/breakpoints.scss';
 
 .cardComponent {
+  background-color: $white;
   border-color: $gainsboro;
   box-shadow: $box-shadow-default;
+
+  &.cardComponentMobile {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
 }
 
 .cardTitle {
   @include font-inter-600;
   color: $caviar;
+}
+
+@include media-breakpoint-up(md) {
+  .cardComponent {
+    &.cardComponentMobile {
+      background-color: $white;
+      border-color: $gainsboro;
+      box-shadow: $box-shadow-default;
+    }
+  }
 }
