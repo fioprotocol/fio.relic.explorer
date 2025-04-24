@@ -8,7 +8,7 @@ import styles from './DataTile.module.scss';
 
 export interface DataItem {
   title: string;
-  value: string | number | ReactElement;
+  value: string | number | ReactElement | null;
 }
 
 export type LayoutType = 'column' | 'row' | 'multi-column';
