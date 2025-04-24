@@ -39,8 +39,8 @@ const DomainDetailsPage: React.FC = () => {
         <Loader fullScreen noBg />
       ) : (
         <>
-          <div className="d-block d-lg-flex justify-content-end align-items-center mb-4 gap-5 f-size-sm lh-1">
-            <div className="text-secondary mb-0">
+          <div className="d-flex justify-content-end align-items-start align-items-md-center flex-wrap flex-column flex-md-row mb-4 gap-2 gap-md-5 f-size-sm lh-1">
+            <div className="text-secondary d-flex justify-content-between align-items-center flex-wrap gap-1 mb-0">
               <span className="me-2">Expiration Date:</span>
               <span className="text-dark fw-bold">
                 {domain?.expiration_timestamp ? formatDate(domain?.expiration_timestamp) : 'N/A'}

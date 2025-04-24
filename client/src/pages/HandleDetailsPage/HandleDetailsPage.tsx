@@ -41,14 +41,14 @@ const HandleDetailsPage: React.FC = () => {
         <Loader fullScreen noBg />
       ) : (
         <>
-          <div className="d-block d-lg-flex justify-content-end align-items-center mb-4 gap-5 f-size-sm lh-1">
-            <div className="text-secondary mb-0">
+          <div className="d-flex justify-content-end align-items-start align-items-md-center flex-wrap flex-column flex-md-row mb-4 gap-2 gap-md-5 f-size-sm lh-1">
+            <div className="text-secondary d-flex justify-content-between align-items-center">
               <span className="me-2">Creation Date:</span>
               <span className="text-dark fw-bold">
                 {handle?.block_timestamp ? formatDate(handle?.block_timestamp) : 'N/A'}
               </span>
             </div>
-            <div className="text-secondary d-flex justify-content-between align-items-center mb-0">
+            <div className="text-secondary d-flex justify-content-between align-items-center">
               <span className="me-2">Account:</span>
               <span className="text-dark fw-bold">
                 {chainData?.owner_account ? (
@@ -60,7 +60,7 @@ const HandleDetailsPage: React.FC = () => {
                 )}
               </span>
             </div>
-            <div className="text-secondary d-flex justify-content-between align-items-center mb-0">
+            <div className="text-secondary d-flex justify-content-between align-items-center">
               <span className="me-2">Domain:</span>
               <span className="text-dark fw-bold">
                 <Link to={`${ROUTES.domains.path}/${handle.domain_name}`}>
@@ -69,12 +69,12 @@ const HandleDetailsPage: React.FC = () => {
               </span>
             </div>
             {handle.handle_status === 'active' ? (
-              <div className="text-secondary d-flex justify-content-between align-items-center mb-0">
+              <div className="text-secondary d-flex justify-content-between align-items-center">
                 <span className="me-2">Remaining Bundles:</span>
                 <span className="text-dark fw-bold">{chainData?.bundleeligiblecountdown}</span>
               </div>
             ) : null}
-            <div className="text-secondary d-flex justify-content-between align-items-center mb-0">
+            <div className="text-secondary d-flex justify-content-between align-items-center">
               <span className="me-2">Status:</span>
               <span className="text-dark fw-bold">
                 <Badge
