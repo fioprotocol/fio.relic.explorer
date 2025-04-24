@@ -40,18 +40,17 @@ const HandlesPage: React.FC = () => {
         <Loader fullScreen noBg />
       ) : (
         <>
-          <div className="d-flex justify-content-start align-items-center gap-3 text-secondary">
-            <div>
-              <span>
-                Registered Handles: <span className="text-dark">{total}</span>
-              </span>
+          <div className="d-flex justify-content-start align-items-start align-items-md-center gap-2 gap-md-3 text-secondary flex-wrap mb-3 mb-md-0">
+            <div className="d-flex justify-content-between align-items-center gap-1 pe-5 pe-md-0 flex-grow-1 flex-sm-grow-0">
+              <span>Registered Handles:</span>
+              <span className="text-dark">{total}</span>
             </div>
-            <div>
-              <span>
-                Active Handles: <span className="text-dark">{totalActive}</span>
-              </span>
+            <div className="d-flex justify-content-between align-items-center gap-1 pe-5 pe-md-0 flex-grow-1 flex-sm-grow-0">
+              <span>Active Handles:</span>
+              <span className="text-dark">{totalActive}</span>
             </div>
           </div>
+
           <LoadableTable
             title="All Handles"
             columns={columns}
@@ -87,6 +86,7 @@ const HandlesPage: React.FC = () => {
               date: formatDate(handle.expiration_stamp),
             }))}
             {...paginationProps}
+            showInCardComponent
             className="mb-5"
           />
         </>

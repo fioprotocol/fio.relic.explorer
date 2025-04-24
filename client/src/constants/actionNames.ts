@@ -137,6 +137,10 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
     description: 'Wrap FIO Domain',
     details: 'fio_domain',
   },
+  unwrapdomain: {
+    description: 'Unwrap FIO Domain',
+    details: 'fio_domain',
+  },
   newfundsreq: {
     description: 'New FIO Request',
     formatDetails: (data: AnyObject): string =>

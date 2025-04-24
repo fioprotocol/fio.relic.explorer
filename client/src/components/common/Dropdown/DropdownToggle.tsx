@@ -17,7 +17,7 @@ export const DropdownToggle = React.forwardRef(
   ) => (
     <Button
       variant={variant || 'outline-light'}
-      className={customClassName || 'text-dark rounded-2 gap-2'}
+      className={customClassName || 'text-dark rounded-2 gap-2 border'}
       ref={ref}
       onClick={(e): void => {
         e.preventDefault();

@@ -32,7 +32,6 @@ export const Transactions: FC<{ domain: string }> = ({ domain }) => {
         })
       )}
       showPagination
-      showInCardComponent={false}
       loading={loading}
       {...paginationData}
     />

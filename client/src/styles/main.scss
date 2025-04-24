@@ -135,3 +135,9 @@ a {
 .cursor-pointer {
   cursor: pointer;
 }
+
+@include media-breakpoint-down(sm) {
+  .text-truncate-max-w {
+    max-width: 10rem;
+  }
+}

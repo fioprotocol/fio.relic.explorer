@@ -7,6 +7,7 @@ export interface TableColumn {
   key: string;
   title: string;
   align?: 'start' | 'center' | 'end';
+  mobileRow?: [row: number, col: number];
 }
 
 export interface TableProps {
@@ -18,12 +19,32 @@ export interface TableProps {
   customMobileDesign?: React.ReactNode;
 }
 
-export const TableComponent: React.FC<TableProps> = ({ columns, data, title, header, className, customMobileDesign }) => {
+export const TableComponent: React.FC<TableProps> = ({
+  columns,
+  data,
+  title,
+  header,
+  className,
+  customMobileDesign,
+}) => {
+  const mobileRows: TableColumn[][] = columns.reduce((acc, column, index) => {
+    const [row, col] = column.mobileRow || [null, null];
+    const rowIndex = row || (index % 2 ? index - 1 : index);
+    acc[rowIndex] = acc[rowIndex] || [];
+    if (col !== null) {
+      acc[rowIndex][col] = column;
+    } else {
+      acc[rowIndex].push(column);
+    }
+
+    return acc;
+  }, [] as TableColumn[][]);
+
   return (
     <Card className={`bg-transparent border-0 rounded-0 mb-4 overflow-hidden ${className || ''}`}>
       {(title || header) && (
         <Card.Header
-          className={`bg-transparent border-bottom py-3 px-4 text-dark ${styles.tableHeader}`}
+          className={`bg-transparent border-bottom py-3 px-0 px-md-4 text-dark ${styles.tableHeader}`}
         >
           {title}
           {header}
@@ -62,23 +83,28 @@ export const TableComponent: React.FC<TableProps> = ({ columns, data, title, hea
         </div>
 
         <div className="d-block d-lg-none">
-          {customMobileDesign ? customMobileDesign :
-            data.map((record, index) => (
-              <div key={index} className={`p-3 border-bottom d-flex flex-row flex-wrap gap-4 ${styles.mobileRow}`}>
-                {columns.map((column) => (
-                  <div
-                    key={`mobile-${index}-${column.key}`}
-                    className={`d-flex flex-column mb-2 ${styles.mobileItem}`}
-                  >
-                    <div className={`mb-1 ${styles.mobileLabel}`}>{column.title}</div>
-                    <div className={styles.mobileValue}>
-                      {record[column.key]}
+          {customMobileDesign
+            ? customMobileDesign
+            : data.map((record, recordIndex) => (
+                <div
+                  key={recordIndex}
+                  className={`py-3 px-0 border-bottom d-flex flex-wrap gap-2 ${styles.mobileRow}`}
+                >
+                  {mobileRows.map((columns, columnIndex) => (
+                    <div key={columnIndex} className={`d-flex gap-2 justify-content-between flex-wrap w-100`}>
+                      {columns.map((column, index) => (
+                        <div
+                          key={`mobile-${index}-${column.key}`}
+                          className={`d-flex flex-column ${styles.mobileItem} ${index % 2 ? 'text-end' : ''}`}
+                        >
+                          <div className={styles.mobileLabel}>{column.title}</div>
+                          <div className={`${styles.mobileValue} flex-grow-1 text-break`}>{record[column.key]}</div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                ))}
-              </div>
-            ))
-          }
+                  ))}
+                </div>
+              ))}
         </div>
       </Card.Body>
     </Card>

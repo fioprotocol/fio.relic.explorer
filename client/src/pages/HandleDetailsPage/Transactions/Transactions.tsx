@@ -32,7 +32,6 @@ export const Transactions: FC<{ handle: string }> = ({ handle }) => {
         })
       )}
       showPagination
-      showInCardComponent={false}
       loading={loading}
       {...paginationData}
     />

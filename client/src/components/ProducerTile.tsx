@@ -10,12 +10,14 @@ interface ProducerTileProps {
 
 export const ProducerTile: React.FC<ProducerTileProps> = ({ name, account, handle }) => {
   return (
-    <div className="text-secondary d-flex justify-content-start align-items-center gap-2 text-nowrap">
-      <Link to={`${ROUTES.accounts.path}/${account}`}>{name || '-'}</Link>{' '}
-      <div className="border-start ps-2">
+    <div className="text-secondary d-flex justify-content-start align-items-start align-items-md-center flex-md-row flex-column gap-1 gap-md-2 text-nowrap flex-wrap">
+      <Link to={`${ROUTES.accounts.path}/${account}`}>{name || '-'}</Link>
+      <div className="d-md-inline-block d-none vr" />
+      <div className="">
         Account: <Link to={`${ROUTES.accounts.path}/${account}`}>{account}</Link>
       </div>
-      <div className="border-start ps-2 overflow-hidden text-truncate text-truncate-max-w">
+      <div className="d-md-inline-block d-none vr" />
+      <div className="overflow-hidden text-truncate text-truncate-max-w">
         FIO Handle: {handle ? <Link to={`${ROUTES.handles.path}/${handle}`}>{handle}</Link> : '-'}
       </div>
     </div>
