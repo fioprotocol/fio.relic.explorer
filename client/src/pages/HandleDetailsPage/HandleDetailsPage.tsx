@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Tab } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
@@ -8,6 +8,7 @@ import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
 import { Loader } from 'src/components/common/Loader';
 import { Alert } from 'src/components/common/Alert';
+import { Tabs } from 'src/components/common/Tabs';
 import { Transactions } from './Transactions/Transactions';
 import MappedPubAddresses from './MappedPubAddresses/MappedPubAddresses';
 import SignedNFTs from './SignedNFTs';
@@ -87,28 +88,28 @@ const HandleDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          <CardComponent title="Handle Details">
+          <CardComponent title="Handle Details" useMobileStyle>
             <Tabs
               defaultActiveKey="transactions"
-              id="block-details-tabs"
+              id="handle-details-tabs"
               variant="underline"
               className="mb-3"
             >
-              <Tab eventKey="transactions" title="Transactions">
+              <Tab.Pane eventKey="transactions" title="Transactions">
                 <Transactions handle={handle?.handle} />
-              </Tab>
-              <Tab eventKey="pub_addresses" title="Mapped Public Addresses">
+              </Tab.Pane>
+              <Tab.Pane eventKey="pub_addresses" title="Mapped Public Addresses">
                 <MappedPubAddresses
                   mappedPubAddresses={chainData?.addresses || []}
                   fch={handle?.handle}
                 />
-              </Tab>
-              <Tab eventKey="nfts" title="Signed NFTs">
+              </Tab.Pane>
+              <Tab.Pane eventKey="nfts" title="Signed NFTs">
                 <SignedNFTs handle={handle?.handle} />
-              </Tab>
-              <Tab eventKey="links" title="Social Media Links">
+              </Tab.Pane>
+              <Tab.Pane eventKey="links" title="Social Media Links">
                 <SocialMediaLinks mappedPubAddresses={chainData?.addresses || []} />
-              </Tab>
+              </Tab.Pane>
             </Tabs>
           </CardComponent>
         </>
