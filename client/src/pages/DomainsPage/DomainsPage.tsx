@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Dropdown } from 'react-bootstrap';
-import { SortDown, CheckCircle } from 'react-bootstrap-icons';
 import Switch from 'react-switch';
 
 import { Badge } from 'src/components/common/Badge';
-import { DropdownToggle, DropdownItem } from 'src/components/common/Dropdown';
 import { Loader } from 'src/components/common/Loader';
 import Container from 'src/components/layout/Container';
 import { LoadableTable } from 'src/components/common/LoadableTable';
+import { SortDropdown, SortOption } from 'src/components/common/SortDropdown';
 
 import { useDomainsPageContext } from './DomainsPageContext';
 
@@ -44,7 +42,7 @@ const columns = [
   },
 ];
 
-const SORT_OPTIONS: { label: string; value: DomainSortOption }[] = [
+const SORT_OPTIONS: SortOption<DomainSortOption>[] = [
   {
     label: 'Most Recent',
     value: 'pk_domain_id',
@@ -116,27 +114,11 @@ const DomainsPage: React.FC = () => {
                   Only Public
                 </label>
               </div>
-              <Dropdown align="end" className="d-flex">
-                <Dropdown.Toggle as={DropdownToggle} className="text-dark rounded-2 gap-2">
-                  <SortDown size={20} className="color-primary" />
-                  <span className="f-size-sm ms-2">Sort</span>
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu className="rounded-3 py-2 px-3 border box-shadow-default">
-                  {SORT_OPTIONS.map(({ label, value }) => (
-                    <Dropdown.Item
-                      key={value}
-                      as={DropdownItem}
-                      active={sort === value}
-                      disabled={sort === value}
-                      onClick={(): void => setSort(value)}
-                    >
-                      {sort === value && <CheckCircle size={16} className="green-icon" />}
-                      <span className="f-size-sm text-nowrap">{label}</span>
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
+              <SortDropdown
+                options={SORT_OPTIONS}
+                currentSort={sort}
+                onSortChange={setSort}
+              />
             </div>
           </div>
         }
