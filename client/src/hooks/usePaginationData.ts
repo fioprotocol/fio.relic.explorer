@@ -10,6 +10,7 @@ type UsePaginationDataProps = {
   params?: AnyObject;
   dataKey?: string;
   limit?: number;
+  returnTotal?: boolean;
 };
 
 export type UsePaginationDefaultProps = {
@@ -36,6 +37,7 @@ export const usePaginationData = <T, O = AnyObject>({
   dataKey = 'data',
   limit = DEFAULT_REQUEST_ITEMS_LIMIT,
   withNavigation = true,
+  returnTotal = false,
 }: UsePaginationDataProps): UsePaginationDataReturn<T, O> => {
   // Get URL parameters
   const location = useLocation();
