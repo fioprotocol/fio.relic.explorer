@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Link } from 'react-router';
-import { Tabs, Tab } from 'react-bootstrap';
+import { Tab } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import { BackButton } from 'src/components/common/BackButton';
@@ -8,6 +8,7 @@ import { Badge } from 'src/components/common/Badge';
 import { CardComponent } from 'src/components/layout/CardComponent';
 import { CopyButton } from 'src/components/common/CopyButton';
 import { DataTile } from 'src/components/common/DataTile';
+import { Tabs } from 'src/components/common/Tabs';
 import { JsonSyntaxHighlighter } from 'src/components/common/JsonSyntaxHighlighter';
 import { JsonDataRender } from 'src/components/common/JsonDataRender';
 import { DetailsPagesHeaderItem } from 'src/components/common/DetailsPagesHeaderItem';
@@ -52,26 +53,26 @@ const TransactionDetailsPage: FC = () => {
       } />
     </div>
     <DataTile items={stats} layout='row' loading={loading} />
-    <CardComponent title="Transaction Details" className="mt-4">
+    <CardComponent title="Transaction Details" className="mt-4" useMobileStyle>
       <Tabs
         defaultActiveKey="input"
-        id="block-details-tabs"
+        id="transaction-details-tabs"
         variant="underline"
         className="mb-3"
       >
-        <Tab eventKey="input" title="Input">
+        <Tab.Pane eventKey="input" title="Input">
           <div className={tabRowStyle}>
             <ContractActionBadge contractActionName={transaction?.contract_action_name} actionName={transaction?.action_name} />
             <JsonDataRender data={transaction?.request_data} />
           </div>
-        </Tab>
-        <Tab eventKey="response" title="Response">
+        </Tab.Pane>
+        <Tab.Pane eventKey="response" title="Response">
           <div className={tabRowStyle}>
             <ContractActionBadge contractActionName={transaction?.contract_action_name} actionName={transaction?.action_name} />
             <JsonDataRender data={transaction?.response_data} />
           </div>
-        </Tab>
-        <Tab eventKey="traces" title="Traces">
+        </Tab.Pane>
+        <Tab.Pane eventKey="traces" title="Traces">
           {transaction?.traces.map((trace, key) => (
             <div
               key={key}
@@ -81,8 +82,8 @@ const TransactionDetailsPage: FC = () => {
               <JsonDataRender data={trace.request_data} isPrimaryFirst />
             </div>
           ))}
-        </Tab>
-        <Tab eventKey="raw" title="Raw">
+        </Tab.Pane>
+        <Tab.Pane eventKey="raw" title="Raw">
           <div className='ps-3'>
             <CopyButton
               data={rawData}
@@ -98,7 +99,7 @@ const TransactionDetailsPage: FC = () => {
               className='mt-3'
             />
           </div>
-        </Tab>
+        </Tab.Pane>
       </Tabs>
     </CardComponent>
   </Container>;

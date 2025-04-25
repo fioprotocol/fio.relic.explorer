@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Tab } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
@@ -11,6 +11,7 @@ import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
 import { Alert } from 'src/components/common/Alert';
 import { Loader } from 'src/components/common/Loader';
+import { Tabs } from 'src/components/common/Tabs';
 
 import { useBlockDetailsContext } from './BlockDetailsContext';
 
@@ -41,8 +42,8 @@ const BlockDetailsPage: React.FC = () => {
       ) : (
         <>
           <div className="d-block d-lg-flex justify-content-between align-items-center mb-4 gap-5 f-size-sm lh-1">
-            <p className="text-secondary mb-0">
-              Block ID: <span className="text-dark fw-bold">{block?.block_id}</span>
+            <p className="text-secondary mb-2 mb-md-0">
+              Block ID: <span className="text-dark fw-bold text-break">{block?.block_id}</span>
             </p>
             <div className="d-flex justify-content-between align-items-center gap-5">
               <div className="text-secondary mb-0">
@@ -102,14 +103,14 @@ const BlockDetailsPage: React.FC = () => {
               },
             ]}
           />
-          <CardComponent title="Block Details">
+          <CardComponent title="Block Details" useMobileStyle>
             <Tabs
               defaultActiveKey="transactions"
               id="block-details-tabs"
               variant="underline"
               className="mb-3"
             >
-              <Tab eventKey="transactions" title="Transactions">
+              <Tab.Pane eventKey="transactions" title="Transactions">
                 {transactions.length > 0 ? (
                   <TableComponent
                     columns={TX_TABLE_COLUMNS}
@@ -118,7 +119,7 @@ const BlockDetailsPage: React.FC = () => {
                 ) : (
                   <Alert hasDash={false} title="No transactions found" />
                 )}
-              </Tab>
+              </Tab.Pane>
             </Tabs>
           </CardComponent>
         </>

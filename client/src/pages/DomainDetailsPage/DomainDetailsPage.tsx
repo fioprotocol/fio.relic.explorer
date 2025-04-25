@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Tab } from 'react-bootstrap';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
@@ -8,6 +8,7 @@ import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
 import { Loader } from 'src/components/common/Loader';
 import { Alert } from 'src/components/common/Alert';
+import { Tabs } from 'src/components/common/Tabs';
 import Transactions from './Transactions';
 import RegisteredHandles from './RegisteredHandles';
 
@@ -77,20 +78,20 @@ const DomainDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          <CardComponent title="Domain Details">
+          <CardComponent title="Domain Details" useMobileStyle>
             <Tabs
               defaultActiveKey="transactions"
-              id="block-details-tabs"
+              id="domains-details-tabs"
               variant="underline"
               className="mb-3"
             >
-              <Tab eventKey="transactions" title="Transactions">
+              <Tab.Pane eventKey="transactions" title="Transactions">
                 <Transactions domain={domain?.domain_name} />
-              </Tab>
+              </Tab.Pane>
               {domain?.domain_status === 'active' ? (
-                <Tab eventKey="registered-handles" title="Registered Handles">
+                <Tab.Pane eventKey="registered-handles" title="Registered Handles">
                   <RegisteredHandles domain={domain?.domain_name} />
-                </Tab>
+                </Tab.Pane>
               ) : null}
             </Tabs>
           </CardComponent>
