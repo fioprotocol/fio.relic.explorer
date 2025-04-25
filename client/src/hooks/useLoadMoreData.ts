@@ -7,6 +7,7 @@ type UseLoadMoreDataProps<T> = {
   params?: AnyObject;
   dataKey?: string;
   itemIdKey?: keyof T;
+  fetchId?: string;
   limit?: number;
 };
 
@@ -30,6 +31,7 @@ export const useLoadMoreData = <T, O = AnyObject>({
   params = {},
   dataKey = 'data',
   itemIdKey = 'id' as keyof T,
+  fetchId = '',
   limit = DEFAULT_REQUEST_ITEMS_LIMIT,
 }: UseLoadMoreDataProps<T>): UseLoadMoreDataReturn<T, O> => {
   const [data, setData] = useState<T[]>([]);
@@ -38,12 +40,18 @@ export const useLoadMoreData = <T, O = AnyObject>({
   const [hasMore, toggleHasMore] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [fetched, setFetched] = useState<boolean>(false);
+  const [localFetchId, setLocalFetchId] = useState<string | undefined>(undefined);
   const [error, setError] = useState<Error | null>(null);
 
   const serializedParams = JSON.stringify(params);
+  const newFetchId = localFetchId !== fetchId;
 
   // Function to fetch data for a specific page
   const fetchData = useCallback(async () => {
+    if (newFetchId) {
+      return;
+    }
+
     const page = currentPage || 1;
 
     setLoading(true);
@@ -80,7 +88,7 @@ export const useLoadMoreData = <T, O = AnyObject>({
       setLoading(false);
       setFetched(true);
     }
-  }, [action, dataKey, itemIdKey, limit, serializedParams, currentPage]);
+  }, [action, dataKey, itemIdKey, limit, serializedParams, currentPage, newFetchId]);
 
   const loadMore = useCallback(() => {
     setCurrentPage((page) => (page || 1) + 1);
@@ -90,10 +98,6 @@ export const useLoadMoreData = <T, O = AnyObject>({
   const reset = useCallback(() => {
     setCurrentPage(1);
   }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   useEffect(() => {
     return () => {
@@ -106,6 +110,21 @@ export const useLoadMoreData = <T, O = AnyObject>({
       setError(null);
     };
   }, []);
+
+  useEffect(() => {
+    setLocalFetchId(fetchId);
+    setData([]);
+    setOtherData(null);
+    setCurrentPage(1);
+    toggleHasMore(false);
+    setLoading(false);
+    setFetched(false);
+    setError(null);
+  }, [fetchId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return {
     data,

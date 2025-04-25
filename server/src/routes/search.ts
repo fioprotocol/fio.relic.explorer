@@ -4,6 +4,7 @@ import { Ecc } from '@fioprotocol/fiojs';
 import pool from '../config/database';
 
 import { validateHandleRegex } from '@shared/util/fio';
+import { FIO_CONTRACTS_MAP } from '@shared/constants/fio';
 
 import { SearchResponse, SearchResultType } from '@shared/types/search';
 
@@ -50,22 +51,7 @@ const validateType = (q: string): SearchResultType => {
   const isFioHandle = new RegExp(validateHandleRegex, 'gim').test(q);
   const isAccount =
     /^[a-zA-Z0-9]{12}$/.test(q) ||
-    [
-      'eosio',
-      'eosio.msig',
-      'eosio.token',
-      'fio.address',
-      'fio.fee',
-      'fio.token',
-      'fio.treasury',
-      'fio.whitelst',
-      'fio.reqobt',
-      'fio.tpid',
-      'fio.staking',
-      'fio.perms',
-      'fio.escrow',
-      'fio.oracle',
-    ].includes(q);
+    Object.values(FIO_CONTRACTS_MAP).includes(q);
   const isDomain = /^(?!-)[a-zA-Z0-9-]{1,62}(?<!-)$/.test(q);
   const isTransactionId = /^[a-f0-9]{64}$/.test(q);
 

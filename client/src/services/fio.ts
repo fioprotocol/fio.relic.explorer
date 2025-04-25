@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 import { NODE_URLS } from '@shared/constants/fio';
-import { BlockProducerResponse, TransactionHistoryResponse } from '@shared/types/fio-api-server';
+import {
+  BlockProducerResponse,
+  ContractTableRow,
+  ContractTablesResponse,
+  TransactionHistoryResponse,
+} from '@shared/types/fio-api-server';
 import { HandleNFT } from '@shared/types/handles';
 
 const FIO_DASH_API_URL = 'https://app.fio.net/api/v1';
@@ -29,10 +34,17 @@ export const getInfo = async (): Promise<ChainInfo> => {
   return response.data;
 };
 
-export const getTransactionHistoryData = async ({ id }: { id: string }): Promise<TransactionHistoryResponse> => {
-  const response = await axios.post<TransactionHistoryResponse>(`${NODE_URLS[0]}history/get_transaction`, {
-    id,
-  });
+export const getTransactionHistoryData = async ({
+  id,
+}: {
+  id: string;
+}): Promise<TransactionHistoryResponse> => {
+  const response = await axios.post<TransactionHistoryResponse>(
+    `${NODE_URLS[0]}history/get_transaction`,
+    {
+      id,
+    }
+  );
 
   return response.data;
 };
@@ -121,4 +133,121 @@ export const getUrlContent = async (url: string): Promise<string | null> => {
   const response = await axios.get(`${FIO_DASH_API_URL}/get-url-content`, { params: { url } });
 
   return response.data;
+};
+
+export const getContractTables = async ({
+  contractName,
+}: {
+  contractName: string;
+}): Promise<ContractTablesResponse> => {
+  if (!contractName) {
+    return { contractName: '', tables: [] };
+  }
+
+  // TODO: fix type
+  const response = await axios.post(`${NODE_URLS[0]}chain/get_abi`, {
+    account_name: contractName,
+  });
+
+  if (response.status !== 200) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = response.data;
+
+  if (!data.abi) {
+    throw new Error('No ABI found for this contract.');
+  }
+
+  return { contractName, tables: data.abi.tables };
+};
+
+export const getContractScopeInfo = async ({
+  contractName,
+  tableName,
+  limit,
+  offset,
+}: {
+  contractName: string;
+  tableName: string;
+  limit: number;
+  offset: number;
+}): Promise<{ scopes: string[]; more: number }> => {
+  const scopesResponse = await axios.post(`${NODE_URLS[0]}chain/get_table_by_scope`, {
+    code: contractName,
+    table: tableName,
+    limit,
+    offset,
+  });
+
+  if (scopesResponse.status !== 200) {
+    throw new Error(`HTTP error! status: ${scopesResponse.status}`);
+  }
+
+  const scopesData = scopesResponse.data;
+
+  return {
+    scopes: scopesData.rows.map((row: { scope: string }) => row.scope),
+    more: scopesData.more,
+  };
+};
+
+export const getTableInfo = async ({
+  contractName,
+  tableName,
+  scope,
+  limit,
+  upper_bound,
+  lower_bound,
+  reverse,
+}: {
+  contractName: string;
+  tableName: string;
+  scope?: string;
+  limit: number;
+  lower_bound?: number | string;
+  upper_bound?: number | string;
+  reverse?: boolean;
+}): Promise<{ rows: ContractTableRow[]; more: number }> => {
+  if (!contractName || !tableName) {
+    return { rows: [], more: 0 };
+  }
+
+  // If no scopes found, try with contract name as scope
+  if (!scope) {
+    scope = contractName;
+  }
+
+  let allRows: ContractTableRow[] = []; // TODO: fix type
+  // let completedScopes = 0;
+
+  const tableResponse = await axios.post(`${NODE_URLS[0]}chain/get_table_rows`, {
+    code: contractName,
+    scope: scope,
+    table: tableName,
+    limit,
+    lower_bound,
+    upper_bound,
+    json: true,
+    reverse,
+  });
+
+  if (tableResponse.status !== 200) {
+    console.error(`Error fetching scope ${scope}: ${tableResponse.statusText}`);
+    return { rows: [], more: 0 };
+  }
+
+  const tableData = tableResponse.data;
+
+  // Add scope info to each row
+  const scopeRows = tableData.rows.map((row: ContractTableRow) => ({
+    // TODO: fix type
+    _scope: scope,
+    ...row,
+  }));
+
+  allRows = [...allRows, ...scopeRows];
+  // completedScopes++;
+
+  return { rows: allRows, more: tableResponse.data.more };
 };

@@ -1,0 +1,12 @@
+.alert {
+  max-width: 350px;
+}
+
+.dropdown {
+  max-width: 335px;
+
+  .dropdownList {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+}

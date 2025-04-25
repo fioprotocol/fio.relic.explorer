@@ -73,7 +73,9 @@ export const TableComponent: React.FC<TableProps> = ({
                       key={`${index}-${column.key}`}
                       className={`py-3 px-4 bg-transparent ${column.align ? `text-${column.align}` : ''}`}
                     >
-                      {record[column.key]}
+                      {Array.isArray(record[column.key])
+                        ? JSON.stringify(record[column.key])
+                        : record[column.key]}
                     </td>
                   ))}
                 </tr>
@@ -91,14 +93,21 @@ export const TableComponent: React.FC<TableProps> = ({
                   className={`py-3 px-0 border-bottom d-flex flex-wrap gap-2 ${styles.mobileRow}`}
                 >
                   {mobileRows.map((columns, columnIndex) => (
-                    <div key={columnIndex} className={`d-flex gap-2 justify-content-between flex-wrap w-100`}>
+                    <div
+                      key={columnIndex}
+                      className={`d-flex gap-2 justify-content-between flex-wrap w-100`}
+                    >
                       {columns.map((column, index) => (
                         <div
                           key={`mobile-${index}-${column.key}`}
                           className={`d-flex flex-column ${styles.mobileItem} ${index % 2 ? 'text-end' : ''}`}
                         >
                           <div className={styles.mobileLabel}>{column.title}</div>
-                          <div className={`${styles.mobileValue} flex-grow-1 text-break`}>{record[column.key]}</div>
+                          <div className={`${styles.mobileValue} flex-grow-1 text-break`}>
+                            {Array.isArray(record[column.key])
+                              ? JSON.stringify(record[column.key])
+                              : record[column.key]}
+                          </div>
                         </div>
                       ))}
                     </div>

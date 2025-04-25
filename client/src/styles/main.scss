@@ -85,6 +85,22 @@ body {
   @include font-inter-400;
 }
 
+.fw-semibold-inter {
+  @include font-inter-600;
+}
+
+.fw-normal-proxima {
+  @include font-proxima-nova-400;
+}
+
+.fw-semibold-proxima {
+  @include font-proxima-nova-600;
+}
+
+.fw-extrabold-proxima {
+  @include font-proxima-nova-800;
+}
+
 a {
   text-decoration: none;
 }

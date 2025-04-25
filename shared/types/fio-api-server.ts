@@ -1,4 +1,4 @@
-import { AnyObject } from "./general";
+import { AnyObject } from './general';
 
 export type ChainInfoResponse = {
   server_version: string;
@@ -32,8 +32,8 @@ export type TransactionHistoryResponse = {
           compression: string;
           packed_context_free_data: string;
           packed_trx: string;
-        }
-      ]
+        },
+      ];
     };
     trx: {
       expiration: string;
@@ -109,4 +109,12 @@ export type BlockProducerResponse = {
   more: boolean;
   producers: BlockProducer[];
   total_producer_vote_weight: string;
+};
+
+export type ContractTable = { name: string; type: string };
+export type ContractItemType = { name: string; tables: ContractTable[] };
+export type ContractTableRow = { _scope?: string } & any; // todo: fix type
+export type ContractTablesResponse = {
+  contractName: string;
+  tables: ContractTable[];
 };

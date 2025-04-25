@@ -21,7 +21,7 @@ export const ROUTES: Record<string, Route> = {
   producers: { path: '/governance/producers', label: 'Producers' },
   proxies: { path: '/governance/proxies', label: 'Proxies' },
   advanced: { path: '/advanced', label: 'Advanced' },
-  contracts: { path: '/advanced/contracts', label: 'Contracts' },
+  contracts: { path: '/state_data', label: 'Contracts' },
   multisigs: { path: '/advanced/multisigs', label: 'Multisigs' },
 
   healthCheck: { path: '/health-check', label: 'Health Check' },
