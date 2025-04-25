@@ -7,6 +7,7 @@ import { getAccounts } from 'src/services/accounts';
 import { formatTokenValue } from 'src/utils/general';
 import { Account, AccountSortOption } from '@shared/types/accounts';
 import { ACCOUNT_SORT_OPTIONS } from '@shared/constants/accounts';
+
 type UseAccountsPageType = {
   loading: boolean;
   stats: DataItem[];
@@ -61,6 +62,7 @@ export const useAccountsPageContext = (): UseAccountsPageType => {
     {
       title: 'Locked Supply',
       value: `${formatTokenValue(response?.lockedTokens)} FIO`,
+
     },
   ];
 
