@@ -7,12 +7,13 @@ type DropdownToggleProps = {
   children: React.ReactNode;
   variant?: Variant;
   customClassName?: string;
+  disabled?: boolean;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 export const DropdownToggle = React.forwardRef(
   (
-    { children, variant, customClassName, onClick }: DropdownToggleProps,
+    { children, variant, customClassName, disabled, onClick }: DropdownToggleProps,
     ref: React.Ref<HTMLButtonElement>
   ) => (
     <Button
@@ -23,6 +24,7 @@ export const DropdownToggle = React.forwardRef(
         e.preventDefault();
         onClick(e);
       }}
+      disabled={disabled}
     >
       {children}
     </Button>

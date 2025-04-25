@@ -15,6 +15,7 @@ import DomainDetailsPage from './pages/DomainDetailsPage';
 import BlockProducersPage from './pages/BlockProducersPage';
 import ProxiesPage from './pages/ProxiesPage';
 import AccountsPage from './pages/AccountsPage';
+import ContractsPage from './pages/ContractsPage';
 
 import { ROUTES } from './constants/routes';
 
@@ -37,6 +38,7 @@ const App: React.FC = () => {
           <Route path={ROUTES.producers.path} element={<BlockProducersPage />} />
           <Route path={ROUTES.proxies.path} element={<ProxiesPage />} />
           <Route path={ROUTES.accounts.path} element={<AccountsPage />} />
+          <Route path={ROUTES.contracts.path} element={<ContractsPage />} />
           <Route
             path="*"
             element={
