@@ -24,6 +24,7 @@ export type UsePaginationDataReturn<T, O = AnyObject> = {
   fetched: boolean;
   error: Error | null;
   otherData: O | null;
+  total: number | null;
   reset?: () => void;
 } & UsePaginationDefaultProps;
 
@@ -52,6 +53,7 @@ export const usePaginationData = <T, O = AnyObject>({
   const [loading, setLoading] = useState<boolean>(false);
   const [fetched, setFetched] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
+  const [total, setTotal] = useState<number | null>(null);
 
   const serializedParams = JSON.stringify(params);
 
@@ -93,6 +95,8 @@ export const usePaginationData = <T, O = AnyObject>({
       setTotalPages(Math.ceil(total / limit));
 
       setData(newItems as T[]);
+
+      setTotal(total);
 
       // Store additional data
       setOtherData(Object.keys(restData).length > 0 ? (restData as O) : null);
@@ -139,6 +143,7 @@ export const usePaginationData = <T, O = AnyObject>({
     error,
     currentPage,
     totalPages,
+    total,
     goToPage,
     reset,
   };

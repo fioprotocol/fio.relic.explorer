@@ -1,6 +1,6 @@
 export const formatDate = (date: string): string => {
   if (!date) return '';
-  
+
   return new Date(date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -20,39 +20,51 @@ export const formatBlockNumber = (block_number: number): string =>
 export const copyToClipboard = async (data: unknown): Promise<boolean> => {
   try {
     const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-    
+
     // Use Clipboard API if available (modern browsers)
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
       return true;
     }
-    
+
     // Fallback for older browsers and mobile devices
     const textArea = document.createElement('textarea');
     textArea.value = text;
-    
+
     // Make the textarea out of viewport
     textArea.style.position = 'fixed';
     textArea.style.left = '-999999px';
     textArea.style.top = '-999999px';
     document.body.appendChild(textArea);
-    
+
     // Ensure mobile device keyboard doesn't appear
     textArea.setAttribute('readonly', '');
-    
+
     // Select the text
     textArea.focus();
     textArea.select();
-    
+
     // Execute the copy command
     const successful = document.execCommand('copy');
-    
+
     // Remove the temporary element
     document.body.removeChild(textArea);
-    
+
     return successful;
   } catch (error) {
     console.error('Failed to copy to clipboard:', error);
     return false;
   }
+};
+
+// Helper to format numbers without truncating decimals
+export const formatTokenValue = (value: number | string | undefined | null): string => {
+  if (value === undefined || value === null) return 'N/A';
+
+  if (typeof value === 'number') {
+    return value.toLocaleString(undefined, { maximumFractionDigits: 20 });
+  }
+
+  // If it's already a string, return it directly
+  return value;
 };
