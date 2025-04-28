@@ -191,7 +191,7 @@ export const NftItem: FC<{ nft: HandleNFT; onClick: (nft: NftItemType) => void }
 
   if (!nftItem) {
     return (
-      <div className={styles.nftItem}>
+      <div className={`cursor-pointer opacity-75-hover w-100 ${styles.nftItem}`}>
         <Loader />
       </div>
     );
