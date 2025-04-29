@@ -9,19 +9,29 @@ export type UseContractsDataTableContextType = {
   loading: boolean;
   activeContract: ContractItemType | null;
   activeTable: ContractTable | null;
-  tableRows: ContractTableRow[]; // TODO: fix type
+  tableRows: ContractTableRow[];
   hasMore: boolean;
   fetched: boolean;
   loadMore: () => void;
 };
 
+const ITEM_ID_KEY_MAP = {
+  fiofees: 'fee_id',
+  feevoters: 'block_producer_name',
+  lockedtokens: 'owner',
+  topprods: 'producer',
+  accountmap: 'account',
+};
+
 export const useContractsDataTableContext = ({
   activeTable,
   activeContract,
+  activeScope,
   reverse,
 }: {
   activeTable: ContractTable | null;
   activeContract: ContractItemType | null;
+  activeScope: string | null;
   reverse: boolean;
 }): UseContractsDataTableContextType => {
   const [lowerBound, setLowerBound] = useState<{
@@ -32,7 +42,11 @@ export const useContractsDataTableContext = ({
     () => setLowerBound((prev) => ({ ...prev, current: prev.next })),
     []
   );
-  const fetchId = `${activeContract?.name || ''}_${activeTable?.name || ''}_${reverse ? 'reverse' : ''}`;
+  const fetchId = `${activeContract?.name || ''}_${activeTable?.name || ''}_${activeScope || ''}_${reverse ? 'reverse' : ''}`;
+  const itemIdKey =
+    activeTable?.key_names[0] ||
+    ITEM_ID_KEY_MAP[activeTable?.name as keyof typeof ITEM_ID_KEY_MAP] ||
+    'id';
 
   const {
     data: tableRows,
@@ -47,10 +61,10 @@ export const useContractsDataTableContext = ({
       tableName: activeTable?.name,
       ...(reverse ? { upper_bound: lowerBound.current } : { lower_bound: lowerBound.current }),
       reverse,
-      // scope: activeTable?.scope, // TODO: there are multiple scopes could be in the contract that can be applied to the getTableInfo
+      scope: activeScope,
     },
     dataKey: 'rows',
-    itemIdKey: 'id', // TODO: check waht else could be used as itemIdKey for different contracts
+    itemIdKey,
   });
 
   useEffect(() => {
@@ -61,10 +75,10 @@ export const useContractsDataTableContext = ({
     if (tableRows.length > 0) {
       setLowerBound((prev) => ({
         ...prev,
-        next: tableRows[tableRows.length - 1].id,
+        next: tableRows[tableRows.length - 1][itemIdKey],
       }));
     }
-  }, [tableRows]);
+  }, [tableRows, itemIdKey]);
 
   return {
     loading: tableInfoLoading,

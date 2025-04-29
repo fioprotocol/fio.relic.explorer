@@ -144,7 +144,6 @@ export const getContractTables = async ({
     return { contractName: '', tables: [] };
   }
 
-  // TODO: fix type
   const response = await axios.post(`${NODE_URLS[0]}chain/get_abi`, {
     account_name: contractName,
   });
@@ -165,14 +164,18 @@ export const getContractTables = async ({
 export const getContractScopeInfo = async ({
   contractName,
   tableName,
-  limit,
-  offset,
+  limit = 20,
+  offset = 0,
 }: {
   contractName: string;
   tableName: string;
-  limit: number;
-  offset: number;
+  limit?: number;
+  offset?: number;
 }): Promise<{ scopes: string[]; more: number }> => {
+  if (!contractName || !tableName) {
+    return { scopes: [], more: 0 };
+  }
+
   const scopesResponse = await axios.post(`${NODE_URLS[0]}chain/get_table_by_scope`, {
     code: contractName,
     table: tableName,
@@ -218,8 +221,7 @@ export const getTableInfo = async ({
     scope = contractName;
   }
 
-  let allRows: ContractTableRow[] = []; // TODO: fix type
-  // let completedScopes = 0;
+  let allRows: ContractTableRow[] = [];
 
   const tableResponse = await axios.post(`${NODE_URLS[0]}chain/get_table_rows`, {
     code: contractName,
@@ -241,13 +243,10 @@ export const getTableInfo = async ({
 
   // Add scope info to each row
   const scopeRows = tableData.rows.map((row: ContractTableRow) => ({
-    // TODO: fix type
-    _scope: scope,
     ...row,
   }));
 
   allRows = [...allRows, ...scopeRows];
-  // completedScopes++;
 
   return { rows: allRows, more: tableResponse.data.more };
 };

@@ -111,10 +111,14 @@ export type BlockProducerResponse = {
   total_producer_vote_weight: string;
 };
 
-export type ContractTable = { name: string; type: string };
+export type ContractTable = { name: string; type: string; key_names: string[] };
 export type ContractItemType = { name: string; tables: ContractTable[] };
-export type ContractTableRow = { _scope?: string } & any; // todo: fix type
+export type ContractTableRow = AnyObject; // could be a lot of different objects
 export type ContractTablesResponse = {
   contractName: string;
   tables: ContractTable[];
+};
+export type ContractScopeResponse = {
+  scopes: string[];
+  more: number;
 };

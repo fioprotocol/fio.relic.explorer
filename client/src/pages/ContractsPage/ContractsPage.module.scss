@@ -1,12 +1,31 @@
+@import 'src/styles/variables.scss';
+@import '~bootstrap/scss/mixins/breakpoints.scss';
+
 .alert {
   max-width: 350px;
 }
 
 .dropdown {
   max-width: 335px;
+  min-width: 200px;
 
   .dropdownList {
     max-height: 300px;
     overflow-y: auto;
+  }
+}
+
+.actionButton {
+  span {
+    font-size: $font-size-sm;
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .actionButton {
+    span {
+      font-size: $font-size-xs;
+    }
+    padding: 0.25rem 0.5rem;
   }
 }

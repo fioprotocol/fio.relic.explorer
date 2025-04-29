@@ -17,6 +17,7 @@ export interface TableProps {
   header?: React.ReactNode;
   className?: string;
   customMobileDesign?: React.ReactNode;
+  keepTableForMobile?: boolean;
 }
 
 export const TableComponent: React.FC<TableProps> = ({
@@ -26,6 +27,7 @@ export const TableComponent: React.FC<TableProps> = ({
   header,
   className,
   customMobileDesign,
+  keepTableForMobile = false,
 }) => {
   const mobileRows: TableColumn[][] = columns.reduce((acc, column, index) => {
     const [row, col] = column.mobileRow || [null, null];
@@ -51,14 +53,14 @@ export const TableComponent: React.FC<TableProps> = ({
         </Card.Header>
       )}
       <Card.Body className="p-0">
-        <div className="d-none d-lg-block">
+        <div className={keepTableForMobile ? '' : 'd-none d-lg-block'}>
           <BootstrapTable responsive hover className="m-0">
             <thead>
               <tr className={styles.thead}>
                 {columns.map((column) => (
                   <th
                     key={column.key}
-                    className={`py-3 px-4 bg-transparent ${column.align ? `text-${column.align}` : ''}`}
+                    className={`py-3 px-4 bg-transparent text-nowrap ${column.align ? `text-${column.align}` : ''}`}
                   >
                     {column.title}
                   </th>
@@ -84,7 +86,7 @@ export const TableComponent: React.FC<TableProps> = ({
           </BootstrapTable>
         </div>
 
-        <div className="d-block d-lg-none">
+        <div className={keepTableForMobile ? 'd-none' : 'd-block d-lg-none'}>
           {customMobileDesign
             ? customMobileDesign
             : data.map((record, recordIndex) => (
@@ -100,7 +102,7 @@ export const TableComponent: React.FC<TableProps> = ({
                       {columns.map((column, index) => (
                         <div
                           key={`mobile-${index}-${column.key}`}
-                          className={`d-flex flex-column ${styles.mobileItem} ${index % 2 ? 'text-end' : ''}`}
+                          className={`d-flex flex-column flex-grow-1 ${styles.mobileItem} ${index % 2 ? 'text-end' : ''}`}
                         >
                           <div className={styles.mobileLabel}>{column.title}</div>
                           <div className={`${styles.mobileValue} flex-grow-1 text-break`}>
