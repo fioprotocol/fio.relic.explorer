@@ -21,11 +21,15 @@ import styles from './ContractsPage.module.scss';
 const ContractsPage: FC = () => {
   const {
     loading,
+    scopeLoading,
     contracts,
+    scopes,
     activeContract,
     setActiveContract,
     activeTable,
     setActiveTable,
+    activeScope,
+    setActiveScope,
     reverse,
     onReverse,
     onRefresh,
@@ -33,7 +37,7 @@ const ContractsPage: FC = () => {
 
   return (
     <Container title="State Data">
-      <CardComponent title="Contract and Contract Tables" className="mb-3 ">
+      <CardComponent title="Contract and Contract Tables" className="mb-3" useMobileStyle>
         <div className="d-flex justify-content-between gap-3 mb-3 flex-wrap">
           <div className="d-flex justify-content-start gap-3 flex-grow-1 flex-wrap">
             <Dropdown align="end" className={`d-flex flex-grow-1 ${styles.dropdown}`}>
@@ -88,32 +92,74 @@ const ContractsPage: FC = () => {
               </Dropdown.Menu>
             </Dropdown>
           </div>
-          <div className="d-flex justify-content-end gap-3">
-            <Button
-              variant="outline-light text-dark border"
-              onClick={onReverse}
-              disabled={!activeTable}
-            >
-              {reverse ? (
-                <SortUpAlt size={24} className="text-primary" />
-              ) : (
-                <SortDownAlt size={24} className="text-primary" />
-              )}
-              <span className="d-none d-md-inline-block ms-2 f-size-sm fw-semibold-inter">
-                Reverse Order
-              </span>
-            </Button>
-            <Button variant="primary" onClick={onRefresh} disabled={!activeTable}>
-              <ArrowRepeat size={24} />
-              <span className="d-none d-md-inline-block ms-2 f-size-sm fw-semibold-inter">
-                Refresh
-              </span>
-            </Button>
+          <div className="d-flex justify-content-between align-items-center flex-grow-1 gap-3 flex-wrap">
+            <span className="d-sm-none f-size-sm fw-semibold-inter">Table Results</span>
+            <div className="d-flex justify-content-end flex-grow-1 gap-3">
+              <Button
+                variant="outline-light text-dark border"
+                onClick={onReverse}
+                disabled={!activeTable}
+                className={styles.actionButton}
+              >
+                {reverse ? (
+                  <SortUpAlt size={24} className="text-primary" />
+                ) : (
+                  <SortDownAlt size={24} className="text-primary" />
+                )}
+                <span className="d-xs-inline-block d-sm-none d-md-inline-block ms-2 fw-semibold-inter">
+                  Reverse
+                  <span className="d-none d-sm-inline"> Order</span>
+                </span>
+              </Button>
+              <Button
+                variant="primary"
+                onClick={onRefresh}
+                disabled={!activeTable}
+                className={styles.actionButton}
+              >
+                <ArrowRepeat size={24} />
+                <span className="d-xs-inline-block d-sm-none d-md-inline-block ms-2 fw-semibold-inter">
+                  Refresh
+                </span>
+              </Button>
+            </div>
           </div>
+        </div>
+
+        <div
+          className={scopes.length > 1 && activeTable?.name && !scopeLoading ? 'd-flex' : 'd-none'}
+        >
+          <Dropdown align="end" className={`d-flex flex-grow-1 ${styles.dropdown}`}>
+            <Dropdown.Toggle
+              as={DropdownToggle}
+              customClassName={`d-flex justify-content-between align-items-center text-dark rounded-2 gap-2 border w-100`}
+            >
+              <span className="f-size-sm">
+                <span className="fw-semibold-inter">Scope:</span> {activeScope}
+              </span>
+              <ChevronDown />
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu
+              className={`rounded-3 py-2 px-3 border box-shadow-default w-100 ${styles.dropdownList}`}
+            >
+              {scopes.map((scope) => (
+                <Dropdown.Item
+                  key={scope}
+                  as={DropdownItem}
+                  active={scope === activeScope}
+                  disabled={scope === activeScope}
+                  onClick={(): void => setActiveScope(scope)}
+                >
+                  <span className="f-size-sm text-nowrap">{scope}</span>
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
         <div className="">
           {loading && (
-            <div className="d-flex justify-content-center align-items-center w-100">
+            <div className="d-flex justify-content-center align-items-center py-5 w-100">
               <Loader absolute fullScreen />
             </div>
           )}
@@ -135,6 +181,8 @@ const ContractsPage: FC = () => {
             <ContractsDataTable
               activeContract={activeContract}
               activeTable={activeTable}
+              activeScope={activeScope}
+              scopeLoading={scopeLoading}
               reverse={reverse}
             />
           )}

@@ -25,11 +25,14 @@ const COLUMNS_MAP = {
 const ContractsPage: FC<{
   activeContract: ContractItemType | null;
   activeTable: ContractTable | null;
+  activeScope: string | null;
+  scopeLoading: boolean;
   reverse: boolean;
-}> = ({ activeContract, activeTable, reverse }) => {
+}> = ({ activeContract, activeTable, activeScope, scopeLoading, reverse }) => {
   const { loading, tableRows, hasMore, loadMore, fetched } = useContractsDataTableContext({
     activeContract,
     activeTable,
+    activeScope,
     reverse,
   });
 
@@ -37,7 +40,7 @@ const ContractsPage: FC<{
     return null;
   }
 
-  if (!fetched) {
+  if (!fetched || scopeLoading || !activeScope) {
     return <Loader fullScreen className="my-5" />;
   }
 
@@ -49,6 +52,7 @@ const ContractsPage: FC<{
             (key) => COLUMNS_MAP[key as keyof typeof COLUMNS_MAP] || { key, title: key }
           )}
           data={tableRows}
+          keepTableForMobile={true}
         />
       ) : (
         <Alert variant="info" title="No data found" className="mt-5" hasDash={false} />
