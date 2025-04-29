@@ -35,7 +35,7 @@ const ContractsPage: FC<{
     <>
       {tableRows.length > 0 ? (
         <TableComponent
-          columns={Object.keys(tableRows[0]).map((key) => ({ key, title: key }))}
+          columns={Object.keys(tableRows[0]).map((key) => ({ key, title: key, verticalAlign: 'baseline' }))}
           data={tableRows}
           keepTableForMobile={true}
         />
