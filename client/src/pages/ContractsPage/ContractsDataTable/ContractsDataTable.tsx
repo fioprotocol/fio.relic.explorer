@@ -9,19 +9,6 @@ import { useContractsDataTableContext } from './ContractsDataTableContext';
 
 import { ContractItemType, ContractTable } from '@shared/types/fio-api-server';
 
-const COLUMNS_MAP = {
-  id: { key: 'id', title: 'ID' },
-  name: { key: 'name', title: 'Name' },
-  addresses: { key: 'addresses', title: 'Addresses' },
-  bundleeligiblecountdown: { key: 'bundleeligiblecountdown', title: 'Bundle Eligible Countdown' },
-  domain: { key: 'domain', title: 'Domain' },
-  domainhash: { key: 'domainhash', title: 'Domain Hash' },
-  expiration: { key: 'expiration', title: 'Expiration' },
-  namehash: { key: 'namehash', title: 'Name Hash' },
-  owner_account: { key: 'owner_account', title: 'Owner Account' },
-  _scope: { key: '_scope', title: 'Scope' },
-};
-
 const ContractsPage: FC<{
   activeContract: ContractItemType | null;
   activeTable: ContractTable | null;
@@ -48,9 +35,7 @@ const ContractsPage: FC<{
     <>
       {tableRows.length > 0 ? (
         <TableComponent
-          columns={Object.keys(tableRows[0]).map(
-            (key) => COLUMNS_MAP[key as keyof typeof COLUMNS_MAP] || { key, title: key }
-          )}
+          columns={Object.keys(tableRows[0]).map((key) => ({ key, title: key }))}
           data={tableRows}
           keepTableForMobile={true}
         />
