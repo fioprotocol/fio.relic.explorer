@@ -23,6 +23,8 @@ export type UseContractsPageContextType = {
   setActiveTable: (table: ContractTable) => void;
   activeScope: string | null;
   setActiveScope: (scope: string) => void;
+  scopeInput: string | null;
+  setScopeInput: (scope: string) => void;
   reverse: boolean;
   onReverse: () => void;
   onRefresh: () => void;
@@ -42,12 +44,13 @@ const CONTRACTS_LIST = Object.values(FIO_CONTRACTS_MAP)
     tables: [],
   }));
 
-const DEFAULT_SCOPES_LIMIT = 50;
+export const DEFAULT_SCOPES_LIMIT = 20;
 
 export const useContractsPageContext = (): UseContractsPageContextType => {
   const [activeContract, setActiveContract] = useState<ContractItemType | null>(null);
   const [activeTable, setActiveTable] = useState<ContractTable | null>(null);
   const [activeScope, setActiveScope] = useState<string | null>(null);
+  const [scopeInput, setScopeInput] = useState<string | null>(null);
   const [reverse, setReverse] = useState<boolean>(false);
   const [contracts, setContracts] = useState<ContractItemType[]>(CONTRACTS_LIST);
 
@@ -105,6 +108,12 @@ export const useContractsPageContext = (): UseContractsPageContextType => {
     }
   }, [scopeResponse?.scopes, activeContract?.name]);
 
+  useEffect(() => {
+    if (activeScope) {
+      setScopeInput(activeScope);
+    }
+  }, [activeScope]);
+
   return {
     loading: tablesLoading,
     scopeLoading,
@@ -116,6 +125,8 @@ export const useContractsPageContext = (): UseContractsPageContextType => {
     setActiveTable,
     activeScope,
     setActiveScope,
+    scopeInput,
+    setScopeInput,
     reverse,
     onReverse,
     onRefresh,
