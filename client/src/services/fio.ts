@@ -173,7 +173,7 @@ export const getContractScopeInfo = async ({
   offset?: number;
 }): Promise<{ scopes: string[]; more: number }> => {
   if (!contractName || !tableName) {
-    return { scopes: [], more: 0 };
+    throw new Error('Contract name and table name is required');
   }
 
   const scopesResponse = await axios.post(`${NODE_URLS[0]}chain/get_table_by_scope`, {
@@ -213,7 +213,7 @@ export const getTableInfo = async ({
   reverse?: boolean;
 }): Promise<{ rows: ContractTableRow[]; more: number }> => {
   if (!contractName || !tableName) {
-    return { rows: [], more: 0 };
+    throw new Error('Contract name and table name is required');
   }
 
   // If no scopes found, try with contract name as scope
@@ -236,7 +236,7 @@ export const getTableInfo = async ({
 
   if (tableResponse.status !== 200) {
     console.error(`Error fetching scope ${scope}: ${tableResponse.statusText}`);
-    return { rows: [], more: 0 };
+    throw new Error(`HTTP error! status: ${tableResponse.status}`);
   }
 
   const tableData = tableResponse.data;
