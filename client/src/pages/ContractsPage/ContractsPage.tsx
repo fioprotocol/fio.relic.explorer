@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Dropdown, Button } from 'react-bootstrap';
+import { Dropdown, Button, InputGroup, Form } from 'react-bootstrap';
 import {
   ArrowRepeat,
   ChevronDown,
@@ -14,7 +14,7 @@ import { Loader } from 'src/components/common/Loader';
 import { DropdownToggle, DropdownItem } from 'src/components/common/Dropdown';
 import ContractsDataTable from './ContractsDataTable/ContractsDataTable';
 
-import { useContractsPageContext } from './ContractsPageContext';
+import { DEFAULT_SCOPES_LIMIT, useContractsPageContext } from './ContractsPageContext';
 
 import styles from './ContractsPage.module.scss';
 
@@ -30,6 +30,8 @@ const ContractsPage: FC = () => {
     setActiveTable,
     activeScope,
     setActiveScope,
+    scopeInput,
+    setScopeInput,
     reverse,
     onReverse,
     onRefresh,
@@ -129,33 +131,62 @@ const ContractsPage: FC = () => {
         <div
           className={scopes.length > 1 && activeTable?.name && !scopeLoading ? 'd-flex' : 'd-none'}
         >
-          <Dropdown align="end" className={`d-flex flex-grow-1 ${styles.dropdown}`}>
-            <Dropdown.Toggle
-              as={DropdownToggle}
-              customClassName={`d-flex justify-content-between align-items-center text-dark rounded-2 gap-2 border w-100`}
-            >
-              <span className="f-size-sm">
-                <span className="fw-semibold-inter">Scope:</span> {activeScope}
-              </span>
-              <ChevronDown />
-            </Dropdown.Toggle>
+          {scopes.length >= DEFAULT_SCOPES_LIMIT ? (
+            <InputGroup className={styles.scopeInput}>
+              <InputGroup.Text id="scope-btn-group-addon" className="f-size-sm">
+                Scope
+              </InputGroup.Text>
+              <Form.Control
+                className="shadow-none"
+                type="text"
+                placeholder="Type your scope here"
+                aria-label="Type your scope here"
+                value={scopeInput || ''}
+                onChange={(e): void => setScopeInput(e.target.value)}
+                aria-describedby="scope-btn-group-addon"
+                onKeyDown={(e): void => {
+                  if (e.key === 'Enter') {
+                    setActiveScope(scopeInput || '');
+                  }
+                }}
+              />
+              <Button
+                variant="outline-light text-dark border"
+                className={styles.actionButton}
+                onClick={(): void => setActiveScope(scopeInput || '')}
+              >
+                <span className="fw-semibold-inter">Submit</span>
+              </Button>
+            </InputGroup>
+          ) : (
+            <Dropdown align="end" className={`d-flex flex-grow-1 ${styles.dropdown}`}>
+              <Dropdown.Toggle
+                as={DropdownToggle}
+                customClassName={`d-flex justify-content-between align-items-center text-dark rounded-2 gap-2 border w-100`}
+              >
+                <span className="f-size-sm">
+                  <span className="fw-semibold-inter">Scope:</span> {activeScope}
+                </span>
+                <ChevronDown />
+              </Dropdown.Toggle>
 
-            <Dropdown.Menu
-              className={`rounded-3 py-2 px-3 border box-shadow-default w-100 ${styles.dropdownList}`}
-            >
-              {scopes.map((scope) => (
-                <Dropdown.Item
-                  key={scope}
-                  as={DropdownItem}
-                  active={scope === activeScope}
-                  disabled={scope === activeScope}
-                  onClick={(): void => setActiveScope(scope)}
-                >
-                  <span className="f-size-sm text-nowrap">{scope}</span>
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
+              <Dropdown.Menu
+                className={`rounded-3 py-2 px-3 border box-shadow-default w-100 ${styles.dropdownList}`}
+              >
+                {scopes.map((scope) => (
+                  <Dropdown.Item
+                    key={scope}
+                    as={DropdownItem}
+                    active={scope === activeScope}
+                    disabled={scope === activeScope}
+                    onClick={(): void => setActiveScope(scope)}
+                  >
+                    <span className="f-size-sm text-nowrap">{scope}</span>
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
         </div>
         <div className="">
           {loading && (

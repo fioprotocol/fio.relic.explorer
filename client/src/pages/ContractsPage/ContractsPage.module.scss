@@ -21,6 +21,10 @@
   }
 }
 
+.scopeInput {
+  max-width: 20.75rem;
+}
+
 @include media-breakpoint-down(sm) {
   .actionButton {
     span {
