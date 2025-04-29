@@ -22,7 +22,7 @@ export const ROUTES: Record<string, Route> = {
   proxies: { path: '/governance/proxies', label: 'Proxies' },
   advanced: { path: '/advanced', label: 'Advanced' },
   contracts: { path: '/state_data', label: 'Contracts' },
-  multisigs: { path: '/advanced/multisigs', label: 'Multisigs' },
+  multisigs: { path: '/multi-sigs', label: 'Multisigs' },
 
   healthCheck: { path: '/health-check', label: 'Health Check' },
   about: { path: '/about', label: 'About' },

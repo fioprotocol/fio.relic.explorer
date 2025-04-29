@@ -6,6 +6,8 @@ export const FIO_ADDRESS_DELIMITER = '@';
 
 export const NODE_URLS = ['https://fio.eosusa.io/v1/'];
 
+export const HYPERION_API_URL = 'https://fio.eosusa.io/v2';
+
 export const FIO_CONTRACTS_MAP = {
   'fio.token': 'fio.token',
   'fio.address': 'fio.address',
