@@ -42,6 +42,8 @@ const CONTRACTS_LIST = Object.values(FIO_CONTRACTS_MAP)
     tables: [],
   }));
 
+const DEFAULT_SCOPES_LIMIT = 50;
+
 export const useContractsPageContext = (): UseContractsPageContextType => {
   const [activeContract, setActiveContract] = useState<ContractItemType | null>(null);
   const [activeTable, setActiveTable] = useState<ContractTable | null>(null);
@@ -55,7 +57,11 @@ export const useContractsPageContext = (): UseContractsPageContextType => {
   });
   const { response: scopeResponse, loading: scopeLoading } = useGetData<ContractScopeResponse>({
     action: getContractScopeInfo,
-    params: { contractName: activeContract?.name, tableName: activeTable?.name },
+    params: {
+      contractName: activeContract?.name,
+      tableName: activeTable?.name,
+      limit: DEFAULT_SCOPES_LIMIT,
+    },
   });
 
   const onReverse = useCallback(() => {
