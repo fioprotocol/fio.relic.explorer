@@ -89,6 +89,14 @@ const BlockDetailsPage: React.FC = () => {
                   </span>
                 ),
               },
+              {
+                title: 'Status',
+                value: proposal.executed ? (
+                  <Badge variant="success">Approved</Badge>
+                ) : (
+                  <Badge variant="warning">Pending</Badge>
+                ),
+              },
             ]}
           />
 
