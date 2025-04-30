@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { getBlock } from 'src/services/blocks';
 
@@ -21,17 +21,30 @@ type UseBlockDetailsContext = {
   loading?: boolean;
   last_irreversible_block_num?: number;
   transactions?: Transaction[];
+  error: Error | null;
+  onBack: () => void;
 };
 
 export const useBlockDetailsContext = (): UseBlockDetailsContext => {
+  const navigate = useNavigate();
   const { id: block_number } = useParams();
   const { producers } = useProducers();
-  const { response, loading } = useGetData<BlockResponseData>({ action: getBlock, params: { block_number } });
+  const { response, loading, error } = useGetData<BlockResponseData>({
+    action: getBlock,
+    params: { block_number },
+  });
   const { response: txResponse } = useGetData<TransactionResponse>({
     action: getTransactions,
     params: { block_number },
   });
-  const { response: chainInfo } = useGetData<ChainInfo>({ action: getInfo, params: { block_number } });
+  const { response: chainInfo } = useGetData<ChainInfo>({
+    action: getInfo,
+    params: { block_number },
+  });
+
+  const onBack = (): void => {
+    navigate(-1);
+  };
 
   return {
     block_number: Number(block_number),
@@ -41,6 +54,8 @@ export const useBlockDetailsContext = (): UseBlockDetailsContext => {
     producer: producers.get(response?.block?.producer_account_name),
     last_irreversible_block_num: chainInfo?.last_irreversible_block_num,
     transactions: txResponse?.transactions || [],
+    onBack,
+    error,
     loading,
   };
 };
