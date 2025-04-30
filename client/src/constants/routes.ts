@@ -23,6 +23,7 @@ export const ROUTES: Record<string, Route> = {
   advanced: { path: '/advanced', label: 'Advanced' },
   contracts: { path: '/state_data', label: 'Contracts' },
   multisigs: { path: '/multi-sigs', label: 'Multisigs' },
+  proposal: { path: '/multi-sigs/:proposal_name', label: 'Proposal' },
 
   healthCheck: { path: '/health-check', label: 'Health Check' },
   about: { path: '/about', label: 'About' },
