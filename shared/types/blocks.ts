@@ -25,3 +25,7 @@ export interface BlockResponse {
 export interface CurrentBlockResponse {
   data: Block;
 }
+
+export interface BlocksDateResponse {
+  data: Record<string, number>;
+}

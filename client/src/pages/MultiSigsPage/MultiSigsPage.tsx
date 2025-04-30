@@ -7,6 +7,7 @@ import { LoadableTable } from 'src/components/common/LoadableTable';
 import { Loader } from 'src/components/common/Loader';
 import { Alert } from 'src/components/common/Alert';
 
+import { formatDate } from 'src/utils/general';
 import { useMultiSigsPageContext } from './MultiSigsPageContext';
 
 import { ROUTES } from 'src/constants/routes';
@@ -70,7 +71,7 @@ const ContractsPage: FC = () => {
                 </span>
               ),
               executed: proposal.executed ? 'Yes' : 'No',
-              date: proposal.block_num, // look-up date of block in Relic for
+              date: proposal.block_date ? formatDate(proposal.block_date) : '-',
               proposals: (
                 <>
                   <Link
