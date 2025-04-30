@@ -30,12 +30,23 @@ const BlockDetailsPage: React.FC = () => {
     next_block_number,
     last_irreversible_block_num,
     transactions = [],
+    onBack,
+    error,
     loading,
   } = useBlockDetailsContext();
 
+  if (error) {
+    return (
+      <Container className="py-5">
+        <BackButton onClick={onBack} />
+        <Alert variant="danger" title="Error fetching block details" message={error.message} />
+      </Container>
+    );
+  }
+
   return (
     <Container className="py-5">
-      <BackButton to={ROUTES.blocks.path} />
+      <BackButton onClick={onBack} />
       <h4>Block: #{formatBlockNumber(block_number || 0)}</h4>
       {!block || loading ? (
         <Loader fullScreen noBg />
