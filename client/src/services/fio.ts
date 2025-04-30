@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { NODE_URLS } from '@shared/constants/fio';
+import { NODE_URLS, FIO_API_VERSION } from '@shared/constants/fio';
 import {
   BlockProducerResponse,
   ContractTableRow,
@@ -29,7 +29,7 @@ export const fetchPrice = async (): Promise<string> => {
 };
 
 export const getInfo = async (): Promise<ChainInfo> => {
-  const response = await axios.get<ChainInfo>(`${NODE_URLS[0]}chain/get_info`);
+  const response = await axios.get<ChainInfo>(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_info`);
 
   return response.data;
 };
@@ -40,7 +40,7 @@ export const getTransactionHistoryData = async ({
   id: string;
 }): Promise<TransactionHistoryResponse> => {
   const response = await axios.post<TransactionHistoryResponse>(
-    `${NODE_URLS[0]}history/get_transaction`,
+    `${NODE_URLS[0]}${FIO_API_VERSION}/history/get_transaction`,
     {
       id,
     }
@@ -50,7 +50,7 @@ export const getTransactionHistoryData = async ({
 };
 
 export const getBlockProducers = async (): Promise<BlockProducerResponse> => {
-  const response = await axios.post<BlockProducerResponse>(`${NODE_URLS[0]}chain/get_producers`);
+  const response = await axios.post<BlockProducerResponse>(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_producers`);
 
   return response.data;
 };
@@ -64,7 +64,7 @@ export const getSignedNFTs = async ({
   limit: number;
   offset: number;
 }): Promise<{ nfts: HandleNFT[]; more: number }> => {
-  const response = await axios.post(`${NODE_URLS[0]}chain/get_nfts_fio_address`, {
+  const response = await axios.post(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_nfts_fio_address`, {
     fio_address: fch,
     limit,
     offset,
@@ -144,7 +144,7 @@ export const getContractTables = async ({
     return { contractName: '', tables: [] };
   }
 
-  const response = await axios.post(`${NODE_URLS[0]}chain/get_abi`, {
+  const response = await axios.post(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_abi`, {
     account_name: contractName,
   });
 
@@ -176,7 +176,7 @@ export const getContractScopeInfo = async ({
     throw new Error('Contract name and table name is required');
   }
 
-  const scopesResponse = await axios.post(`${NODE_URLS[0]}chain/get_table_by_scope`, {
+  const scopesResponse = await axios.post(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_table_by_scope`, {
     code: contractName,
     table: tableName,
     limit,
@@ -223,7 +223,7 @@ export const getTableInfo = async ({
 
   let allRows: ContractTableRow[] = [];
 
-  const tableResponse = await axios.post(`${NODE_URLS[0]}chain/get_table_rows`, {
+  const tableResponse = await axios.post(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_table_rows`, {
     code: contractName,
     scope: scope,
     table: tableName,
