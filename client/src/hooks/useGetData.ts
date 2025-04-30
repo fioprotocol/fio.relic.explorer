@@ -6,6 +6,7 @@ type UseGetDataProps = {
   action: (params: AnyObject) => Promise<AnyObject>;
   params?: AnyObject;
   interval?: number;
+  ready?: boolean;
 };
 
 type UseGetDataReturnProps<T> = {
@@ -18,6 +19,7 @@ export const useGetData = <T>({
   action,
   params = {},
   interval,
+  ready = true,
 }: UseGetDataProps): UseGetDataReturnProps<T> => {
   const [response, setResponse] = useState<T>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,6 +41,8 @@ export const useGetData = <T>({
   const paramsString = getParamsString();
 
   const getData = useCallback(async () => {
+    if (!ready) return;
+
     setLoading(true);
     setError(null);
 
@@ -58,7 +62,7 @@ export const useGetData = <T>({
         setLoading(false);
       }
     }
-  }, [action, paramsString]);
+  }, [action, paramsString, ready]);
 
   // Initial fetch when params change
   useEffect(() => {

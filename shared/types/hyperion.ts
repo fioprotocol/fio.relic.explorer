@@ -5,6 +5,7 @@ export type Proposal = {
   requested_approvals: string[];
   provided_approvals: string[];
   block_num: number;
+  block_date?: number;
 };
 
 export type ProposalsResponse = {

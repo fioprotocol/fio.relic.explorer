@@ -6,7 +6,7 @@ import * as healthCheckRoute from './health-check';
 import * as searchRoute from './search';
 import * as getStatsRoute from './stats';
 import * as roeRoute from './roe';
-import { blocksRoute, blockRoute, currentBlockRoute } from './blocks/index';
+import { blocksRoute, blockRoute, currentBlockRoute, blocksDateRoute } from './blocks/index';
 import { handleTransactionsRoute, handlesRoute, handleRoute } from './handles/index';
 import { domainsRoute, domainRoute, domainsTransactionsRoute, domainsHandlesRoute } from './domains/index';
 import {
@@ -28,6 +28,7 @@ const routes: RouteConfig[] = [
   { plugin: roeRoute.default, prefix: `/${API_PREFIX}/roe` },
   { plugin: blocksRoute, prefix: `/${API_PREFIX}/blocks` },
   { plugin: currentBlockRoute, prefix: `/${API_PREFIX}/blocks/current` },
+  { plugin: blocksDateRoute, prefix: `/${API_PREFIX}/blocks/date` },
   { plugin: blockRoute, prefix: `/${API_PREFIX}/blocks/:block_number` },
   { plugin: getTransactionsRoute, prefix: `/${API_PREFIX}/transactions` },
   { plugin: getTransactionByIdRoute, prefix: `/${API_PREFIX}/transactions/:id` },
