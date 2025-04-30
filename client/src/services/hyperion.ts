@@ -25,3 +25,16 @@ export const getMultiSigsData = async ({
     total: response.data.total.value,
   };
 };
+
+export const getProposal = async ({ proposal }: { proposal: string }): Promise<Proposal> => {
+  const response = await axios.get<{
+    proposals: Proposal[];
+    total: { value: number; relation: string };
+  }>(`${NODE_URLS[0]}${FIO_HYPERION_VERSION}/state/get_proposals`, {
+    params: {
+      proposal,
+    },
+  });
+
+  return response.data.proposals[0];
+};

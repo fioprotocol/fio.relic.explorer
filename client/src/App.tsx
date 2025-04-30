@@ -17,6 +17,7 @@ import ProxiesPage from './pages/ProxiesPage';
 import AccountsPage from './pages/AccountsPage';
 import ContractsPage from './pages/ContractsPage';
 import MultiSigsPage from './pages/MultiSigsPage';
+import ProposalDetailsPage from './pages/ProposalDetailsPage';
 
 import { ROUTES } from './constants/routes';
 
@@ -41,6 +42,7 @@ const App: React.FC = () => {
           <Route path={ROUTES.accounts.path} element={<AccountsPage />} />
           <Route path={ROUTES.contracts.path} element={<ContractsPage />} />
           <Route path={ROUTES.multisigs.path} element={<MultiSigsPage />} />
+          <Route path={ROUTES.proposal.path} element={<ProposalDetailsPage />} />
           <Route
             path="*"
             element={
