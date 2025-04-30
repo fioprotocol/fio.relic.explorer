@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { HYPERION_API_URL } from '@shared/constants/fio';
+import { NODE_URLS, FIO_HYPERION_VERSION } from '@shared/constants/fio';
 import { Proposal, ProposalsResponse } from '@shared/types/hyperion';
 
 export const getMultiSigsData = async ({
@@ -13,7 +13,7 @@ export const getMultiSigsData = async ({
   const response = await axios.get<{
     proposals: Proposal[];
     total: { value: number; relation: string };
-  }>(`${HYPERION_API_URL}/state/get_proposals`, {
+  }>(`${NODE_URLS[0]}${FIO_HYPERION_VERSION}/state/get_proposals`, {
     params: {
       limit,
       skip: offset,

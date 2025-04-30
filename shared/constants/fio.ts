@@ -4,9 +4,10 @@ export const FIO_PREFIX = 'FIO';
 
 export const FIO_ADDRESS_DELIMITER = '@';
 
-export const NODE_URLS = ['https://fio.eosusa.io/v1/'];
+export const FIO_API_VERSION = 'v1';
+export const FIO_HYPERION_VERSION = 'v2';
 
-export const HYPERION_API_URL = 'https://fio.eosusa.io/v2';
+export const NODE_URLS = ['https://fio.eosusa.io/'];
 
 export const FIO_CONTRACTS_MAP = {
   'fio.token': 'fio.token',

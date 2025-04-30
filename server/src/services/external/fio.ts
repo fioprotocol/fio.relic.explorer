@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 
 import { isDomain } from '@shared/util/fio';
 
-import { NODE_URLS } from '@shared/constants/fio';
+import { FIO_API_VERSION, NODE_URLS } from '@shared/constants/fio';
 
 type GetTableRawsParams = {
   code: string;
@@ -54,7 +54,7 @@ export const setTableRowsParams = (
 };
 
 export const getTableRows = async (params: GetTableRawsParams): Promise<any> => {
-  const response = await fetch(`${NODE_URLS[0]}chain/get_table_rows`, {
+  const response = await fetch(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_table_rows`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
