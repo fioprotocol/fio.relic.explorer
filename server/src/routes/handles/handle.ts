@@ -1,11 +1,12 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 
 import pool from 'src/config/database';
-import { setTableRowsParams, getTableRows } from 'src/services/external/fio';
+import { setTableRowsParams } from 'src/services/external/fio';
 
-import { validateHandleRegex } from '@shared/util/fio';
+import { validateHandleRegex, getTableRows } from '@shared/util/fio';
 
 import { HandleResponse } from '@shared/types/handles';
+import { FioChainHandle } from '@shared/types/fio-api-server';
 
 interface handleQuery {
   Params: {
@@ -129,7 +130,7 @@ const handleRoute: FastifyPluginAsync = async (fastify) => {
         handleResult.rows[0].pk_handle_id,
       ]);
 
-      const chainData = await getTableRows(setTableRowsParams(handle));
+      const chainData = await getTableRows<FioChainHandle>(setTableRowsParams(handle));
 
       return {
         handle: { ...handleResult.rows[0], ...activitiesResult.rows[0] },

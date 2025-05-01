@@ -155,28 +155,28 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   trnsfiopubky: {
     description: 'Transfer FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount(data?.amount)} to ${truncateLongText(data?.payee_public_key || '')}`,
+    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })} to ${truncateLongText(data?.payee_public_key || '')}`,
   },
   trnsloctoks: {
     description: 'Transfer and lock FIO Tokens',
     formatDetails: (data: AnyObject): string =>
-      `${formatFioAmount(data?.amount)} to ${truncateLongText(data?.payee_public_key || '')}`,
+      `${formatFioAmount({ amount: data?.amount })} to ${truncateLongText(data?.payee_public_key || '')}`,
   },
   stakefio: {
     description: 'Stake FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount(data?.amount)}`,
+    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })}`,
   },
   unstakefio: {
     description: 'Unstake FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount(data?.amount)}`,
+    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })}`,
   },
   wraptokens: {
     description: 'Wrap FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount(data?.amount)} to ${data?.chain_code || ''}`,
+    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })} to ${data?.chain_code || ''}`,
   },
   retire: {
     description: 'Burn FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount(data?.quantity)}`,
+    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.quantity })}`,
   },
   addnft: {
     description: 'Sign NFTs',

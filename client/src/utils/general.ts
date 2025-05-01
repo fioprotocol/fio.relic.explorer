@@ -68,3 +68,18 @@ export const formatTokenValue = (value: number | string | undefined | null): str
   // If it's already a string, return it directly
   return value;
 };
+
+export const formatUsdValue = ({
+  value,
+  minimumFractionDigits = 2,
+  maximumFractionDigits = 2,
+}: {
+  value: number | string | undefined | null;
+  minimumFractionDigits?: number;
+  maximumFractionDigits?: number;
+}): string => {
+  if (value === undefined || value === null) return 'N/A';
+
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+  return `$${numValue.toLocaleString('en-US', { minimumFractionDigits, maximumFractionDigits })}`;
+};

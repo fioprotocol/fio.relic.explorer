@@ -51,7 +51,7 @@ export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageCon
       value: loading ? null : transformDetails({ actionInfo, request_data }) || ' - ',
     },
     { title: 'Account', value: account_name },
-    { title: 'Fees', value: formatFioAmount(fee) },
+    { title: 'Fees', value: formatFioAmount({ amount: fee }) },
   ];
 
   return {

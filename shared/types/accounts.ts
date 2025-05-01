@@ -9,6 +9,14 @@ export interface Account {
   block_timestamp: string;
 }
 
+export interface AccountDetails extends Account {
+  public_key: string;
+  fk_block_number: number;
+}
+export interface AccountResponse {
+  data: AccountDetails;
+}
+
 export type AccountSortOption = typeof ACCOUNT_SORT_OPTIONS[keyof typeof ACCOUNT_SORT_OPTIONS];
 
 export interface AccountsResponse {

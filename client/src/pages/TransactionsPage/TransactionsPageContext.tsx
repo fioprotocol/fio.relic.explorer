@@ -19,8 +19,8 @@ export const useTransactionsPageContext = (): UseTransactionsPageContext => {
   const stats = useMemo(() => {
     return [
       { title: 'Transactions (30 Days)', value: response?.transactionsCount },
-      { title: 'Transaction Fees (30 Days)', value: formatFioAmount(response?.transactionFees) },
-      { title: 'AVG Transaction Fee (30 Days)', value: formatFioAmount(response?.avgTransactionFee) },
+      { title: 'Transaction Fees (30 Days)', value: formatFioAmount({ amount: response?.transactionFees }) },
+      { title: 'AVG Transaction Fee (30 Days)', value: formatFioAmount({ amount: response?.avgTransactionFee }) },
     ];
   }, [response]);
 

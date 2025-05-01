@@ -122,3 +122,81 @@ export type ContractScopeResponse = {
   scopes: string[];
   more: number;
 };
+
+export type FioChainDomain = {
+  id: number;
+  name: string;
+  domainhash: string;
+  account: string;
+  is_public: number;
+  expiration: number;
+};
+
+export type FioChainHandle = {
+  id: number;
+  name: string;
+  namehash: string;
+  domain: string;
+  domainhash: string;
+  expiration: number;
+  owner_account: string;
+  addresses: Array<{
+    token_code: string;
+    chain_code: string;
+    public_address: string;
+  }>;
+  bundleeligiblecountdown: number;
+};
+
+export type GetTableRowsResponse<T> = {
+  rows: T[];
+  more: boolean;
+};
+
+export type GetTableRawsParams = {
+  code: string;
+  scope: string;
+  table: string;
+  lower_bound: string;
+  upper_bound?: string;
+  key_type?: string;
+  index_position?: string;
+  json?: boolean;
+  reverse?: boolean;
+  limit?: number;
+};
+
+export type FioChainProducer = {
+  id: number;
+  owner: string;
+  fio_address: string;
+  addresshash: string;
+  total_votes: string;
+  producer_public_key: string;
+  is_active: number;
+  url: string;
+  unpaid_blocks: number;
+  last_claim_time: string;
+  last_bpclaim: number;
+  location: number;
+};
+
+export type FioChainVoter = {
+  id: number;
+  fioaddress: string;
+  addresshash: string;
+  owner: string;
+  proxy: string;
+  producers: string[];
+  last_vote_weight: string;
+  proxied_vote_weight: string;
+  is_proxy: number;
+  is_auto_proxy: number;
+  reserved2: number;
+  reserved3: string;
+};
+
+export type getProxyVotesDataResponse = {
+  producers: GetTableRowsResponse<FioChainProducer>;
+  voters: GetTableRowsResponse<FioChainVoter>;
+};
