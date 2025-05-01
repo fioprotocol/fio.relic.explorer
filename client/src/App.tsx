@@ -15,6 +15,7 @@ import DomainDetailsPage from './pages/DomainDetailsPage';
 import BlockProducersPage from './pages/BlockProducersPage';
 import ProxiesPage from './pages/ProxiesPage';
 import AccountsPage from './pages/AccountsPage';
+import AccountDetailsPage from './pages/AccountDetailsPage';
 import ContractsPage from './pages/ContractsPage';
 import MultiSigsPage from './pages/MultiSigsPage';
 import ProposalDetailsPage from './pages/ProposalDetailsPage';
@@ -40,6 +41,7 @@ const App: React.FC = () => {
           <Route path={ROUTES.producers.path} element={<BlockProducersPage />} />
           <Route path={ROUTES.proxies.path} element={<ProxiesPage />} />
           <Route path={ROUTES.accounts.path} element={<AccountsPage />} />
+          <Route path={ROUTES.account.path} element={<AccountDetailsPage />} />
           <Route path={ROUTES.contracts.path} element={<ContractsPage />} />
           <Route path={ROUTES.multisigs.path} element={<MultiSigsPage />} />
           <Route path={ROUTES.proposal.path} element={<ProposalDetailsPage />} />

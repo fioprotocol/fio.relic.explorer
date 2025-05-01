@@ -1,11 +1,11 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 
 import pool from 'src/config/database';
-import { setTableRowsParams, getTableRows } from 'src/services/external/fio';
+import { setTableRowsParams } from 'src/services/external/fio';
 
-import { validateDomainRegex } from '@shared/util/fio';
-
+import { validateDomainRegex, getTableRows } from '@shared/util/fio';
 import { DomainResponse } from '@shared/types/domains';
+import { FioChainDomain } from '@shared/types/fio-api-server';
 
 interface domainQuery {
   Params: {
@@ -93,11 +93,13 @@ const domainRoute: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ error: 'Handle not found' });
       }
 
-      const chainData = await getTableRows(setTableRowsParams(domain));
+      const chainData = await getTableRows<FioChainDomain>(setTableRowsParams(domain));
 
       return {
         domain: { ...domainResult.rows[0] },
-        chainData: chainData.rows[0],
+        chainData: {
+          owner_account: chainData.rows[0]?.account || '',
+        },
       };
     }
   );

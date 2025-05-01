@@ -73,6 +73,6 @@ export const transformTransactions = ({
     action: actionInfo.description || action_name,
     date: formatDate(block_timestamp),
     details: transformDetails({ actionInfo, request_data }),
-    fee: formatFioAmount(fee),
+    fee: formatFioAmount({ amount: fee }),
   };
 };

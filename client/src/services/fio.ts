@@ -1,13 +1,18 @@
 import axios from 'axios';
 
-import { NODE_URLS, FIO_API_VERSION } from '@shared/constants/fio';
+import { FIO_CONTRACTS_MAP, NODE_URLS, FIO_API_VERSION } from '@shared/constants/fio';
+
 import {
   BlockProducerResponse,
   ContractTableRow,
   ContractTablesResponse,
+  FioChainProducer,
+  FioChainVoter,
+  GetTableRowsResponse,
   TransactionHistoryResponse,
 } from '@shared/types/fio-api-server';
 import { HandleNFT } from '@shared/types/handles';
+import { getTableRows } from '@shared/util/fio';
 
 const FIO_DASH_API_URL = 'https://app.fio.net/api/v1';
 
@@ -249,4 +254,70 @@ export const getTableInfo = async ({
   allRows = [...allRows, ...scopeRows];
 
   return { rows: allRows, more: tableResponse.data.more };
+};
+
+export const getProducersFromFioChain = async ({
+  accountName,
+}: {
+  accountName: string;
+}): Promise<GetTableRowsResponse<FioChainProducer>> => {
+  const params = {
+    json: true,
+    code: FIO_CONTRACTS_MAP.eosio,
+    scope: FIO_CONTRACTS_MAP.eosio,
+    table: 'producers',
+    lower_bound: accountName,
+    upper_bound: accountName,
+    index_position: '4',
+    key_type: 'name',
+  };
+  return await getTableRows(params);
+};
+
+export const getVotersFromFioChain = async ({
+  accountName,
+}: {
+  accountName: string;
+}): Promise<GetTableRowsResponse<FioChainVoter>> => {
+  const params = {
+    json: true,
+    code: FIO_CONTRACTS_MAP.eosio,
+    scope: FIO_CONTRACTS_MAP.eosio,
+    table: 'voters',
+    lower_bound: accountName,
+    upper_bound: accountName,
+    index_position: '3',
+    key_type: 'name',
+  };
+
+  return await getTableRows<FioChainVoter>(params);
+};
+
+export const getProxyVotesData = async ({ accountName }: { accountName: string }): Promise<{
+  producers: GetTableRowsResponse<FioChainProducer>;
+  voters: GetTableRowsResponse<FioChainVoter>;
+}> => {
+  const producers = await getProducersFromFioChain({ accountName });
+  const voters = await getVotersFromFioChain({ accountName });
+
+  return {
+    producers,
+    voters,
+  };
+};
+
+export type FioBalanceResponse = {
+  balance: number;
+  available: number;
+  staked: number;
+  srps: number;
+  roe: string;
+};
+
+export const getFioBalance = async ({ fioPublicKey }: { fioPublicKey: string }): Promise<FioBalanceResponse> => {
+  const response = await axios.post<FioBalanceResponse>(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_fio_balance`, {
+    fio_public_key: fioPublicKey,
+  });
+
+  return response.data;
 };
