@@ -1,3 +1,5 @@
+import { TRANSACTION_TYPE } from '../constants/transaction';
+
 export type Transaction = {
   pk_transaction_id: string;
   fk_block_number: number;
@@ -56,3 +58,5 @@ export type TransactionDetails = {
     request_data: string;
   }[];
 };
+
+export type TransactionType = typeof TRANSACTION_TYPE[keyof typeof TRANSACTION_TYPE];

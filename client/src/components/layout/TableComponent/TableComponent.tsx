@@ -13,7 +13,7 @@ export interface TableColumn {
 
 export interface TableProps {
   columns: TableColumn[];
-  data: { [key: string]: string | number | React.ReactNode }[];
+  data: { [key: string]: string | number | React.ReactNode; className?: string }[];
   title?: string;
   header?: React.ReactNode;
   className?: string;
@@ -70,7 +70,7 @@ export const TableComponent: React.FC<TableProps> = ({
             </thead>
             <tbody className={styles.tbody}>
               {data.map((record, index) => (
-                <tr key={index}>
+                <tr key={index} className={record.className}>
                   {columns.map((column) => (
                     <td
                       key={`${index}-${column.key}`}
@@ -91,32 +91,32 @@ export const TableComponent: React.FC<TableProps> = ({
           {customMobileDesign
             ? customMobileDesign
             : data.map((record, recordIndex) => (
-                <div
-                  key={recordIndex}
-                  className={`py-3 px-0 border-bottom d-flex flex-wrap gap-2 ${styles.mobileRow}`}
-                >
-                  {mobileRows.map((columns, columnIndex) => (
-                    <div
-                      key={columnIndex}
-                      className={`d-flex gap-2 justify-content-between flex-wrap w-100`}
-                    >
-                      {columns.map((column, index) => (
-                        <div
-                          key={`mobile-${index}-${column.key}`}
-                          className={`d-flex flex-column flex-grow-1 ${styles.mobileItem} ${index % 2 ? 'text-end' : ''}`}
-                        >
-                          <div className={styles.mobileLabel}>{column.title}</div>
-                          <div className={`${styles.mobileValue} flex-grow-1 text-break`}>
-                            {Array.isArray(record[column.key])
-                              ? JSON.stringify(record[column.key])
-                              : record[column.key]}
-                          </div>
+              <div
+                key={recordIndex}
+                className={`py-3 px-0 border-bottom d-flex flex-wrap gap-2 ${styles.mobileRow} ${record.className}`}
+              >
+                {mobileRows.map((columns, columnIndex) => (
+                  <div
+                    key={columnIndex}
+                    className={`d-flex gap-2 justify-content-between flex-wrap w-100`}
+                  >
+                    {columns.map((column, index) => (
+                      <div
+                        key={`mobile-${index}-${column.key}`}
+                        className={`d-flex flex-column flex-grow-1 ${styles.mobileItem} ${index % 2 ? 'text-end' : ''}`}
+                      >
+                        <div className={styles.mobileLabel}>{column.title}</div>
+                        <div className={`${styles.mobileValue} flex-grow-1 text-break`}>
+                          {Array.isArray(record[column.key])
+                            ? JSON.stringify(record[column.key])
+                            : record[column.key]}
                         </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ))}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
         </div>
       </Card.Body>
     </Card>

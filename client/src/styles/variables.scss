@@ -11,17 +11,20 @@ $mountain-mist: #969696;
 $briquette-grey: #515151;
 
 $sky-blue: #00c1ff;
+$crystal-blue: #4eb2fe;
 
-$bright-pink: #F502B1;
-$blood-burst: #FF4B4B;
+$bright-pink: #f502b1;
+$blood-burst: #ff4b4b;
 
-$saffron-gold: #EF9103;
+$saffron-gold: #ef9103;
 
-$golden-foil: #CCD000;
+$golden-foil: #ccd000;
 
 $malachite: #13ce66;
-$benzol-green: #00D26D;
+$benzol-green: #00d26d;
 $green: #00ff00;
+$malachite: #03d063;
+$green-teal: #01b26e;
 
 $gainsboro: #dcdcdc;
 $mercury: #e6e6e6;
@@ -49,7 +52,7 @@ $box-shadow-default:
   0px 18px 80px 0px rgba(0, 0, 0, 0.04);
 
 $custom-colors: (
-  'green': #00B045,
+  'green': #00b045,
 );
 
 $theme-colors: map-merge($theme-colors, $custom-colors);

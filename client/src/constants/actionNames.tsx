@@ -1,3 +1,5 @@
+import { ReactElement } from 'react';
+
 import { AnyObject } from '@shared/types/general';
 import { truncateLongText } from 'src/utils/general';
 import { formatFioAmount } from 'src/utils/fio';
@@ -5,7 +7,7 @@ import { formatFioAmount } from 'src/utils/fio';
 export interface ActionInfo {
   description: string;
   details?: string;
-  formatDetails?: (data: AnyObject) => string;
+  formatDetails?: (data: AnyObject, className?: string) => string | ReactElement;
 }
 
 export interface FeeRatio {
@@ -155,7 +157,11 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   trnsfiopubky: {
     description: 'Transfer FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })} to ${truncateLongText(data?.payee_public_key || '')}`,
+    formatDetails: (data: AnyObject, className?: string): ReactElement => (
+      <>
+        <span className={className}>{formatFioAmount({ amount: data?.amount })}</span> to {truncateLongText(data?.payee_public_key || '')}
+      </>
+    ),
   },
   trnsloctoks: {
     description: 'Transfer and lock FIO Tokens',

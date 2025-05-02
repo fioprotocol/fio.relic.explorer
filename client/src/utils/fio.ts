@@ -22,5 +22,5 @@ export const formatFioAmount = ({
     return `${value.div(FIO_SUF_UNITS).toNumber().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 20 })} ${FIO_PREFIX}`;
   }
 
-  return `${value.div(FIO_SUF_UNITS).toFixed(2)} ${FIO_PREFIX}`;
+  return `${value.div(FIO_SUF_UNITS).toNumber().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${FIO_PREFIX}`;
 };

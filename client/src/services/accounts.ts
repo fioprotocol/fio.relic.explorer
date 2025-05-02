@@ -1,5 +1,10 @@
 import { apiClient } from './api-client';
-import { AccountsResponse, AccountSortOption, AccountResponse } from '@shared/types/accounts';
+import {
+  AccountsResponse,
+  AccountSortOption,
+  AccountResponse,
+  AccountTransactionsResponse,
+} from '@shared/types/accounts';
 
 export const getAccounts = async (params: {
   offset: number;
@@ -13,5 +18,16 @@ export const getAccounts = async (params: {
 
 export const getAccount = async ({ account }: { account: string }): Promise<AccountResponse> => {
   const response = await apiClient.get<AccountResponse>(`/accounts/${account}`);
+  return response.data;
+};
+
+export const getAccountTransactions = async ({
+  account,
+}: {
+  account: string;
+}): Promise<AccountTransactionsResponse> => {
+  const response = await apiClient.get<AccountTransactionsResponse>(
+    `/accounts/${account}/transactions`
+  );
   return response.data;
 };
