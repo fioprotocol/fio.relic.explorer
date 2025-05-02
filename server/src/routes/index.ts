@@ -8,13 +8,18 @@ import * as getStatsRoute from './stats';
 import * as roeRoute from './roe';
 import { blocksRoute, blockRoute, currentBlockRoute, blocksDateRoute } from './blocks/index';
 import { handleTransactionsRoute, handlesRoute, handleRoute } from './handles/index';
-import { domainsRoute, domainRoute, domainsTransactionsRoute, domainsHandlesRoute } from './domains/index';
+import {
+  domainsRoute,
+  domainRoute,
+  domainsTransactionsRoute,
+  domainsHandlesRoute,
+} from './domains/index';
 import {
   getTransactionsRoute,
   getTransactionByIdRoute,
   getTransactionStatsRoute,
 } from './transactions/index';
-import { accountsRoute, accountRoute } from './accounts/index';
+import { accountsRoute, accountRoute, accountTransactionsRoute } from './accounts/index';
 
 interface RouteConfig {
   plugin: FastifyPluginAsync;
@@ -45,6 +50,7 @@ const routes: RouteConfig[] = [
   { plugin: domainsHandlesRoute, prefix: `/${API_PREFIX}/domains/:domain/handles` },
   { plugin: accountsRoute, prefix: `/${API_PREFIX}/accounts` },
   { plugin: accountRoute, prefix: `/${API_PREFIX}/accounts/:account` },
+  { plugin: accountTransactionsRoute, prefix: `/${API_PREFIX}/accounts/:account/transactions` },
 ];
 
 export const registerRoutes = async (server: FastifyInstance): Promise<void> => {

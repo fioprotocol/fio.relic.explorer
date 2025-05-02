@@ -13,6 +13,8 @@ import { Link } from 'react-router';
 import DataTile from 'src/components/common/DataTile/DataTile';
 import { CardComponent } from 'src/components/layout/CardComponent';
 
+import { Transactions } from './Transactions';
+
 const AccountDetailsPage: FC = () => {
   const { account, publicKey, date, blockNumber, stats, isBlockProducer, isProxy, loading } = useAccountDetailsPageContext();
 
@@ -59,7 +61,7 @@ const AccountDetailsPage: FC = () => {
           className="mb-3"
         >
           <Tab.Pane eventKey="transactions" title="Transactions">
-            Transactions
+            <Transactions />
           </Tab.Pane>
           <Tab.Pane eventKey="fio-handles" title="FIO Handles">
             Fio Handles
