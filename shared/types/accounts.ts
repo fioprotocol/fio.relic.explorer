@@ -40,3 +40,13 @@ export type AccountTransactionsResponse = {
   transactions: AccountTransaction[];
   total: number;
 };
+
+export type AccounFioHandle = {
+  handle: string;
+  handle_status: string;
+};
+
+export type AccountFioHandlesResponse = {
+  data: AccounFioHandle[];
+  total: number;
+};

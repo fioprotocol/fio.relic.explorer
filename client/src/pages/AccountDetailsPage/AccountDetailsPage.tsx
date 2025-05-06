@@ -1,22 +1,25 @@
 import { FC } from 'react';
 import { Tab } from 'react-bootstrap';
+import { Link } from 'react-router';
 
 import Container from 'src/components/layout/Container';
 import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
 import { Tabs } from 'src/components/common/Tabs';
-
-import { ROUTES } from 'src/constants/routes';
-import { useAccountDetailsPageContext } from './AccountDetailsPageContext';
-import { formatDate } from 'src/utils/general';
-import { Link } from 'react-router';
 import DataTile from 'src/components/common/DataTile/DataTile';
 import { CardComponent } from 'src/components/layout/CardComponent';
 
+import { ROUTES } from 'src/constants/routes';
+import { formatDate } from 'src/utils/general';
+
 import { Transactions } from './Transactions';
+import { FioHandlesTab } from './FioHandlesTab';
+
+import { useAccountDetailsPageContext } from './AccountDetailsPageContext';
 
 const AccountDetailsPage: FC = () => {
-  const { account, publicKey, date, blockNumber, stats, isBlockProducer, isProxy, loading } = useAccountDetailsPageContext();
+  const { account, publicKey, date, blockNumber, stats, isBlockProducer, isProxy, loading } =
+    useAccountDetailsPageContext();
 
   return (
     <Container className="py-5">
@@ -34,17 +37,13 @@ const AccountDetailsPage: FC = () => {
         <div className="d-flex flex-row flex-wrap align-items-center gap-3">
           <div className="text-secondary d-flex justify-content-between align-items-center">
             <span className="me-2">Date:</span>
-            <span className="text-dark fw-bold">
-              {date ? formatDate(date) : 'N/A'}
-            </span>
+            <span className="text-dark fw-bold">{date ? formatDate(date) : 'N/A'}</span>
           </div>
           <div className="text-secondary d-flex justify-content-between align-items-center">
             <span className="me-2">Block #:</span>
             <span className="text-dark fw-bold">
               {blockNumber ? (
-                <Link to={`${ROUTES.blocks.path}/${blockNumber}`}>
-                  {blockNumber}
-                </Link>
+                <Link to={`${ROUTES.blocks.path}/${blockNumber}`}>{blockNumber}</Link>
               ) : (
                 '-'
               )}
@@ -64,7 +63,7 @@ const AccountDetailsPage: FC = () => {
             <Transactions />
           </Tab.Pane>
           <Tab.Pane eventKey="fio-handles" title="FIO Handles">
-            Fio Handles
+            <FioHandlesTab />
           </Tab.Pane>
           <Tab.Pane eventKey="fio-domains" title="FIO Domains">
             Fio Domains

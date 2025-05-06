@@ -39,6 +39,7 @@ const COLUMNS = [
     align: 'end',
   },
 ];
+
 export const Transactions: FC = () => {
   const { loading, transactions, paginationData } = useTransactionsContext();
 

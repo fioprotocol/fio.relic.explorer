@@ -40,6 +40,7 @@ export const TransactionsMobile: FC<{ transactions: AccountTransaction[] }> = ({
           return (
             <div
               className={`border-bottom border-1 py-3 d-flex flex-column gap-3 justify-content-between ${isSender ? styles.senderRow : ''}`}
+              key={transaction_id}
             >
               <div className={rowClass}>
                 <div className="d-flex flex-row gap-2 align-items-center">
