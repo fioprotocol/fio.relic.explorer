@@ -14,6 +14,7 @@ import { formatDate } from 'src/utils/general';
 
 import { Transactions } from './Transactions';
 import { FioHandlesTab } from './FioHandlesTab';
+import { DomainsTab } from './DomainsTab';
 
 import { useAccountDetailsPageContext } from './AccountDetailsPageContext';
 
@@ -66,7 +67,7 @@ const AccountDetailsPage: FC = () => {
             <FioHandlesTab />
           </Tab.Pane>
           <Tab.Pane eventKey="fio-domains" title="FIO Domains">
-            Fio Domains
+            <DomainsTab />
           </Tab.Pane>
           <Tab.Pane eventKey="voting" title="Voting">
             Voting

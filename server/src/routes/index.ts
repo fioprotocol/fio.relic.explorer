@@ -24,6 +24,7 @@ import {
   accountRoute,
   accountTransactionsRoute,
   accountFioHandlesRoute,
+  accountDomainsRoute,
 } from './accounts/index';
 
 interface RouteConfig {
@@ -57,6 +58,7 @@ const routes: RouteConfig[] = [
   { plugin: accountRoute, prefix: `/${API_PREFIX}/accounts/:account` },
   { plugin: accountTransactionsRoute, prefix: `/${API_PREFIX}/accounts/:account/transactions` },
   { plugin: accountFioHandlesRoute, prefix: `/${API_PREFIX}/accounts/:account/fio-handles` },
+  { plugin: accountDomainsRoute, prefix: `/${API_PREFIX}/accounts/:account/domains` },
 ];
 
 export const registerRoutes = async (server: FastifyInstance): Promise<void> => {
