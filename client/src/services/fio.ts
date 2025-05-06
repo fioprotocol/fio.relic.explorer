@@ -13,6 +13,7 @@ import {
 } from '@shared/types/fio-api-server';
 import { HandleNFT } from '@shared/types/handles';
 import { getTableRows } from '@shared/util/fio';
+import { AnyObject } from '@shared/types/general';
 
 const FIO_DASH_API_URL = 'https://app.fio.net/api/v1';
 
@@ -317,6 +318,65 @@ export type FioBalanceResponse = {
 export const getFioBalance = async ({ fioPublicKey }: { fioPublicKey: string }): Promise<FioBalanceResponse> => {
   const response = await axios.post<FioBalanceResponse>(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_fio_balance`, {
     fio_public_key: fioPublicKey,
+  });
+
+  return response.data;
+};
+
+export type FioAccountPermission = {
+  perm_name: string;
+  parent: string;
+  required_auth: {
+    threshold: number;
+    keys: {
+      key: string;
+      weight: number;
+    }[];
+    accounts: AnyObject[];
+    waits: AnyObject[];
+  };
+};
+
+export type FioAccountResponse = {
+  account_name: string;
+  head_block_num: number;
+  head_block_time: string;
+  privileged: boolean;
+  last_code_update: string;
+  created: string;
+  ram_quota: number;
+  net_weight: number;
+  cpu_weight: number;
+  net_limit: {
+    used: number;
+    available: number;
+    max: number;
+  };
+  cpu_limit: {
+    used: number;
+    available: number;
+    max: number;
+  };
+  ram_usage: number;
+  permissions: FioAccountPermission[];
+  total_resources: {
+    owner: string;
+    net_weight: string;
+    cpu_weight: string;
+    ram_bytes: number;
+  };
+  self_delegated_bandwidth: AnyObject;
+  refund_request: AnyObject;
+  voter_info: AnyObject;
+};
+
+export const getAccountKeyPermissions = async ({
+  accountName,
+}: {
+  accountName: string;
+}): Promise<FioAccountResponse> => {
+  const response = await axios.post<FioAccountResponse>(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_account`, {
+    account_name: accountName,
   });
 
   return response.data;
