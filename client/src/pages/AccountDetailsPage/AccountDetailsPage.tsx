@@ -15,6 +15,7 @@ import { formatDate } from 'src/utils/general';
 import { Transactions } from './Transactions';
 import { FioHandlesTab } from './FioHandlesTab';
 import { DomainsTab } from './DomainsTab';
+import { KeyPermissionTab } from './KeyPermissionTab';
 
 import { useAccountDetailsPageContext } from './AccountDetailsPageContext';
 
@@ -73,7 +74,7 @@ const AccountDetailsPage: FC = () => {
             Voting
           </Tab.Pane>
           <Tab.Pane eventKey="keys" title="Keys/Permissions">
-            Keys/Permissions
+            <KeyPermissionTab />
           </Tab.Pane>
         </Tabs>
       </CardComponent>
