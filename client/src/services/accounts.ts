@@ -4,6 +4,7 @@ import {
   AccountSortOption,
   AccountResponse,
   AccountTransactionsResponse,
+  AccountFioHandlesResponse,
 } from '@shared/types/accounts';
 
 export const getAccounts = async (params: {
@@ -29,5 +30,14 @@ export const getAccountTransactions = async ({
   const response = await apiClient.get<AccountTransactionsResponse>(
     `/accounts/${account}/transactions`
   );
+  return response.data;
+};
+
+export const getAccountFioHandles = async ({
+  account,
+}: {
+  account: string;
+}): Promise<AccountFioHandlesResponse> => {
+  const response = await apiClient.get<AccountFioHandlesResponse>(`/accounts/${account}/fio-handles`);
   return response.data;
 };
