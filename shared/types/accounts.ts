@@ -50,3 +50,16 @@ export type AccountFioHandlesResponse = {
   data: AccounFioHandle[];
   total: number;
 };
+
+export type AccountDomain = {
+  domain_name: string;
+  is_public: boolean;
+  handles_count: number;
+  status: string;
+  expiration_timestamp: string;
+};
+
+export type AccountDomainResponse = {
+  data: AccountDomain[];
+  total: number;
+};
