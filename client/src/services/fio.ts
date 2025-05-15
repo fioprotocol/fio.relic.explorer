@@ -381,3 +381,11 @@ export const getAccountKeyPermissions = async ({
 
   return response.data;
 };
+
+export const getAccountPublicKey = async ({ accountName }: { accountName: string }): Promise<{ fio_public_key: string }> => {
+  const response = await axios.post(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_account_fio_public_key`, {
+    account: accountName,
+  });
+
+  return response.data;
+};

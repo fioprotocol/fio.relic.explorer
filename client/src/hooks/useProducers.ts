@@ -25,8 +25,8 @@ export const useProducers = (options: UseProducersOptions = {}): UseProducersRet
     try {
       const producers = await getProducers();
       const newProducersMap = new Map<string, Producer>();
-      producers.forEach((producer) => {
-        newProducersMap.set(producer.owner, producer);
+      producers.sort((a, b) => b.score?.score - a.score?.score).forEach((producer, index) => {
+        newProducersMap.set(producer.owner, { ...producer, index: index + 1 });
       });
 
       sharedProducersMap = newProducersMap;

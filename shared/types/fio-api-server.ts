@@ -103,6 +103,7 @@ export type BlockProducer = {
   total_votes: string;
   unpaid_blocks: number;
   url: string;
+  index: number;
 };
 
 export type BlockProducerResponse = {

@@ -77,8 +77,20 @@ body {
   font-size: $font-size-xs;
 }
 
+.f-size-xsm {
+  font-size: $font-size-xsm;
+}
+
 .f-size-sm {
   font-size: $font-size-sm;
+}
+
+.f-size-lsm {
+  font-size: $font-size-lsm;
+}
+
+.f-size-xxs {
+  font-size: $font-size-xxs;
 }
 
 .fw-normal-inter {
@@ -128,6 +140,10 @@ a {
 
 .green-icon {
   color: $green;
+}
+
+.word-break-all {
+  word-break: break-all;
 }
 
 // Custom styles for nav-underline

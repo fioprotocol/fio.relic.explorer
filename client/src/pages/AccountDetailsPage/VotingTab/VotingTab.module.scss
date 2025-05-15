@@ -1,0 +1,49 @@
+@import '../../../styles/variables.scss';
+
+.image {
+  width: 68px;
+  background-color: $black;
+  border-radius: 8px;
+
+  &.noImage {
+    padding: 0.5rem;
+  }
+}
+
+.producerImage {
+  width: 29px;
+  max-width: 29px;
+  max-height: 29px;
+}
+
+.producerLinkImage {
+  width: 16px;
+  height: 16px;
+}
+
+.gradeBadge {
+  width: 28px;
+  height: 24px;
+  font-size: 9px;
+}
+
+.producerRankBadge {
+  height: 24px;
+  font-size: 9px;
+}
+
+.gridLayout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  justify-content: center;
+}
+
+.delegatorBadge {
+  padding: 10px 15px !important;
+}
+
+.candidateBadge {
+  background-color: $seashell !important;
+  border: none !important;
+}

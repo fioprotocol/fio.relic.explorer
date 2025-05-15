@@ -4,12 +4,7 @@ import { BlockProducer, BlockProducerResponse } from '@shared/types/fio-api-serv
 import { useGetData } from 'src/hooks/useGetData';
 import { getBlockProducers } from 'src/services/fio';
 import useProducers from 'src/hooks/useProducers';
-import { SOCIAL_MEDIA_IDS, SOCIAL_MEDIA_URLS } from '@shared/constants/social-media-links';
-
-import websiteLogo from 'src/assets/icons/social-network-governance/website.svg';
-import twitterLogo from 'src/assets/icons/social-network-governance/twitter.svg';
-import telegramLogo from 'src/assets/icons/social-network-governance/telegram.svg';
-import defaultLogo from 'src/assets/no-bp-icon.svg';
+import { transformBlockProducer } from 'src/utils/bpmonitor';
 
 import { BlockProducerProps } from './types';
 
@@ -31,57 +26,15 @@ export const useBlockProducersPageContext = (): UseBlockProducersPageContextType
   const activeFioChainProducers =
     fioChainblockProducers?.producers?.length && bpMonitorProducers?.size > 0
       ? fioChainblockProducers?.producers?.filter(
-        (blockProducer: BlockProducer) =>
-          blockProducer?.is_active === 1 && new BigNumber(blockProducer?.total_votes).gt(0)
-      )
+          (blockProducer: BlockProducer) =>
+            blockProducer?.is_active === 1 && new BigNumber(blockProducer?.total_votes).gt(0)
+        )
       : [];
 
-  const producers: BlockProducerProps[] = activeFioChainProducers
-    ?.map(blockProducer => {
-      const bpMonitorProducer = bpMonitorProducers.get(blockProducer?.owner);
-
-      const { branding, candidate_name, flagIconUrl, score, socials, url } =
-        bpMonitorProducer || {};
-
-      const links = [];
-
-      if (socials?.twitter) {
-        links.push({
-          name: 'twitter',
-          url: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TWITTER]}${socials?.twitter}`,
-          logo: twitterLogo,
-        });
-      }
-
-      if (socials?.telegram) {
-        links.push({
-          name: 'telegram',
-          url: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TELEGRAM]}${socials?.telegram}`,
-          logo: telegramLogo,
-        });
-      }
-
-      if (url) {
-        links.push({
-          name: 'Website',
-          url,
-          logo: websiteLogo,
-        });
-      }
-
-      return {
-        account: blockProducer?.owner,
-        fioHandle: blockProducer?.fio_address,
-        votes: blockProducer?.total_votes,
-        links,
-        flagIconUrl: flagIconUrl || '',
-        grade: score?.grade || '',
-        name: candidate_name || 'N/A',
-        logo: branding?.logo_svg || branding?.logo_256 || defaultLogo,
-        ranks: score?.score || 0,
-      };
-    })
-    .sort((a, b) => b.ranks - a.ranks);
+  const producers = activeFioChainProducers
+    ?.map((blockProducer) =>
+      transformBlockProducer({ producer: blockProducer, bpMonitorProducers })
+    );
 
   const columns = [
     { key: 'name', title: 'Block Producer' },
