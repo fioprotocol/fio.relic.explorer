@@ -25,6 +25,7 @@ export interface Producer {
   };
   total_votes: number;
   url: string;
+  index: number;
 }
 
 export interface Proxy {

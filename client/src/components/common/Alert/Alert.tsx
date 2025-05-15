@@ -8,7 +8,7 @@ import styles from './Alert.module.scss';
 
 export type AlertProps = {
   title?: string;
-  message?: string;
+  message?: string | React.ReactNode;
   variant?: Variant;
   className?: string;
   hasDash?: boolean;
@@ -28,7 +28,7 @@ export const Alert: FC<AlertProps> = ({
   return (
     <BootstrapAlert
       variant={variant}
-      className={`d-flex flex-row align-items-center p-3 w-100 gap-3 mb-0 rounded-3 border-0 bg-${variant} ${styles.alertComponent} ${className || ''}`}
+      className={`d-flex flex-row align-items-start p-3 w-100 gap-3 mb-0 rounded-3 border-0 bg-${variant} ${styles.alertComponent} ${className || ''}`}
     >
       {icon || <ExclamationCircleFill size={20} />}
       <div className={`d-flex flex-row gap-2 w-100 ${styles.alertContent}`}>

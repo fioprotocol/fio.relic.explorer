@@ -7,11 +7,12 @@ export type LinkItem = {
 export type BlockProducerProps = {
   account: string;
   fioHandle: string;
-  votes: string;
+  votes: string | number;
   links: LinkItem[];
   flagIconUrl: string;
   grade: string;
   name: string;
   logo: string;
   ranks: number;
+  index: number;
 };

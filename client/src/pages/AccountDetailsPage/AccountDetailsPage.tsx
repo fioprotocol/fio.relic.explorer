@@ -16,12 +16,25 @@ import { Transactions } from './Transactions';
 import { FioHandlesTab } from './FioHandlesTab';
 import { DomainsTab } from './DomainsTab';
 import { KeyPermissionTab } from './KeyPermissionTab';
+import { VotingTab } from './VotingTab';
 
 import { useAccountDetailsPageContext } from './AccountDetailsPageContext';
 
 const AccountDetailsPage: FC = () => {
-  const { account, publicKey, date, blockNumber, stats, isBlockProducer, isProxy, loading } =
-    useAccountDetailsPageContext();
+  const {
+    account,
+    publicKey,
+    date,
+    blockNumber,
+    stats,
+    isBlockProducer,
+    isProxy,
+    loading,
+    producers,
+    proxy,
+    votes,
+    votingProxy,
+  } = useAccountDetailsPageContext();
 
   return (
     <Container className="py-5">
@@ -32,10 +45,10 @@ const AccountDetailsPage: FC = () => {
         {isProxy && <Badge variant="white">Proxy</Badge>}
       </div>
       <div className="d-flex justify-content-between align-items-start align-items-md-center flex-wrap flex-column flex-md-row my-3 gap-2 gap-md-5 f-size-sm lh-1 w-100">
-        <div className="text-secondary d-flex justify-content-between align-items-center">
+        <p className="text-secondary word-break-all lh-lg m-0">
           <span className="me-2">Public key:</span>
           <span className="fw-bold text-primary">{publicKey}</span>
-        </div>
+        </p>
         <div className="d-flex flex-row flex-wrap align-items-center gap-3">
           <div className="text-secondary d-flex justify-content-between align-items-center">
             <span className="me-2">Date:</span>
@@ -71,7 +84,13 @@ const AccountDetailsPage: FC = () => {
             <DomainsTab />
           </Tab.Pane>
           <Tab.Pane eventKey="voting" title="Voting">
-            Voting
+            <VotingTab
+              publicKey={publicKey}
+              votingProxy={votingProxy}
+              votes={votes}
+              producers={producers}
+              proxy={proxy}
+            />
           </Tab.Pane>
           <Tab.Pane eventKey="keys" title="Keys/Permissions">
             <KeyPermissionTab />

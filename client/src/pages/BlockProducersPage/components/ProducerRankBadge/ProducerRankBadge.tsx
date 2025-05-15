@@ -4,18 +4,19 @@ import { Badge } from 'src/components/common/Badge';
 import styles from './ProducerRankBadge.module.scss';
 
 type ProducerRankBadgeProps = {
+  className?: string;
   index: number;
   topRank?: number;
 };
 
-export const ProducerRankBadge: FC<ProducerRankBadgeProps> = ({ index, topRank = 21 }) => {
+export const ProducerRankBadge: FC<ProducerRankBadgeProps> = ({ index, topRank = 21, className }) => {
   if (index > topRank) return null;
 
   return (
     <Badge
       variant="dark"
       textVariant="white"
-      className={`d-flex align-items-center justify-content-center px-2 py-2 f-size-xs ${styles.topBadge}`}
+      className={`d-flex align-items-center justify-content-center px-2 py-2 f-size-xs rounded-3 ${styles.topBadge} ${className}`}
     >
       TOP {topRank}
     </Badge>

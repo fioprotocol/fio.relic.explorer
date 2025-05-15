@@ -3,12 +3,13 @@ import React from 'react';
 import styles from './GradeBadge.module.scss';
 
 type Props = {
+  className?: string;
   grade: string;
 };
 
-export const GradeBadge: React.FC<Props> = ({ grade }) => {
+export const GradeBadge: React.FC<Props> = ({ grade, className }) => {
   if (!grade) return null;
-  
+
   let color;
 
   switch (true) {
@@ -32,6 +33,10 @@ export const GradeBadge: React.FC<Props> = ({ grade }) => {
   }
 
   return (
-    <div className={`d-flex align-items-center justify-content-center f-size-sm px-2 py-2 rounded-3 f-size-xs ${styles.container} ${color ? styles[color] : ''}`}>{grade}</div>
+    <div
+      className={`d-flex align-items-center justify-content-center f-size-sm px-2 py-2 rounded-3 f-size-xs ${styles.container} ${color ? styles[color] : ''} ${className}`}
+    >
+      {grade}
+    </div>
   );
 };
