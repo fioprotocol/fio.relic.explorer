@@ -52,18 +52,17 @@ const BlockDetailsPage: React.FC = () => {
         <Loader fullScreen noBg />
       ) : (
         <>
-          <div className="d-block d-lg-flex justify-content-between align-items-center mb-4 gap-5 f-size-sm lh-1">
-            <p className="text-secondary mb-2 mb-md-0">
-              Block ID: <span className="text-dark fw-bold text-break">{block?.block_id}</span>
+            <div className="d-flex justify-content-between align-items-start align-items-md-center flex-wrap flex-column flex-md-row my-3 gap-2 f-size-sm lh-1 w-100">
+              <p className="text-secondary m-0 lh-lg word-break-all">
+              Block ID: <span className="text-dark fw-bold">{block?.block_id}</span>
             </p>
-            <div className="d-flex justify-content-between align-items-center gap-5">
+            <div className="d-flex flex-row flex-wrap align-items-center gap-3">
               <div className="text-secondary mb-0">
                 <span className="me-2">Date:</span>
                 <span className="text-dark fw-bold">{formatDate(block?.stamp)}</span>
               </div>
               <div className="text-secondary d-flex justify-content-between align-items-center mb-0 gap-2">
                 <span>Status:</span>
-                <Badge variant="success">Executed</Badge>
                 <IrreversibleStatus
                   blockNumber={block_number}
                   lastIrreversibleBlockNumber={last_irreversible_block_num}
