@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { getDomain } from 'src/services/domains';
 
@@ -12,17 +12,11 @@ type UseDomainDetailsContext = {
   chainData?: DomainChainData;
   loading: boolean;
   error: Error | null;
-  onBack: () => void;
 };
 
 export const useDomainDetailsContext = (): UseDomainDetailsContext => {
   const { id: domain } = useParams();
   const { response, loading, error } = useGetData<DomainResponse>({ action: getDomain, params: { domain } });
-  const navigate = useNavigate();
-
-  const onBack = (): void => {
-    navigate(-1);
-  };
 
   return {
     domainParam: domain,
@@ -30,6 +24,5 @@ export const useDomainDetailsContext = (): UseDomainDetailsContext => {
     chainData: response?.chainData,
     loading,
     error,
-    onBack,
   };
 };

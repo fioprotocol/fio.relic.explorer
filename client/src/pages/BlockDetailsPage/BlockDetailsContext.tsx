@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { getBlock } from 'src/services/blocks';
 
@@ -22,11 +22,9 @@ type UseBlockDetailsContext = {
   last_irreversible_block_num?: number;
   transactions?: Transaction[];
   error: Error | null;
-  onBack: () => void;
 };
 
 export const useBlockDetailsContext = (): UseBlockDetailsContext => {
-  const navigate = useNavigate();
   const { id: block_number } = useParams();
   const { producers } = useProducers();
   const { response, loading, error } = useGetData<BlockResponseData>({
@@ -42,10 +40,6 @@ export const useBlockDetailsContext = (): UseBlockDetailsContext => {
     params: { block_number },
   });
 
-  const onBack = (): void => {
-    navigate(-1);
-  };
-
   return {
     block_number: Number(block_number),
     block: response?.block,
@@ -54,7 +48,6 @@ export const useBlockDetailsContext = (): UseBlockDetailsContext => {
     producer: producers.get(response?.block?.producer_account_name),
     last_irreversible_block_num: chainInfo?.last_irreversible_block_num,
     transactions: txResponse?.transactions || [],
-    onBack,
     error,
     loading,
   };

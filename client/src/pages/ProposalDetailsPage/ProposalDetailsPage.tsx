@@ -31,14 +31,13 @@ const COLUMNS = [
   },
 ];
 
-const BlockDetailsPage: React.FC = () => {
-  const { requested_approvals, proposal, block_date, onBack, error, loading } =
-    useProposalDetailsContext();
+const ProposalDetailsPage: React.FC = () => {
+  const { requested_approvals, proposal, block_date, error, loading } = useProposalDetailsContext();
 
   if (error) {
     return (
       <Container className="py-5" title="Multisig TX">
-        <BackButton onClick={onBack} />
+        <BackButton />
         <Alert variant="danger" title="Error fetching proposal details" message={error.message} />
       </Container>
     );
@@ -46,7 +45,7 @@ const BlockDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton onClick={onBack} />
+      <BackButton />
       <h4>Multisig TX</h4>
       {!proposal || loading ? (
         <Loader fullScreen noBg />
@@ -122,4 +121,4 @@ const BlockDetailsPage: React.FC = () => {
   );
 };
 
-export default BlockDetailsPage;
+export default ProposalDetailsPage;

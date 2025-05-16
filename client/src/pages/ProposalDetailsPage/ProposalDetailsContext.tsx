@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { getProposal } from 'src/services/hyperion';
 import { getBlocksDate } from 'src/services/blocks';
@@ -21,11 +21,9 @@ type UseProposalDetailsContext = {
   }[];
   loading?: boolean;
   error: Error | null;
-  onBack: () => void;
 };
 
 export const useProposalDetailsContext = (): UseProposalDetailsContext => {
-  const navigate = useNavigate();
   const { proposal_name } = useParams();
   const {
     response: proposal,
@@ -43,10 +41,6 @@ export const useProposalDetailsContext = (): UseProposalDetailsContext => {
       blocks: [proposal?.block_num],
     },
   });
-
-  const onBack = (): void => {
-    navigate(-1);
-  };
 
   const requested_approvals =
     proposal?.requested_approvals.map((approval) => {
@@ -66,7 +60,6 @@ export const useProposalDetailsContext = (): UseProposalDetailsContext => {
     proposal,
     block_date: blockDateResponse?.data?.[proposal?.block_num],
     requested_approvals,
-    onBack,
     error,
     loading,
   };

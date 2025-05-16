@@ -19,12 +19,12 @@ import { formatDate } from 'src/utils/general';
 import { ROUTES } from 'src/constants/routes';
 
 const DomainDetailsPage: React.FC = () => {
-  const { domainParam, domain, chainData, loading, error, onBack } = useDomainDetailsContext();
+  const { domainParam, domain, chainData, loading, error } = useDomainDetailsContext();
 
   if (error) {
     return (
       <Container className="py-5">
-        <BackButton to={ROUTES.domains.path} />
+        <BackButton />
         <Alert variant="danger" title="Not found">
           Domain <span className="fw-bold">{domainParam}</span> is not found
         </Alert>
@@ -34,7 +34,7 @@ const DomainDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton onClick={onBack} />
+      <BackButton />
       <h4>FIO Domain: {domain?.domain_name || domainParam}</h4>
       {!domain?.domain_name || loading ? (
         <Loader fullScreen noBg />
@@ -51,7 +51,9 @@ const DomainDetailsPage: React.FC = () => {
               <span className="me-2">Account:</span>
               <span className="text-dark fw-bold">
                 {chainData?.owner_account || domain?.owner_account_name ? (
-                  <Link to={`${ROUTES.accounts.path}/${chainData?.owner_account || domain?.owner_account_name}`}>
+                  <Link
+                    to={`${ROUTES.accounts.path}/${chainData?.owner_account || domain?.owner_account_name}`}
+                  >
                     {chainData?.owner_account || domain?.owner_account_name}
                   </Link>
                 ) : (

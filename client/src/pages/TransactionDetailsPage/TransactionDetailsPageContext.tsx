@@ -28,9 +28,14 @@ export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageCon
     params: { id },
   });
 
-  const { response: chainInfo, loading: chainInfoLoading } = useGetData<ChainInfo>({ action: getInfo });
+  const { response: chainInfo, loading: chainInfoLoading } = useGetData<ChainInfo>({
+    action: getInfo,
+  });
 
-  const { response: rawData, loading: rawDataLoading } = useGetData<TransactionHistoryResponse>({ action: getTransactionHistoryData, params: { id } });
+  const { response: rawData, loading: rawDataLoading } = useGetData<TransactionHistoryResponse>({
+    action: getTransactionHistoryData,
+    params: { id },
+  });
 
   const { action_name, account_name, block_number, fee, request_data } = response?.data || {};
 
