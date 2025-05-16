@@ -139,7 +139,7 @@ export const DataTile: React.FC<DataTileProps> = ({
             </div>
           )}
         </div>
-        {loading && <Loader fullScreen />}
+        {loading && <Loader fullScreen absolute />}
       </Card.Body>
     </CardComponent>
   );

@@ -47,7 +47,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   const displayEmptyState = !loading && data.length === 0 ? emptyState : undefined;
 
   const tableRender = (): ReactNode => (
-    <div className="position-relative flex-column align-items-center gap-3">
+    <div className="d-flex w-100 position-relative flex-column align-items-center gap-3">
       <TableComponent
         columns={columns}
         data={data}
@@ -67,7 +67,11 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   );
 
   if (showInCardComponent) {
-    return <CardComponent className="mt-4 mb-4" useMobileStyle>{tableRender()}</CardComponent>;
+    return (
+      <CardComponent className="mt-4 mb-4" useMobileStyle>
+        {tableRender()}
+      </CardComponent>
+    );
   }
 
   return <>{tableRender()}</>;
