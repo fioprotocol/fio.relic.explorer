@@ -9,7 +9,11 @@ import { useGetData } from 'src/hooks/useGetData';
 import { DEFAULT_REFRESH_INTERVAL } from 'src/constants/general';
 
 import { DEFAULT_REQUEST_ITEMS_LIMIT } from '@shared/constants/network';
-import { TransformedTransaction, Transaction, TransactionResponse } from '@shared/types/transactions';
+import {
+  TransformedTransaction,
+  Transaction,
+  TransactionResponse,
+} from '@shared/types/transactions';
 
 type UseTxInfiniteUpdateConextProps = {
   transactions: TransformedTransaction[];
@@ -35,7 +39,7 @@ export const useTxInfiniteUpdateConext = (): UseTxInfiniteUpdateConextProps => {
     [];
 
   return {
-    loading: loading && transactions.length === 0,
+    loading: loading && transactions.length === 0, // Show loading only on fisrst load. Next loadings should be not shown because of infinite update.
     transactions,
     onActionButtonClick,
   };
