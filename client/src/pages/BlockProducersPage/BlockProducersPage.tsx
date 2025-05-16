@@ -23,6 +23,7 @@ const BlockProducersPage: FC = () => {
         title="All Block Producers"
         loading={loading}
         className="mt-3"
+        showPagination={false}
       />
     </Container>
   );
