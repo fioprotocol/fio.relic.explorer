@@ -12,6 +12,7 @@ import { Badge } from 'src/components/common/Badge';
 import { Alert } from 'src/components/common/Alert';
 import { Loader } from 'src/components/common/Loader';
 import { Tabs } from 'src/components/common/Tabs';
+import { IrreversibleStatus } from 'src/components/IrreversibleStatus';
 
 import { useBlockDetailsContext } from './BlockDetailsContext';
 
@@ -63,11 +64,10 @@ const BlockDetailsPage: React.FC = () => {
               <div className="text-secondary d-flex justify-content-between align-items-center mb-0 gap-2">
                 <span>Status:</span>
                 <Badge variant="success">Executed</Badge>
-                {block_number &&
-                last_irreversible_block_num &&
-                block_number > last_irreversible_block_num ? (
-                  <Badge variant="warning">Irreversible</Badge>
-                ) : null}
+                <IrreversibleStatus
+                  blockNumber={block_number}
+                  lastIrreversibleBlockNumber={last_irreversible_block_num}
+                />
               </div>
             </div>
           </div>
