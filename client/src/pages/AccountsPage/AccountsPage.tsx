@@ -89,8 +89,7 @@ const AccountsPage: FC = () => {
       <p className="f-size-sm">
         Account Holders: <span className="text-dark fw-bold">{totalAccounts}</span>
       </p>
-      <DataTile items={stats} layout='multi-column' columns={3} loading={loading}></DataTile>
-
+      <DataTile items={stats} columns={3} loading={loading} />
       <LoadableTable
         header={
           <div className="d-flex justify-content-between align-items-center gap-1 flex-wrap">

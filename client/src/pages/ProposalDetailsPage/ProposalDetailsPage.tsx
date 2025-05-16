@@ -55,8 +55,7 @@ const ProposalDetailsPage: React.FC = () => {
 
           <DataTile
             className="mb-4"
-            layout="row"
-            columns={2}
+            columns={5}
             items={[
               {
                 title: 'Proposer',

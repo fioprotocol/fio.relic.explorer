@@ -9,7 +9,7 @@ const TransactionsPage: React.FC = () => {
   const { stats, loading } = useTransactionsPageContext();
 
   return <Container title='Transactions'>
-    <DataTile items={stats} layout='row' loading={loading}></DataTile>
+    <DataTile items={stats} loading={loading} columns={3} />
     <TxComponent />
     </Container>;
 };

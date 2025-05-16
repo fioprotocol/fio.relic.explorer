@@ -72,7 +72,7 @@ const TransactionDetailsPage: FC = () => {
           }
         />
       </div>
-      <DataTile items={stats} layout="row" loading={loading} />
+      <DataTile items={stats} loading={loading} columns={4} />
       <CardComponent title="Transaction Details" className="mt-4" useMobileStyle>
         <Tabs
           defaultActiveKey="input"

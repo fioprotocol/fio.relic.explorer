@@ -1,5 +1,5 @@
-import React, { ReactNode, ReactElement } from 'react';
-import { Card, ListGroup, Row, Col } from 'react-bootstrap';
+import React, { ReactNode, ReactElement, useEffect, useState } from 'react';
+import { Card } from 'react-bootstrap';
 
 import { CardComponent } from '../../layout/CardComponent';
 import { Loader } from '../Loader';
@@ -9,128 +9,122 @@ import styles from './DataTile.module.scss';
 export interface DataItem {
   title: string;
   value: string | number | ReactElement | null;
+  wideWidth?: boolean;
+  narrowWidth?: boolean;
 }
-
-export type LayoutType = 'column' | 'row' | 'multi-column';
 
 export interface DataTileProps {
   children?: ReactNode;
   className?: string;
   columns?: number;
   items: DataItem[];
-  layout?: LayoutType;
   title?: string;
   loading?: boolean;
 }
 
-// Row layout component
-interface RowLayoutProps {
-  items: DataItem[];
-}
-
-const RowLayout: React.FC<RowLayoutProps> = ({ items }) => (
-  <Row className="d-flex flex-row gap-3 flex-wrap m-0 w-100">
-    {items.map((item, index) => (
-      <Col key={index} className={`flex-grow-1 p-0 ${styles.dataItemCol}`}>
-        <div
-          className={`d-flex align-items-center w-100 bg-transparent p-3 rounded-1 border-0 ${styles.dataItem} ${styles.dataItemRow}`}
-        >
-          <div className="d-flex flex-column gap-1 align-items-start">
-            <div className={styles.dataItemTitle}>{item.title}</div>
-            <div className={styles.dataItemValue}>{item.value}</div>
-          </div>
-        </div>
-      </Col>
-    ))}
-  </Row>
-);
-
-// Reusable DataItem component for list group items
-interface DataItemListGroupItemProps {
+// Reusable DataItem component
+interface DataItemComponentProps {
   item: DataItem;
+  isRow?: boolean;
 }
 
-const DataItemListGroupItem: React.FC<DataItemListGroupItemProps> = ({ item }) => (
-  <ListGroup.Item className={`${styles.dataItem} py-2 ps-3 pe-0 border-bottom`}>
-    <div>
+const DataItemComponent: React.FC<DataItemComponentProps> = ({ item, isRow = false }) => (
+  <div
+    className={`${styles.dataItem} ${isRow ? styles.dataItemRow : 'py-2 ps-3 pe-0'}`}
+  >
+    <div className="d-flex flex-column gap-1 align-items-start">
       <div className={styles.dataItemTitle}>{item.title}</div>
       <div className={styles.dataItemValue}>{item.value}</div>
     </div>
-  </ListGroup.Item>
+  </div>
 );
-
-// Reusable DataItemsList component
-interface DataItemsListProps {
-  items: DataItem[];
-  keyPrefix?: string;
-}
-
-const DataItemsList: React.FC<DataItemsListProps> = ({ items, keyPrefix = '' }) => (
-  <ListGroup variant="flush" className="d-flex flex-column gap-3 p-0 w-100 border-0">
-    {items.map((item, index) => (
-      <DataItemListGroupItem key={`${keyPrefix}${index}`} item={item} />
-    ))}
-  </ListGroup>
-);
-
-// Multi-column layout component
-interface MultiColumnLayoutProps {
-  items: DataItem[];
-  columns: number;
-}
-
-const MultiColumnLayout: React.FC<MultiColumnLayoutProps> = ({ items, columns }) => {
-  // Calculate items per column
-  const itemsPerCol = Math.ceil(items.length / columns);
-
-  return (
-    <Row className="d-flex w-100 m-0 gap-3">
-      {Array.from({ length: columns }).map((_, colIndex) => {
-        // Get items for this column
-        const colItems = items.slice(colIndex * itemsPerCol, (colIndex + 1) * itemsPerCol);
-
-        return (
-          <Col key={colIndex} className="p-0">
-            <DataItemsList items={colItems} keyPrefix={`col-${colIndex}-`} />
-          </Col>
-        );
-      })}
-    </Row>
-  );
-};
-
-// Column layout component
-interface ColumnLayoutProps {
-  items: DataItem[];
-}
-
-const ColumnLayout: React.FC<ColumnLayoutProps> = ({ items }) => <DataItemsList items={items} />;
 
 export const DataTile: React.FC<DataTileProps> = ({
   children,
   className = '',
-  columns = 2,
+  columns = 1,
   items,
-  layout = 'column',
   title,
   loading = false,
 }) => {
-  const renderItems = (): ReactNode => {
-    switch (layout) {
-      case 'row':
-        return <RowLayout items={items} />;
-      case 'multi-column':
-        return <MultiColumnLayout items={items} columns={columns} />;
-      default:
-        return <ColumnLayout items={items} />;
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkMobile = (): void => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Create grid template columns string
+  const getGridTemplateColumns = (): string => {
+    // On mobile, use the default template
+    if (isMobile) {
+      return `repeat(1, 1fr)`;
     }
+    
+    const templateParts: string[] = [];
+    
+    // Calculate how many items to show per row
+    const itemsPerRow = Math.min(columns, items.length);
+    
+    // Create the template parts for each item in a row
+    for (let i = 0; i < itemsPerRow; i++) {
+      const item = items[i % items.length];
+      
+      if (item.narrowWidth) {
+        templateParts.push('150px');
+      } else if (item.wideWidth) {
+        templateParts.push('1.8fr');
+      } else {
+        templateParts.push('1fr');
+      }
+    }
+    
+    return templateParts.join(' ');
+  };
+  
+  // Calculate which items are in the last row
+  const isLastRow = (index: number): boolean => {
+    if (isMobile) {
+      // On mobile, only the very last item is in the "last row"
+      return index === items.length - 1;
+    }
+    
+    // For desktop, calculate based on columns
+    const itemsPerRow = Math.min(columns, items.length);
+    const totalRows = Math.ceil(items.length / itemsPerRow);
+    const lastRowStartIndex = (totalRows - 1) * itemsPerRow;
+    
+    return index >= lastRowStartIndex;
   };
 
   return (
     <CardComponent title={title} className={className}>
       <Card.Body className="d-flex flex-column gap-3 p-0">
         <div className="w-100 d-flex flex-column flex-md-row gap-4">
-          <div className="w-100">{renderItems()}</div>
+          <div 
+            className="w-100"
+            style={{ 
+              gridTemplateColumns: getGridTemplateColumns(),
+              display: 'grid',
+              gap: '1rem'
+            }}
+          >
+            {items.map((item, index) => (
+              <div 
+                key={index} 
+                className={`${styles.gridItem} ${isLastRow(index) ? styles.lastRow : ''}`}
+              >
+                <DataItemComponent item={item} />
+              </div>
+            ))}
+          </div>
           {children && (
             <div
               className={`w-100 border-start border-1 border-mercury ${styles.childrenContainer}`}
