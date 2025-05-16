@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Tab, Nav, Button, TabPaneProps, Dropdown } from 'react-bootstrap';
 import { ChevronDown } from 'react-bootstrap-icons';
-
+import { Loader } from 'src/components/common/Loader';
 interface TabsProps extends React.PropsWithChildren<unknown> {
   variant?: 'tabs' | 'pills' | 'underline' | string;
   id: string;
   defaultActiveKey?: string;
   className?: string;
+  loading?: boolean;
 }
 
 const CustomToggle = React.forwardRef(
@@ -37,6 +38,7 @@ export const Tabs: React.FC<TabsProps> = ({
   children,
   defaultActiveKey,
   id,
+  loading,
 }) => {
   const [activeKey, setActiveKey] = useState<string | undefined>(defaultActiveKey);
 
@@ -85,7 +87,7 @@ export const Tabs: React.FC<TabsProps> = ({
           ))}
         </Dropdown.Menu>
       </Dropdown>
-      <Tab.Content>{children}</Tab.Content>
+      <Tab.Content>{loading ? <Loader fullScreen noBg /> : children}</Tab.Content>
     </Tab.Container>
   );
 };

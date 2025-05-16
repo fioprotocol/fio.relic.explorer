@@ -79,6 +79,7 @@ const TransactionDetailsPage: FC = () => {
           id="transaction-details-tabs"
           variant="underline"
           className="mb-3"
+          loading={loading}
         >
           <Tab.Pane eventKey="input" title="Input">
             <div className={tabRowStyle}>
