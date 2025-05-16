@@ -102,6 +102,18 @@ export const useAccountDetailsPageContext = (): UseAccountDetailsPageContext => 
     ready: isProxy,
   });
 
+  const voters = chainData?.voters?.rows || [];
+  const votingProxy =
+    voters.find((voter) => voter.is_auto_proxy === 1 || !!voter.proxy)?.proxy || null;
+
+  const { response: proxyVotes, loading: proxyVotesLoading } = useGetData<getProxyVotesDataResponse>({
+    action: getProxyVotesData,
+    params: { accountName: votingProxy },
+    ready: !!votingProxy,
+  });
+
+  const votingProducers = votingProxy ? proxyVotes?.voters?.rows || [] : voters;
+
   const stats: DataItem[] = [
     {
       title: 'Total FIO Balance',
@@ -129,12 +141,8 @@ export const useAccountDetailsPageContext = (): UseAccountDetailsPageContext => 
     },
   ];
 
-  const voters = chainData?.voters?.rows || [];
-  const votingProxy =
-    voters.find((voter) => voter.is_auto_proxy === 1 || !!voter.proxy)?.proxy || null;
-
   const transformedProducers =
-    voters[0]?.producers?.map((producerAccountName) =>
+    votingProducers[0]?.producers?.map((producerAccountName) =>
       transformBlockProducer({
         producer: producers.get(producerAccountName) as Producer,
         bpMonitorProducers: producers,
@@ -151,7 +159,8 @@ export const useAccountDetailsPageContext = (): UseAccountDetailsPageContext => 
       fioBalanceLoading ||
       roeLoading ||
       proxiesLoading ||
-      producersLoading,
+      producersLoading ||
+      proxyVotesLoading,
     publicKey,
     votingProxy,
     votes: voters,
