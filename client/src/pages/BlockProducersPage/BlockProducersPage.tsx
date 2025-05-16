@@ -11,16 +11,14 @@ const BlockProducersPage: FC = () => {
 
   return (
     <Container title="Block Producers">
-      <p className="f-size-sm">Registered Block Producers: <span className="text-dark fw-bold">{producers?.length}</span></p>
+      <p className="f-size-sm">
+        Registered Block Producers: <span className="text-dark fw-bold">{producers?.length}</span>
+      </p>
       <LoadableTable
         columns={columns}
         data={producers?.map((producer, index) => createProducerDesktopRow(producer, index))}
         customMobileDesign={producers?.map((producer, index) => (
-          <ProducerMobileItem 
-            key={producer.account}
-            producer={producer} 
-            index={index} 
-          />
+          <ProducerMobileItem key={producer.account} producer={producer} index={index} />
         ))}
         title="All Block Producers"
         loading={loading}

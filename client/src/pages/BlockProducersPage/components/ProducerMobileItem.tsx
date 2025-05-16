@@ -6,6 +6,8 @@ import { ProducerLinks } from './ProducerLinks/ProducerLinks';
 import { LocationFlag } from './LocationFlag/LocationFlag';
 import { ProducerRankBadge } from './ProducerRankBadge/ProducerRankBadge';
 
+import styles from './ProducerMobileItem.module.scss';
+
 type ProducerMobileItemProps = {
   producer: BlockProducerProps;
   index: number;
@@ -26,17 +28,21 @@ export const ProducerMobileItem: FC<ProducerMobileItemProps> = ({ producer, inde
           <div className="text-secondary f-size-sm">FIO Handle:</div>
           <div className="text-dark f-size-sm text-wrap">{fioHandle}</div>
         </div>
-      </div> 
+      </div>
       <div className="d-flex flex-row flex-wrap gap-1">
         <div className="text-secondary f-size-sm">Votes:</div>
         <div className="text-dark f-size-sm text-wrap">
           {new Intl.NumberFormat('en-US').format(Number(votes))}
         </div>
       </div>
-      <div className="d-flex flex-row flex-wrap justify-content-between gap-3">
-        <ProducerLinks links={links} />
-        <LocationFlag flagIconUrl={flagIconUrl} name={name} />
-        <div className="d-flex flex-row gap-2">
+      <div className={styles.producerActionsGrid}>
+        <div className={styles.linksColumn}>
+          <ProducerLinks links={links} />
+        </div>
+        <div className={styles.flagColumn}>
+          <LocationFlag flagIconUrl={flagIconUrl} name={name} />
+        </div>
+        <div className={`${styles.badgesColumn} d-flex flex-row gap-2`}>
           <GradeBadge grade={grade} />
           <ProducerRankBadge index={index} />
         </div>
