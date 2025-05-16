@@ -66,7 +66,7 @@ const AccountDetailsPage: FC = () => {
           </div>
         </div>
       </div>
-      <DataTile items={stats} columns={3} layout="multi-column" loading={loading} />
+      <DataTile items={stats} columns={3} loading={loading} />
       <CardComponent title="Account Details" useMobileStyle className="mt-3">
         <Tabs
           defaultActiveKey="transactions"

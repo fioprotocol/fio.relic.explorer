@@ -19,7 +19,7 @@ import { BlockProducerProps } from 'src/pages/BlockProducersPage/types';
 
 // Helper functions
 const calculateFioBalanceValue = (balance?: number, roe?: string): string => {
-  if (!balance || !roe) return '';
+  if (balance === undefined || balance === null || !roe) return '';
   
   // Convert number to string for BigNumber to avoid precision issues
   const balanceStr = String(balance);
@@ -120,20 +120,20 @@ export const useAccountDetailsPageContext = (): UseAccountDetailsPageContext => 
       value: formatFioAmount({ amount: fioBalance?.balance, hasFullAmount: true }),
     },
     {
-      title: 'Total FIO Balance Value',
-      value: calculateFioBalanceValue(fioBalance?.balance, roe),
-    },
-    {
       title: 'Available FIO',
       value: formatFioAmount({ amount: fioBalance?.available, hasFullAmount: true }),
     },
     {
-      title: 'Locked FIO',
-      value: calculateLockedFio(fioBalance),
-    },
-    {
       title: 'Staked FIO',
       value: formatFioAmount({ amount: fioBalance?.staked, hasFullAmount: true }),
+    },
+    {
+      title: 'Total FIO Balance Value',
+      value: calculateFioBalanceValue(fioBalance?.balance, roe),
+    },
+    {
+      title: 'Locked FIO',
+      value: calculateLockedFio(fioBalance),
     },
     {
       title: 'Accrued Staking Rewards',

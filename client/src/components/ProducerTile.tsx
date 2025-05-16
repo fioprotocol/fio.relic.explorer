@@ -16,7 +16,6 @@ export const ProducerTile: React.FC<ProducerTileProps> = ({ name, account, handl
       <div className="">
         Account: <Link to={`${ROUTES.accounts.path}/${account}`}>{account}</Link>
       </div>
-      <div className="d-md-inline-block d-none vr" />
       <div className="overflow-hidden text-truncate text-truncate-max-w">
         FIO Handle: {handle ? <Link to={`${ROUTES.handles.path}/${handle}`}>{handle}</Link> : '-'}
       </div>

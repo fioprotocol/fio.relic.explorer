@@ -24,10 +24,6 @@ const CurrentBlock: React.FC<{ currentBlock: Block; producer?: Producer }> = ({
           value: formatBlockNumber(currentBlock.pk_block_number),
         },
         {
-          title: 'Date',
-          value: formatDate(currentBlock.stamp),
-        },
-        {
           title: 'Producer',
           value: (
             <ProducerTile
@@ -36,26 +32,28 @@ const CurrentBlock: React.FC<{ currentBlock: Block; producer?: Producer }> = ({
               handle={producer?.fio_address}
             />
           ),
-        },
-        {
-          title: 'Block ID',
-          value: (
-            <Link to={`${ROUTES.blocks.path}/${currentBlock.pk_block_number}`}>
-              {currentBlock.block_id}
-            </Link>
-          ),
+          wideWidth: true,
         },
         {
           title: 'Transactions',
           value: currentBlock.transaction_count,
+          narrowWidth: true,
         },
         {
-          title: '',
-          value: '',
+          title: 'Date',
+          value: formatDate(currentBlock.stamp),
+        },
+        {
+          title: 'Block ID',
+          value: (
+            <Link to={`${ROUTES.blocks.path}/${currentBlock.pk_block_number}`} className="word-break-all">
+              {currentBlock.block_id}
+            </Link>
+          ),
+          wideWidth: true,
         },
       ]}
       columns={3}
-      layout="multi-column"
     />
   );
 };

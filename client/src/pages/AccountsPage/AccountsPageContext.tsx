@@ -44,10 +44,6 @@ export const useAccountsPageContext = (): UseAccountsPageType => {
       value: '1,000,000,000 FIO',
     },
     {
-      title: 'FIO Price',
-      value: `${formatTokenValue(response?.roe)} USD`,
-    },
-    {
       title: 'Current Token Supply',
       value: `${formatTokenValue(response?.currentTokenSupply)} FIO`,
     },
@@ -56,13 +52,16 @@ export const useAccountsPageContext = (): UseAccountsPageType => {
       value: `${formatTokenValue(response?.tokenCirculatingSupply)} FIO`,
     },
     {
+      title: 'FIO Price',
+      value: `${formatTokenValue(response?.roe)} USD`,
+    },
+    {
       title: 'Staked FIO',
       value: `${formatTokenValue(response?.stakedFio)} FIO`,
     },
     {
       title: 'Locked Supply',
       value: `${formatTokenValue(response?.lockedTokens)} FIO`,
-
     },
   ];
 

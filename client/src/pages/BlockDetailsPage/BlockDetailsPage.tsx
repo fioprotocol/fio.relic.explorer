@@ -8,7 +8,6 @@ import { DataTile } from 'src/components/common/DataTile';
 import { ProducerTile } from 'src/components/ProducerTile';
 import { TableComponent } from 'src/components/layout/TableComponent';
 import { BackButton } from 'src/components/common/BackButton';
-import { Badge } from 'src/components/common/Badge';
 import { Alert } from 'src/components/common/Alert';
 import { Loader } from 'src/components/common/Loader';
 import { Tabs } from 'src/components/common/Tabs';
@@ -73,7 +72,6 @@ const BlockDetailsPage: React.FC = () => {
 
           <DataTile
             className="mb-4"
-            layout="multi-column"
             columns={2}
             items={[
               {
@@ -87,16 +85,6 @@ const BlockDetailsPage: React.FC = () => {
                 ),
               },
               {
-                title: 'Next Block',
-                value: next_block_number ? (
-                  <Link to={`${ROUTES.blocks.path}/${next_block_number}`}>
-                    {formatBlockNumber(next_block_number)}
-                  </Link>
-                ) : (
-                  '-'
-                ),
-              },
-              {
                 title: 'Producer',
                 value: (
                   <ProducerTile
@@ -104,6 +92,16 @@ const BlockDetailsPage: React.FC = () => {
                     account={block.producer_account_name}
                     handle={producer?.fio_address}
                   />
+                ),
+              },
+              {
+                title: 'Next Block',
+                value: next_block_number ? (
+                  <Link to={`${ROUTES.blocks.path}/${next_block_number}`}>
+                    {formatBlockNumber(next_block_number)}
+                  </Link>
+                ) : (
+                  '-'
                 ),
               },
               {
