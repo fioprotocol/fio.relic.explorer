@@ -12,6 +12,7 @@ import { Tabs } from 'src/components/common/Tabs';
 import { JsonSyntaxHighlighter } from 'src/components/common/JsonSyntaxHighlighter';
 import { JsonDataRender } from 'src/components/common/JsonDataRender';
 import { DetailsPagesHeaderItem } from 'src/components/common/DetailsPagesHeaderItem';
+import { IrreversibleStatus } from 'src/components/IrreversibleStatus';
 
 import { ROUTES } from 'src/constants/routes';
 import { formatDate } from 'src/utils/general';
@@ -37,7 +38,7 @@ const ContractActionBadge: FC<{ contractActionName: string; actionName: string }
 };
 
 const TransactionDetailsPage: FC = () => {
-  const { id, loading, transaction, isIrreversible, stats, rawData } =
+  const { id, loading, transaction, lastIrreversibleBlockNumber, stats, rawData } =
     useTransactionDetailsPageContext();
   const tabRowStyle = 'm-0 gap-4 d-flex flex-column flex-md-row flex-wrap w-100';
 
@@ -63,7 +64,10 @@ const TransactionDetailsPage: FC = () => {
               <Badge variant="success" className="text-capitalize">
                 {transaction?.result_status}
               </Badge>
-              {isIrreversible && <Badge variant="warning">Irreversible</Badge>}
+              <IrreversibleStatus
+                blockNumber={transaction?.block_number}
+                lastIrreversibleBlockNumber={lastIrreversibleBlockNumber}
+              />
             </div>
           }
         />

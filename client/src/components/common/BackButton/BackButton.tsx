@@ -20,7 +20,7 @@ export const BackButton: FC<BackButtonProps> = ({ onClick, to}) => {
   }, [navigate, onClick, to]);
 
   return (
-    <Button variant="primary" onClick={handleClick} className="mb-5 p-2 lh-1">
+    <Button variant="primary" onClick={handleClick} className="mb-4 p-2 lh-1">
       <ChevronLeft size={16} className="m-1" />
     </Button>
   );
