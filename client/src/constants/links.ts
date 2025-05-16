@@ -1,3 +1,4 @@
+import { SOCIAL_MEDIA_IDS, SOCIAL_MEDIA_URLS } from '@shared/constants/social-media-links';
 import { ROUTES } from './routes';
 
 interface FooterLink {
@@ -11,67 +12,67 @@ export const FIO_DAPP_LINK = 'https://app.fio.net';
 
 export const SOCIAL_LINKS: FooterLink[] = [
   {
-    href: 'https://discord.gg/pHBmJCc',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.DISCORDSER]}pHBmJCc`,
     icon: 'discord',
     label: 'Discord',
   },
   {
-    href: 'https://twitter.com/joinFIO',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TWITTER]}joinFIO`,
     icon: 'x',
     label: 'X (Twitter)',
   },
   {
-    href: 'https://www.facebook.com/officialFIO',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.FACEBOOK]}officialFIO`,
     icon: 'facebook',
     label: 'Facebook',
   },
   {
-    href: 'https://github.com/fioprotocol',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.GITHUB]}fioprotocol`,
     icon: 'github',
     label: 'GitHub',
   },
   {
-    href: 'https://www.instagram.com/join.fio/',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.INSTAGRAM]}join.fio/`,
     icon: 'instagram',
     label: 'Instagram',
   },
   {
-    href: 'https://www.linkedin.com/company/fioprotocol/',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.LINKEDINCO]}fioprotocol/`,
     icon: 'linkedin',
     label: 'LinkedIn',
   },
   {
-    href: 'https://medium.com/fio-blog',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.MEDIUM]}fio-blog`,
     icon: 'medium',
     label: 'Medium',
   },
   {
-    href: 'https://www.binance.com/en/square/profile/fioprotocol',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.BINANCE]}fioprotocol`,
     icon: 'binance',
     label: 'Binance',
   },
   {
-    href: 'https://www.reddit.com/r/officialFIO',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.REDDITCOMPANY]}officialFIO`,
     icon: 'reddit',
     label: 'Reddit',
   },
   {
-    href: 'https://t.me/joinFIO',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TELEGRAM]}joinFIO`,
     icon: 'telegram',
     label: 'Telegram',
   },
   {
-    href: 'https://www.tiktok.com/@join_fio',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TIKTOK]}join_fio`,
     icon: 'tt',
     label: 'TikTok',
   },
   {
-    href: 'https://www.youtube.com/@FIOprotocol',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.YOUTUBE]}FIOprotocol`,
     icon: 'youtube',
     label: 'YouTube',
   },
   {
-    href: 'https://warpcast.com/joinfio',
+    href: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.WARPCAST]}joinfio`,
     icon: 'farcaster',
     label: 'Farcaster',
   },

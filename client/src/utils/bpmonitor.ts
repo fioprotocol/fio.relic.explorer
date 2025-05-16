@@ -5,7 +5,7 @@ import { BlockProducer } from '@shared/types/fio-api-server';
 import { Producer } from 'src/services/bpmonitor';
 
 import websiteLogo from 'src/assets/icons/social-network-governance/website.svg';
-import twitterLogo from 'src/assets/icons/social-network-governance/twitter.svg';
+import xLogo from 'src/assets/icons/social-network-governance/x.svg';
 import telegramLogo from 'src/assets/icons/social-network-governance/telegram.svg';
 import defaultLogo from 'src/assets/no-bp-icon.svg';
 
@@ -24,19 +24,19 @@ export const transformBlockProducer = ({
 
   const links = [];
 
-  if (socials?.twitter) {
-    links.push({
-      name: 'twitter',
-      url: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TWITTER]}${socials?.twitter}`,
-      logo: twitterLogo,
-    });
-  }
-
   if (socials?.telegram) {
     links.push({
       name: 'telegram',
       url: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TELEGRAM]}${socials?.telegram}`,
       logo: telegramLogo,
+    });
+  }
+
+  if (socials?.twitter) {
+    links.push({
+      name: 'x',
+      url: `${SOCIAL_MEDIA_URLS[SOCIAL_MEDIA_IDS.TWITTER]}${socials?.twitter}`,
+      logo: xLogo,
     });
   }
 
