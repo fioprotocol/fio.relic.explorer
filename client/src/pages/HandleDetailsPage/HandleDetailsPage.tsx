@@ -26,7 +26,7 @@ const HandleDetailsPage: React.FC = () => {
   if (error) {
     return (
       <Container className="py-5">
-        <BackButton to={ROUTES.handles.path} />
+        <BackButton />
         <Alert variant="danger" title="Not found">
           Handle <span className="fw-bold">{handleParam}</span> is not found
         </Alert>
@@ -36,7 +36,7 @@ const HandleDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton to={ROUTES.handles.path} />
+      <BackButton />
       <h4>FIO Handle: {handle?.handle || handleParam}</h4>
       {!handle?.handle || loading ? (
         <Loader fullScreen noBg />
