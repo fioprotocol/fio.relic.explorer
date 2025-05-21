@@ -90,10 +90,13 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
           b.block_id,
           b.producer_account_name,
           b.schedule_version,
-          COUNT(t.transaction_id) as transaction_count
+          (
+            SELECT COUNT(*)
+            FROM transactions t
+            WHERE t.fk_block_number = b.pk_block_number
+          ) as transactions_count
         FROM
           blocks b
-          LEFT JOIN transactions t ON t.fk_block_number = b.pk_block_number
         WHERE
           b.pk_block_number <= (SELECT MAX(pk_block_number) - $2 FROM blocks)
         GROUP BY

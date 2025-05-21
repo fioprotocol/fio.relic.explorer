@@ -81,97 +81,104 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
       const { account } = request.params;
       const { limit, offset } = request.query;
 
-      // Query to get transactions where account is sender or receiver
-      const transactionsQuery = {
-        text: `
-          WITH account_info AS (
-            SELECT pk_account_id 
-            FROM accounts 
-            WHERE account_name = $1
-          ),
-          
-          all_transactions AS (
-            -- Sender transactions (where fk_account_id = account's pk_account_id)
-            SELECT 
-              t.pk_transaction_id,
-              t.transaction_id,
-              t.block_timestamp,
-              t.action_name,
-              t.fee,
-              t.request_data,
-              'SENDER' as transaction_type,
-              (SELECT SUM(tt.fio_suf_amount)
-               FROM tokentransfers tt 
-               WHERE tt.fk_payer_account_id = (SELECT pk_account_id FROM account_info) 
-               AND tt.fk_transaction_id = t.pk_transaction_id) as fio_tokens
-            FROM transactions t
-            WHERE t.fk_account_id = (SELECT pk_account_id FROM account_info)
-            
-            UNION ALL
-            
-            -- Receiver transactions (via accountactivities)
-            SELECT 
-              t.pk_transaction_id,
-              t.transaction_id,
-              t.block_timestamp,
-              t.action_name,
-              t.fee,
-              t.request_data,
-              'RECEIVER' as transaction_type,
-              (SELECT SUM(tt.fio_suf_amount)
-               FROM tokentransfers tt
-               WHERE tt.fk_payee_account_id = (SELECT pk_account_id FROM account_info) 
-               AND tt.fk_transaction_id = t.pk_transaction_id) as fio_tokens
-            FROM transactions t
-            JOIN accountactivities aa ON t.pk_transaction_id = aa.fk_transaction_id
-            WHERE aa.fk_account_id = (SELECT pk_account_id FROM account_info)
-          )
-          
-          SELECT 
-            pk_transaction_id,
-            transaction_id,
-            block_timestamp,
-            action_name,
-            fee,
-            fio_tokens::text,
-            transaction_type,
-            request_data
-          FROM all_transactions
-          ORDER BY pk_transaction_id DESC
-          LIMIT $2
-          OFFSET $3
-        `,
-        values: [account, limit, offset],
-      };
-
-      // Simplified count query
-      const countQuery = {
-        text: `
-          WITH account_info AS (
-            SELECT pk_account_id 
-            FROM accounts 
-            WHERE account_name = $1
-          )
-          
-          SELECT 
-            (
-              SELECT COUNT(*) 
-              FROM transactions 
-              WHERE fk_account_id = (SELECT pk_account_id FROM account_info)
-            ) +
-            (
-              SELECT COUNT(*) 
+      try {
+        // First get the account_id to avoid repeating this lookup
+        const accountQuery = {
+          text: 'SELECT pk_account_id FROM accounts WHERE account_name = $1',
+          values: [account],
+        };
+        
+        const accountResult = await pool.query(accountQuery);
+        
+        if (accountResult.rows.length === 0) {
+          return {
+            transactions: [],
+            total: 0
+          };
+        }
+        
+        const accountId = accountResult.rows[0].pk_account_id;
+        
+        // Efficient combined query with pagination at the database level
+        const paginatedTransactionsQuery = {
+          text: `
+            WITH combined_txs AS (
+              -- Sender transactions
+              SELECT 
+                t.pk_transaction_id,
+                t.transaction_id,
+                t.block_timestamp,
+                t.action_name,
+                t.fee,
+                t.request_data,
+                'SENDER' as transaction_type,
+                CAST(COALESCE(tt_sender.total_amount, NULL) AS TEXT) as fio_tokens
+              FROM transactions t
+              LEFT JOIN (
+                SELECT 
+                  fk_transaction_id, 
+                  SUM(fio_suf_amount) as total_amount
+                FROM tokentransfers 
+                WHERE fk_payer_account_id = $1
+                GROUP BY fk_transaction_id
+              ) tt_sender ON t.pk_transaction_id = tt_sender.fk_transaction_id
+              WHERE t.fk_account_id = $1
+              
+              UNION ALL
+              
+              -- Receiver transactions
+              SELECT 
+                t.pk_transaction_id,
+                t.transaction_id,
+                t.block_timestamp,
+                t.action_name,
+                t.fee,
+                t.request_data,
+                'RECEIVER' as transaction_type,
+                CAST(COALESCE(tt_receiver.total_amount, NULL) AS TEXT) as fio_tokens
               FROM transactions t
               JOIN accountactivities aa ON t.pk_transaction_id = aa.fk_transaction_id
-              WHERE aa.fk_account_id = (SELECT pk_account_id FROM account_info)
-            ) as total
-        `,
-        values: [account],
-      };
+              LEFT JOIN (
+                SELECT 
+                  fk_transaction_id, 
+                  SUM(fio_suf_amount) as total_amount
+                FROM tokentransfers 
+                WHERE fk_payee_account_id = $1
+                GROUP BY fk_transaction_id
+              ) tt_receiver ON t.pk_transaction_id = tt_receiver.fk_transaction_id
+              WHERE aa.fk_account_id = $1
+            )
+            SELECT *
+            FROM combined_txs
+            ORDER BY pk_transaction_id DESC
+            LIMIT $2 OFFSET $3
+          `,
+          values: [accountId, limit, offset],
+        };
+        
+        // Get total counts more efficiently with materialized CTE
+        const countQuery = {
+          text: `
+            WITH sender_count AS MATERIALIZED (
+              SELECT COUNT(*) as count 
+              FROM transactions 
+              WHERE fk_account_id = $1
+            ),
+            receiver_count AS MATERIALIZED (
+              SELECT COUNT(*) as count
+              FROM accountactivities 
+              WHERE fk_account_id = $1
+            )
+            SELECT 
+              (SELECT count FROM sender_count) +
+              (SELECT count FROM receiver_count) as total
+          `,
+          values: [accountId],
+        };
 
-      try {
+        // Execute queries in parallel
         const [transactionsResult, countResult] = await Promise.all([
-          pool.query(transactionsQuery),
+          pool.query(paginatedTransactionsQuery),
           pool.query(countQuery),
         ]);
 
