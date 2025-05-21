@@ -66,3 +66,13 @@ CREATE INDEX IF NOT EXISTS idx_accounts_sorting_composite ON accounts(
   fio_balance_suf, 
   block_timestamp
 );
+
+-- Indexes for optimizing transaction lookup by ID
+CREATE INDEX IF NOT EXISTS idx_transactions_transaction_id ON transactions(transaction_id);
+
+-- Index for trace operations
+CREATE INDEX IF NOT EXISTS idx_traces_fk_transaction_id ON traces(fk_transaction_id);
+CREATE INDEX IF NOT EXISTS idx_traces_fk_action_account_id ON traces(fk_action_account_id);
+
+-- Index for transaction action account lookups
+CREATE INDEX IF NOT EXISTS idx_transactions_fk_action_account_id ON transactions(fk_action_account_id);
