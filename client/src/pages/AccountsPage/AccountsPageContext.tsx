@@ -11,6 +11,7 @@ import { ACCOUNT_SORT_OPTIONS } from '@shared/constants/accounts';
 type UseAccountsPageType = {
   loading: boolean;
   stats: DataItem[];
+  statsLoading: boolean;
   accounts: Account[];
   accountsLoading: boolean;
   totalAccounts: number;
@@ -66,8 +67,9 @@ export const useAccountsPageContext = (): UseAccountsPageType => {
   ];
 
   return {
-    loading: statsLoading || accountsLoading,
+    loading: accountsLoading,
     stats,
+    statsLoading,
     accounts: accounts || [],
     accountsLoading,
     totalAccounts: total || 0,
