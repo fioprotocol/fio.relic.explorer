@@ -58,3 +58,11 @@ CREATE INDEX IF NOT EXISTS idx_handles_pk_handle_id ON handles(pk_handle_id);
 CREATE INDEX IF NOT EXISTS idx_handles_owner_groupby ON handles(fk_owner_account_id, pk_handle_id);
 
 CREATE INDEX IF NOT EXISTS idx_domains_owner_pk_covering ON domains(fk_owner_account_id) INCLUDE (pk_domain_id);
+
+-- Composite index for accounts table sorting and filtering
+CREATE INDEX IF NOT EXISTS idx_accounts_sorting_composite ON accounts(
+  pk_account_id, 
+  account_name, 
+  fio_balance_suf, 
+  block_timestamp
+);

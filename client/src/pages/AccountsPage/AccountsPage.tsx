@@ -60,6 +60,7 @@ const AccountsPage: FC = () => {
   const {
     loading,
     stats,
+    statsLoading,
     accounts,
     accountsLoading,
     totalAccounts,
@@ -89,7 +90,7 @@ const AccountsPage: FC = () => {
       <p className="f-size-sm">
         Account Holders: <span className="text-dark fw-bold">{totalAccounts}</span>
       </p>
-      <DataTile items={stats} columns={3} loading={loading} />
+      <DataTile items={stats} columns={3} loading={statsLoading} />
       <LoadableTable
         header={
           <div className="d-flex justify-content-between align-items-center gap-1 flex-wrap">

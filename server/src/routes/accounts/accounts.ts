@@ -87,34 +87,80 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
         order = 'desc';
       }
 
-      const sqlQuery = `
-        SELECT
-          a.pk_account_id,
-          a.account_name,
-          a.fio_balance_suf,
-          a.block_timestamp,
-          COUNT(DISTINCT h.pk_handle_id) as handle_count,
-          COUNT(DISTINCT d.pk_domain_id) as domain_count
-        FROM accounts a
-        LEFT JOIN handles h ON a.pk_account_id = h.fk_owner_account_id
-        LEFT JOIN domains d ON a.pk_account_id = d.fk_owner_account_id
-        GROUP BY a.pk_account_id, a.account_name, a.fio_balance_suf, a.block_timestamp
-        ORDER BY ${sort} ${order}
-        LIMIT $1
-        OFFSET $2
-      `;
+      // Optimize query based on sort field to avoid expensive operations
+      let sqlQuery = '';
+      const queryParams = [limit, offset];
+
+      if (sort === ACCOUNT_SORT_OPTIONS.HANDLES || sort === ACCOUNT_SORT_OPTIONS.DOMAINS) {
+        // For handle/domain counts, we need aggregation
+        sqlQuery = `
+          SELECT 
+            a.pk_account_id,
+            a.account_name,
+            a.fio_balance_suf,
+            a.block_timestamp,
+            COALESCE(h.handle_count, 0) as handle_count,
+            COALESCE(d.domain_count, 0) as domain_count
+          FROM accounts a
+          LEFT JOIN (
+            SELECT fk_owner_account_id, COUNT(*) as handle_count
+            FROM handles
+            GROUP BY fk_owner_account_id
+          ) h ON a.pk_account_id = h.fk_owner_account_id
+          LEFT JOIN (
+            SELECT fk_owner_account_id, COUNT(*) as domain_count
+            FROM domains
+            GROUP BY fk_owner_account_id
+          ) d ON a.pk_account_id = d.fk_owner_account_id
+          ORDER BY ${sort === ACCOUNT_SORT_OPTIONS.HANDLES ? 'handle_count' : 'domain_count'} ${order}
+          LIMIT $1
+          OFFSET $2
+        `;
+      } else {
+        // For account_id or balance, we can optimize by doing the aggregation after sorting
+        const orderByField = sort === ACCOUNT_SORT_OPTIONS.BALANCE ? 'a.fio_balance_suf' : 'a.pk_account_id';
+        
+        sqlQuery = `
+          WITH sorted_accounts AS (
+            SELECT 
+              a.pk_account_id,
+              a.account_name,
+              a.fio_balance_suf,
+              a.block_timestamp
+            FROM accounts a
+            ORDER BY ${orderByField} ${order}
+            LIMIT $1
+            OFFSET $2
+          )
+          SELECT 
+            sa.pk_account_id,
+            sa.account_name,
+            sa.fio_balance_suf,
+            sa.block_timestamp,
+            COALESCE(h.handle_count, 0) as handle_count,
+            COALESCE(d.domain_count, 0) as domain_count
+          FROM sorted_accounts sa
+          LEFT JOIN (
+            SELECT fk_owner_account_id, COUNT(*) as handle_count
+            FROM handles
+            GROUP BY fk_owner_account_id
+          ) h ON sa.pk_account_id = h.fk_owner_account_id
+          LEFT JOIN (
+            SELECT fk_owner_account_id, COUNT(*) as domain_count
+            FROM domains
+            GROUP BY fk_owner_account_id
+          ) d ON sa.pk_account_id = d.fk_owner_account_id
+        `;
+      }
 
       // Query for total count
       const countQuery = {
-        text: `
-        SELECT COUNT(*) as total
-        FROM accounts
-      `,
+        text: `SELECT COUNT(*) as total FROM accounts`,
         values: [],
       };
 
       const [accountsResult, countResult] = await Promise.all([
-        pool.query(sqlQuery, [limit, offset]),
+        pool.query(sqlQuery, queryParams),
         pool.query(countQuery),
       ]);
 
