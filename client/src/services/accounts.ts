@@ -25,29 +25,46 @@ export const getAccount = async ({ account }: { account: string }): Promise<Acco
 
 export const getAccountTransactions = async ({
   account,
+  limit,
+  offset,
 }: {
   account: string;
+  limit: number;
+  offset: number;
 }): Promise<AccountTransactionsResponse> => {
   const response = await apiClient.get<AccountTransactionsResponse>(
-    `/accounts/${account}/transactions`
+    `/accounts/${account}/transactions`,
+    { params: { limit, offset } }
   );
   return response.data;
 };
 
 export const getAccountFioHandles = async ({
   account,
+  limit,
+  offset,
 }: {
   account: string;
+  limit: number;
+  offset: number;
 }): Promise<AccountFioHandlesResponse> => {
-  const response = await apiClient.get<AccountFioHandlesResponse>(`/accounts/${account}/fio-handles`);
+  const response = await apiClient.get<AccountFioHandlesResponse>(`/accounts/${account}/fio-handles`,
+    { params: { limit, offset } }
+  );
   return response.data;
 };
 
 export const getAccountDomains = async ({
   account,
+  limit,
+  offset,
 }: {
   account: string;
+  limit: number;
+  offset: number;
 }): Promise<AccountDomainResponse> => {
-  const response = await apiClient.get<AccountDomainResponse>(`/accounts/${account}/domains`);
+  const response = await apiClient.get<AccountDomainResponse>(`/accounts/${account}/domains`,
+    { params: { limit, offset } }
+  );
   return response.data;
 };

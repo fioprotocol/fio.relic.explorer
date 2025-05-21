@@ -85,9 +85,11 @@ const blockRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       const neighborsSqlQuery = `
-        (SELECT pk_block_number, 'prev' AS type FROM blocks WHERE pk_block_number < $1 ORDER BY pk_block_number DESC LIMIT 1)
-        UNION ALL
-        (SELECT pk_block_number, 'next' AS type FROM blocks WHERE pk_block_number > $1 ORDER BY pk_block_number ASC LIMIT 1)
+        SELECT * FROM (
+          (SELECT pk_block_number, 'prev' AS type FROM blocks WHERE pk_block_number < $1 ORDER BY pk_block_number DESC LIMIT 1)
+          UNION ALL
+          (SELECT pk_block_number, 'next' AS type FROM blocks WHERE pk_block_number > $1 ORDER BY pk_block_number ASC LIMIT 1)
+        ) adjacent_blocks
       `;
       const neighborsResult = await pool.query(neighborsSqlQuery, [block_number]);
 

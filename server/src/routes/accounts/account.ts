@@ -69,13 +69,18 @@ const accountRoute: FastifyPluginAsync = async (fastify) => {
             a.block_timestamp,
             a.public_key,
             a.fk_block_number,
-            COUNT(DISTINCT h.pk_handle_id) as handle_count,
-            COUNT(DISTINCT d.pk_domain_id) as domain_count
+            (
+              SELECT COUNT(*)
+              FROM handles h
+              WHERE h.fk_owner_account_id = a.pk_account_id
+            ) as handle_count,
+            (
+              SELECT COUNT(*)
+              FROM domains d
+              WHERE d.fk_owner_account_id = a.pk_account_id
+            ) as domain_count
           FROM accounts a
-          LEFT JOIN handles h ON a.pk_account_id = h.fk_owner_account_id
-          LEFT JOIN domains d ON a.pk_account_id = d.fk_owner_account_id
           WHERE a.account_name = $1
-          GROUP BY a.pk_account_id, a.account_name, a.fio_balance_suf, a.block_timestamp
         `,
         values: [account]
       };

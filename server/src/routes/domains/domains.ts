@@ -102,12 +102,14 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
           d.domain_status,
           a.account_name as owner_account_name,
           a.pk_account_id as owner_account_id,
-          COUNT(h.pk_handle_id) as handle_count
+          (
+            SELECT COUNT(*)
+            FROM handles h
+            WHERE h.fk_domain_id = d.pk_domain_id
+          ) as handle_count
         FROM domains d
         LEFT JOIN accounts a ON d.fk_owner_account_id = a.pk_account_id
-        LEFT JOIN handles h ON d.pk_domain_id = h.fk_domain_id
         WHERE d.domain_status = 'active'${only_public ? ' AND d.is_public = true' : ''}
-        GROUP BY d.pk_domain_id, d.domain_name, d.is_public, d.expiration_timestamp, d.domain_status, a.account_name, a.pk_account_id
         ORDER BY ${sort} ${order}
         LIMIT $1
         OFFSET $2
