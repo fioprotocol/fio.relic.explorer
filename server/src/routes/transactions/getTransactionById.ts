@@ -13,8 +13,8 @@ const getTransactionByIdRoute: FastifyPluginAsync = async (fastify) => {
         type: 'object',
         required: ['id'],
         properties: {
-          id: { type: 'string' }
-        }
+          id: { type: 'string' },
+        },
       },
       response: {
         200: {
@@ -34,27 +34,27 @@ const getTransactionByIdRoute: FastifyPluginAsync = async (fastify) => {
                 response_data: { type: 'string' },
                 result_status: { type: 'string' },
                 contract_action_name: { type: 'string' },
-                traces: { 
-                  type: 'array', 
-                  items: { 
+                traces: {
+                  type: 'array',
+                  items: {
                     type: 'object',
                     properties: {
                       account_name: { type: 'string' },
                       action_name: { type: 'string' },
-                      request_data: { type: 'string' }
-                    }
-                  } 
-                }
-              }
-            }
-          }
+                      request_data: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         404: {
           type: 'object',
           properties: {
-            error: { type: 'string' }
-          }
-        }
+            error: { type: 'string' },
+          },
+        },
       },
       tags: ['transactions'],
       summary: 'Get transaction by ID',
@@ -65,44 +65,72 @@ const getTransactionByIdRoute: FastifyPluginAsync = async (fastify) => {
   server.get('/', getTransactionByIdOpts, async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = request.params as { id: string };
 
-    const query = {
-      text: `
-        SELECT
-          t.transaction_id,
-          t.block_timestamp,
-          t.result_status,
-          t.action_name,
-          t.tpid,
-          t.fee,
-          t.request_data,
-          t.response_data,
-          t.fk_block_number as block_number,
-          a.account_name,
-          ac.account_name as contract_action_name,
-          (SELECT COALESCE(json_agg(json_build_object(
-            'account_name', acc.account_name,
-            'action_name', tr.action_name,
-            'request_data', tr.request_data
-          )), '[]'::json) 
-           FROM traces tr 
-           LEFT JOIN accounts acc ON tr.fk_action_account_id = acc.pk_account_id
-           WHERE t.pk_transaction_id = tr.fk_transaction_id) as traces
-        FROM transactions t
-        LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id
-        LEFT JOIN accounts ac ON t.fk_action_account_id = ac.pk_account_id
-        WHERE t.transaction_id = $1
-      `,
-      values: [id]
-    };
-    
-    const result = await pool.query(query);
-    
-    if (result.rows.length === 0) {
-      reply.code(404);
-      return { error: 'Transaction not found' };
-    }
+    try {
+      // First query: Get the basic transaction data
+      const transactionQuery = {
+        text: `
+          SELECT
+            t.transaction_id,
+            t.block_timestamp,
+            t.result_status,
+            t.action_name,
+            t.tpid,
+            t.fee,
+            t.request_data,
+            t.response_data,
+            t.fk_block_number as block_number,
+            t.pk_transaction_id,
+            a.account_name,
+            ac.account_name as contract_action_name
+          FROM transactions t
+          LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id
+          LEFT JOIN accounts ac ON t.fk_action_account_id = ac.pk_account_id
+          WHERE t.transaction_id = $1
+          LIMIT 1
+        `,
+        values: [id],
+      };
 
-    return { data: result.rows[0] as TransactionDetails };
+      const transactionResult = await pool.query(transactionQuery);
+
+      if (transactionResult.rows.length === 0) {
+        reply.code(404);
+        return { error: 'Transaction not found' };
+      }
+
+      const transaction = transactionResult.rows[0];
+
+      // Second query: Get the traces data separately
+      const tracesQuery = {
+        text: `
+          SELECT 
+            acc.account_name,
+            tr.action_name,
+            tr.request_data
+          FROM traces tr 
+          LEFT JOIN accounts acc ON tr.fk_action_account_id = acc.pk_account_id
+          WHERE tr.fk_transaction_id = $1
+        `,
+        values: [transaction.pk_transaction_id],
+      };
+
+      const tracesResult = await pool.query(tracesQuery);
+
+      // Format the response
+      const response = {
+        ...transaction,
+        traces: tracesResult.rows,
+      };
+
+      // Remove pk_transaction_id as it's not part of the response schema
+      delete response.pk_transaction_id;
+
+      return { data: response as TransactionDetails };
+    } catch (error) {
+      console.error('Error fetching transaction:', error);
+      reply.code(500);
+      return { error: 'Internal server error' };
+    }
   });
 };
 
