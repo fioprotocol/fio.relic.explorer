@@ -8,6 +8,7 @@ export const FIO_API_VERSION = 'v1';
 export const FIO_HYPERION_VERSION = 'v2';
 
 export const NODE_URLS = ['https://fio.eosusa.io/'];
+export const HISTORY_V2_SERVERS = ['https://fio.eosphere.io/'];
 
 export const FIO_CONTRACTS_MAP = {
   'fio.token': 'fio.token',

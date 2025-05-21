@@ -9,7 +9,6 @@ import { Account, AccountSortOption } from '@shared/types/accounts';
 import { ACCOUNT_SORT_OPTIONS } from '@shared/constants/accounts';
 
 type UseAccountsPageType = {
-  loading: boolean;
   stats: DataItem[];
   statsLoading: boolean;
   accounts: Account[];
@@ -67,7 +66,6 @@ export const useAccountsPageContext = (): UseAccountsPageType => {
   ];
 
   return {
-    loading: accountsLoading,
     stats,
     statsLoading,
     accounts: accounts || [],

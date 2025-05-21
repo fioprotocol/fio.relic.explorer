@@ -1,10 +1,10 @@
 import { FC } from 'react';
 import { Link } from 'react-router';
+import BigNumber from 'big.js';
 
 import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
 import { LoadableTable } from 'src/components/common/LoadableTable';
-import { Loader } from 'src/components/common/Loader';
 import { Alert } from 'src/components/common/Alert';
 
 import { formatDate } from 'src/utils/general';
@@ -42,18 +42,12 @@ const COLUMNS = [
 const ContractsPage: FC = () => {
   const { loading, fetched, proposals, paginationProps } = useMultiSigsPageContext();
 
-  if (!fetched) {
-    return (
-      <Container title="Multi-signature Proposals">
-        <Loader fullScreen className="my-5" />
-      </Container>
-    );
-  }
-
   return (
     <Container title="Multi-signature Proposals">
       <CardComponent title="Proposal Details" className="mb-3" useMobileStyle>
-        {proposals.length > 0 ? (
+        {!proposals.length && fetched ? (
+          <Alert variant="info" title="No data found" className="mt-5" hasDash={false} />
+        ) : (
           <LoadableTable
             columns={COLUMNS}
             data={proposals.map((proposal) => ({
@@ -67,7 +61,10 @@ const ContractsPage: FC = () => {
               ),
               status: (
                 <span>
-                  {proposal.requested_approvals.length} / {proposal.provided_approvals.length}
+                  {proposal.provided_approvals.length} /{' '}
+                  {new BigNumber(proposal.provided_approvals.length)
+                    .add(proposal.requested_approvals.length)
+                    .toString()}
                 </span>
               ),
               executed: proposal.executed ? 'Yes' : 'No',
@@ -93,8 +90,6 @@ const ContractsPage: FC = () => {
             loading={loading}
             {...paginationProps}
           />
-        ) : (
-          <Alert variant="info" title="No data found" className="mt-5" hasDash={false} />
         )}
       </CardComponent>
     </Container>

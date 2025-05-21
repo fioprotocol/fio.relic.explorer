@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { NODE_URLS, FIO_HYPERION_VERSION } from '@shared/constants/fio';
+import { HISTORY_V2_SERVERS, FIO_HYPERION_VERSION } from '@shared/constants/fio';
 import { Proposal, ProposalsResponse } from '@shared/types/hyperion';
 
 export const getMultiSigsData = async ({
@@ -13,7 +13,7 @@ export const getMultiSigsData = async ({
   const response = await axios.get<{
     proposals: Proposal[];
     total: { value: number; relation: string };
-  }>(`${NODE_URLS[0]}${FIO_HYPERION_VERSION}/state/get_proposals`, {
+  }>(`${HISTORY_V2_SERVERS[0]}${FIO_HYPERION_VERSION}/state/get_proposals`, {
     params: {
       limit,
       skip: offset,
@@ -30,7 +30,7 @@ export const getProposal = async ({ proposal }: { proposal: string }): Promise<P
   const response = await axios.get<{
     proposals: Proposal[];
     total: { value: number; relation: string };
-  }>(`${NODE_URLS[0]}${FIO_HYPERION_VERSION}/state/get_proposals`, {
+  }>(`${HISTORY_V2_SERVERS[0]}${FIO_HYPERION_VERSION}/state/get_proposals`, {
     params: {
       proposal,
     },
