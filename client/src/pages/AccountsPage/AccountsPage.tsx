@@ -58,7 +58,6 @@ const columns = [
 
 const AccountsPage: FC = () => {
   const {
-    loading,
     stats,
     statsLoading,
     accounts,

@@ -10,15 +10,19 @@ import { formatDate } from 'src/utils/general';
 import { Proposal } from '@shared/types/hyperion';
 import { BlocksDateResponse } from '@shared/types/blocks';
 
+type ProvidedApproval = {
+  account: string;
+  date: string;
+  executed: boolean;
+  originalTime?: string;
+};
+
 type UseProposalDetailsContext = {
   proposal_name?: string;
   proposal?: Proposal;
   block_date?: number;
-  requested_approvals: {
-    account: string;
-    date: string;
-    executed: boolean;
-  }[];
+  requested_approvals: ProvidedApproval[];
+  provided_approvals: ProvidedApproval[];
   loading?: boolean;
   error: Error | null;
 };
@@ -55,11 +59,20 @@ export const useProposalDetailsContext = (): UseProposalDetailsContext => {
       };
     }) || [];
 
+  const provided_approvals =
+    proposal?.provided_approvals.map((approval) => ({
+      account: approval.actor,
+      date: approval.time ? formatDate(approval.time) : '-',
+      executed: true,
+      originalTime: approval.time || '',
+    })) || [];
+
   return {
     proposal_name,
     proposal,
     block_date: blockDateResponse?.data?.[proposal?.block_num],
     requested_approvals,
+    provided_approvals,
     error,
     loading,
   };
