@@ -25,11 +25,15 @@
     "fastify-plugin": "5.0.1",
     "pg": "8.14.1",
     "pino": "9.6.0",
-    "pino-pretty": "13.0.0"
+    "pino-pretty": "13.0.0",
+    "ssh2": "1.15.0",
+    "tunnel-ssh": "5.0.6"
   },
   "devDependencies": {
     "@types/node": "22.13.13",
     "@types/pg": "8.10.9",
+    "@types/ssh2": "1.15.0",
+    "@types/tunnel-ssh": "5.0.4",
     "nodemon": "3.1.0",
     "tsconfig-paths": "4.2.0",
     "ts-node": "10.9.2"
