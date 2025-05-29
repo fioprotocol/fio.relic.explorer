@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import dotenv from 'dotenv';
 import { AddressInfo } from 'net';
 import config from './config';
-import pool from './config/database'; // Import the database pool
+import { getPool } from './config/database'; // Import the async pool getter
 
 // Load environment variables
 dotenv.config();
@@ -44,11 +44,12 @@ server.get('/', async () => {
 const start = async () => {
   try {
     // Test database connection before starting the server
+    const pool = await getPool();
     const client = await pool.connect();
     server.log.info('Successfully connected to the database');
     client.release();
   } catch (err) {
-    server.log.error(err);
+    server.log.error('Failed to connect to database:', err);
   }
 
   try {
