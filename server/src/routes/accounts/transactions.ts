@@ -82,7 +82,7 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
       const { limit, offset } = request.query;
 
       try {
-        // First get the account_id to avoid repeating this lookup
+        // First get the account_id
         const accountQuery = {
           text: 'SELECT pk_account_id FROM accounts WHERE account_name = $1',
           values: [account],
@@ -99,10 +99,10 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
         
         const accountId = accountResult.rows[0].pk_account_id;
         
-        // Efficient combined query with pagination at the database level
-        const paginatedTransactionsQuery = {
+        // Combined query with database-level pagination
+        const transactionsQuery = {
           text: `
-            WITH combined_txs AS (
+            WITH combined_transactions AS (
               -- Sender transactions
               SELECT 
                 t.pk_transaction_id,
@@ -112,7 +112,7 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                 t.fee,
                 t.request_data,
                 'SENDER' as transaction_type,
-                CAST(COALESCE(tt_sender.total_amount, NULL) AS TEXT) as fio_tokens
+                CAST(COALESCE(tt.total_amount, NULL) AS TEXT) as fio_tokens
               FROM transactions t
               LEFT JOIN (
                 SELECT 
@@ -121,7 +121,7 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                 FROM tokentransfers 
                 WHERE fk_payer_account_id = $1
                 GROUP BY fk_transaction_id
-              ) tt_sender ON t.pk_transaction_id = tt_sender.fk_transaction_id
+              ) tt ON t.pk_transaction_id = tt.fk_transaction_id
               WHERE t.fk_account_id = $1
               
               UNION ALL
@@ -135,9 +135,9 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                 t.fee,
                 t.request_data,
                 'RECEIVER' as transaction_type,
-                CAST(COALESCE(tt_receiver.total_amount, NULL) AS TEXT) as fio_tokens
-              FROM transactions t
-              JOIN accountactivities aa ON t.pk_transaction_id = aa.fk_transaction_id
+                CAST(COALESCE(tt.total_amount, NULL) AS TEXT) as fio_tokens
+              FROM accountactivities aa
+              JOIN transactions t ON aa.fk_transaction_id = t.pk_transaction_id
               LEFT JOIN (
                 SELECT 
                   fk_transaction_id, 
@@ -145,43 +145,41 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                 FROM tokentransfers 
                 WHERE fk_payee_account_id = $1
                 GROUP BY fk_transaction_id
-              ) tt_receiver ON t.pk_transaction_id = tt_receiver.fk_transaction_id
+              ) tt ON t.pk_transaction_id = tt.fk_transaction_id
               WHERE aa.fk_account_id = $1
+                AND t.fk_account_id != $1
             )
-            SELECT *
-            FROM combined_txs
+            SELECT * FROM combined_transactions
             ORDER BY pk_transaction_id DESC
             LIMIT $2 OFFSET $3
           `,
           values: [accountId, limit, offset],
         };
-        
-        // Get total counts more efficiently with materialized CTE
+
+        // Get total count efficiently
         const countQuery = {
           text: `
-            WITH sender_count AS MATERIALIZED (
-              SELECT COUNT(*) as count 
-              FROM transactions 
-              WHERE fk_account_id = $1
-            ),
-            receiver_count AS MATERIALIZED (
-              SELECT COUNT(*) as count
-              FROM accountactivities 
-              WHERE fk_account_id = $1
-            )
             SELECT 
-              (SELECT count FROM sender_count) +
-              (SELECT count FROM receiver_count) as total
+              (
+                SELECT COUNT(*) 
+                FROM transactions 
+                WHERE fk_account_id = $1
+              ) + 
+              (
+                SELECT COUNT(*) 
+                FROM accountactivities 
+                WHERE fk_account_id = $1
+              ) as total
           `,
           values: [accountId],
         };
 
-        // Execute queries in parallel
+        // Execute both queries in parallel
         const [transactionsResult, countResult] = await Promise.all([
-          pool.query(paginatedTransactionsQuery),
+          pool.query(transactionsQuery),
           pool.query(countQuery),
         ]);
-
+        
         return {
           transactions: transactionsResult.rows,
           total: parseInt(countResult.rows[0].total),
