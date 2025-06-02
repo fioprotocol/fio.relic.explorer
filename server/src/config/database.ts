@@ -61,11 +61,11 @@ const initializePool = async (): Promise<Pool> => {
   if (!signalHandlersRegistered) {
     signalHandlersRegistered = true;
     
-    // Handle process termination
-    process.on('SIGINT', async () => {
-      console.log('Received SIGINT, closing database pool and SSH tunnel...');
+    // Handle process termination - only in production or explicit shutdown
+    const handleShutdown = async (signal: string) => {
+      console.log(`Received ${signal}, closing database pool and SSH tunnel...`);
       try {
-        if (pool) {
+        if (pool && !(pool as any).ended) {
           await pool.end();
         }
         if (sshTunnel) {
@@ -77,24 +77,13 @@ const initializePool = async (): Promise<Pool> => {
         console.error('Error during cleanup:', error);
         process.exit(1);
       }
-    });
+    };
 
-    process.on('SIGTERM', async () => {
-      console.log('Received SIGTERM, closing database pool and SSH tunnel...');
-      try {
-        if (pool) {
-          await pool.end();
-        }
-        if (sshTunnel) {
-          await sshTunnel.disconnect();
-        }
-        console.log('Cleanup completed successfully');
-        process.exit(0);
-      } catch (error) {
-        console.error('Error during cleanup:', error);
-        process.exit(1);
-      }
-    });
+    // Only register signal handlers in production or when explicitly requested
+    if (process.env.NODE_ENV === 'production' || process.env.HANDLE_SIGNALS === 'true') {
+      process.on('SIGINT', () => handleShutdown('SIGINT'));
+      process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+    }
   }
 
   return pool;
@@ -102,7 +91,8 @@ const initializePool = async (): Promise<Pool> => {
 
 // Export a promise that resolves to the initialized pool
 export const getPool = async (): Promise<Pool> => {
-  if (!pool) {
+  if (!pool || (pool as any).ended) {
+    console.log('Initializing new database pool...');
     await initializePool();
   }
   return pool!; // We know pool is defined after initializePool
@@ -120,8 +110,9 @@ export const getPoolSync = (): Pool => {
 // For backward compatibility, create a proxy object that will work once pool is initialized
 const poolProxy = new Proxy({} as Pool, {
   get(target, prop) {
-    if (!pool) {
-      throw new Error('Database pool not initialized. Make sure to call getPool() first in your server startup.');
+    if (!pool || (pool as any).ended) {
+      // If pool is not initialized or has been ended, throw a clear error
+      throw new Error('Database pool not available. The pool may have been closed. Please restart the server.');
     }
     return (pool as any)[prop];
   }
