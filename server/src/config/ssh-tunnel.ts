@@ -172,17 +172,24 @@ class SSHTunnel {
 let sshTunnel: SSHTunnel | null = null;
 
 export const createSSHTunnel = (): SSHTunnel | null => {
-  if (!process.env.SSH_HOST || !process.env.SSH_KEY_URL) {
+  if (!process.env.SSH_HOST || (!process.env.SSH_KEY_URL && !process.env.SSH_TUNNEL_KEY)) {
     console.log('SSH configuration not provided, skipping SSH tunnel setup');
     return null;
   }
 
   if (!sshTunnel) {
+    const privateKey = process.env.SSH_KEY_URL || process.env.SSH_TUNNEL_KEY || '';
+    
+    if (!privateKey) {
+      console.log('SSH private key not provided, skipping SSH tunnel setup');
+      return null;
+    }
+
     const config: SSHTunnelConfig = {
       host: process.env.SSH_HOST,
       port: parseInt(process.env.SSH_PORT || '22'),
       username: process.env.SSH_USER || 'root',
-      privateKey: process.env.SSH_KEY_URL,
+      privateKey,
       passphrase: process.env.SSH_KEY_PASSPHRASE,
       dstHost: process.env.DB_HOST_REMOTE || process.env.DB_HOST || 'localhost',
       dstPort: parseInt(process.env.DB_PORT_REMOTE || process.env.DB_PORT || '5432'),
