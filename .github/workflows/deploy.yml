@@ -85,12 +85,24 @@ jobs:
           echo "CLIENT_URL=${CLIENT_URL}" >> $GITHUB_ENV
           PORT=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
           echo "PORT=${PORT}" >> $GITHUB_ENV
-          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST" --with-decryption --query "Parameter.Value" --output text)
-          echo "SSH_HOST=${SSH_HOST}" >> $GITHUB_ENV
+          SSH_HOST_REL=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST_REL" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_HOST_REL=${SSH_HOST_REL}" >> $GITHUB_ENV
           REACT_APP_BASE_URL=$(aws ssm get-parameter --name "/fio-relic/dev/REACT_APP_BASE_URL" --with-decryption --query "Parameter.Value" --output text)
           echo "REACT_APP_BASE_URL=${REACT_APP_BASE_URL}" >> $GITHUB_ENV
           aws ssm get-parameter --name "/fio-relic/dev/ssh_key" --with-decryption --query "Parameter.Value" --output text > ssh_key
           chmod 600 ssh_key
+          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_HOST=${SSH_HOST}" >> $GITHUB_ENV
+          SSH_PORT=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_PORT=${SSH_PORT}" >> $GITHUB_ENV
+          SSH_USER=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_USER" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_USER=${SSH_USER}" >> $GITHUB_ENV
+          DB_HOST_REMOTE=$(aws ssm get-parameter --name "/fio-relic/dev/DB_HOST_REMOTE" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_HOST_REMOTE=${DB_HOST_REMOTE}" >> $GITHUB_ENV
+          DB_PORT_REMOTE=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PORT_REMOTE" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_PORT_REMOTE=${DB_PORT_REMOTE}" >> $GITHUB_ENV
+          SSH_KEY_URL=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_KEY_URL" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_KEY_URL=${SSH_KEY_URL}" >> $GITHUB_ENV
       - name: Use the secret
         run: |
           echo "Secret value1 is $HOST"
@@ -101,7 +113,7 @@ jobs:
           envsubst < ansible/roles/fio-server/templates/fio-client.env.j2.tmp > ansible/roles/fio-server/templates/fio-client.env.j2
       - name: SSH to EC2 and run command
         run: |
-          ssh -o StrictHostKeyChecking=no -i ssh_key root@$SSH_HOST "\
+          ssh -o StrictHostKeyChecking=no -i ssh_key root@$SSH_HOST_REL "\
             aws ecr get-login-password --region us-west-2 | \
             docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client && \
             aws ecr get-login-password --region us-west-2 | \
