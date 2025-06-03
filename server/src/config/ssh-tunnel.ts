@@ -16,6 +16,51 @@ interface SSHTunnelConfig {
   localPort?: number;
 }
 
+/**
+ * Utility function to detect and decode base64 encoded SSH keys
+ * @param keyString - The SSH key string that might be base64 encoded
+ * @returns The decoded SSH key string
+ */
+const decodeSSHKey = (keyString: string): string => {
+  // If it's already a regular SSH key or file path, return as-is
+  if (keyString.includes('-----BEGIN') || 
+      keyString.includes('ssh-rsa') || 
+      keyString.includes('ssh-ed25519') ||
+      keyString.includes('/') ||  // likely a file path
+      keyString.includes('\\')) { // Windows file path
+    return keyString;
+  }
+  
+  // Clean the string (remove whitespace and newlines)
+  const cleanedKey = keyString.replace(/\s+/g, '');
+  
+  // Check if it looks like base64 (length divisible by 4, valid base64 characters)
+  const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
+  
+  if (cleanedKey.length > 0 && cleanedKey.length % 4 === 0 && base64Regex.test(cleanedKey)) {
+    try {
+      const decoded = Buffer.from(cleanedKey, 'base64').toString('utf8');
+      
+      // Verify the decoded content looks like an SSH key
+      if (decoded.includes('-----BEGIN') || 
+          decoded.includes('ssh-rsa') || 
+          decoded.includes('ssh-ed25519')) {
+        console.log('Successfully decoded base64 SSH key');
+        return decoded;
+      } else {
+        console.log('Decoded base64 but content doesn\'t look like SSH key, using original');
+        return keyString;
+      }
+    } catch (error) {
+      console.warn('Failed to decode as base64, using key as-is:', error);
+      return keyString;
+    }
+  }
+  
+  // If it doesn't look like base64, return as-is
+  return keyString;
+};
+
 class SSHTunnel {
   private tunnel: any = null;
   private config: SSHTunnelConfig;
@@ -44,14 +89,17 @@ class SSHTunnel {
       this.isConnecting = true;
       console.log('Establishing SSH tunnel...');
       
+      // Decode the private key if it's base64 encoded
+      const decodedPrivateKey = decodeSSHKey(this.config.privateKey);
+      
       // Read private key from file or use the key directly
       let privateKey: Buffer;
       try {
         // Try to read as file path first
-        privateKey = readFileSync(this.config.privateKey);
+        privateKey = readFileSync(decodedPrivateKey);
       } catch (error) {
         // If reading as file fails, treat it as the key content itself
-        privateKey = Buffer.from(this.config.privateKey, 'utf8');
+        privateKey = Buffer.from(decodedPrivateKey, 'utf8');
       }
 
       // Tunnel options (first argument)
