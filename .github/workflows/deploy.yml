@@ -101,8 +101,8 @@ jobs:
           echo "DB_HOST_REMOTE=${DB_HOST_REMOTE}" >> $GITHUB_ENV
           DB_PORT_REMOTE=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PORT_REMOTE" --with-decryption --query "Parameter.Value" --output text)
           echo "DB_PORT_REMOTE=${DB_PORT_REMOTE}" >> $GITHUB_ENV
-          SSH_KEY_URL=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_KEY_URL" --with-decryption --query "Parameter.Value" --output text)
-          echo "SSH_KEY_URL=${SSH_KEY_URL}" >> $GITHUB_ENV
+          SSH_TUNNEL_KEY=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_TUNNEL_KEY" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_TUNNEL_KEY=${SSH_TUNNEL_KEY}" >> $GITHUB_ENV
       - name: Use the secret
         run: |
           echo "Secret value1 is $HOST"
