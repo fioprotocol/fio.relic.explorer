@@ -66,12 +66,22 @@ class SSHTunnel {
   private config: SSHTunnelConfig;
   private localPort: number = 0;
   private isConnecting: boolean = false;
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 5;
+  private reconnectDelay: number = 2000; // Start with 2 seconds
+  private maxReconnectDelay: number = 30000; // Max 30 seconds
+  private reconnectTimer: NodeJS.Timeout | null = null;
+  private isDestroyed: boolean = false;
 
   constructor(config: SSHTunnelConfig) {
     this.config = config;
   }
 
   async connect(): Promise<number> {
+    if (this.isDestroyed) {
+      throw new Error('SSH tunnel has been destroyed');
+    }
+
     if (this.tunnel) {
       console.log('SSH tunnel already established on port', this.localPort);
       return this.localPort;
@@ -79,7 +89,7 @@ class SSHTunnel {
 
     if (this.isConnecting) {
       console.log('SSH tunnel connection already in progress, waiting...');
-      while (this.isConnecting) {
+      while (this.isConnecting && !this.isDestroyed) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
       return this.localPort;
@@ -87,7 +97,7 @@ class SSHTunnel {
 
     try {
       this.isConnecting = true;
-      console.log('Establishing SSH tunnel...');
+      console.log(`Establishing SSH tunnel... (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
       
       // Decode the private key if it's base64 encoded
       const decodedPrivateKey = decodeSSHKey(this.config.privateKey);
@@ -122,6 +132,7 @@ class SSHTunnel {
         passphrase: this.config.passphrase,
         keepaliveInterval: 5000,
         keepaliveCountMax: 3,
+        readyTimeout: 20000, // Increased timeout
       };
 
       // Forward options (fourth argument) - forwarding configuration
@@ -141,30 +152,128 @@ class SSHTunnel {
       console.log(`SSH tunnel established successfully on local port ${this.localPort}`);
       console.log(`Forwarding localhost:${this.localPort} -> ${this.config.host}:${this.config.port} -> ${this.config.dstHost}:${this.config.dstPort}`);
       
+      // Reset reconnection state on successful connection
+      this.reconnectAttempts = 0;
+      this.reconnectDelay = 2000;
+      
+      // Clear any pending reconnection timer
+      if (this.reconnectTimer) {
+        clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = null;
+      }
+      
       // Handle tunnel events
       server.on('error', (err: Error) => {
         console.error('SSH tunnel server error:', err);
+        this.handleConnectionError(err);
+      });
+
+      server.on('close', () => {
+        console.log('SSH tunnel server closed');
+        this.handleConnectionClose();
       });
 
       conn.on('error', (err: Error) => {
         console.error('SSH tunnel connection error:', err);
+        this.handleConnectionError(err);
       });
 
       conn.on('end', () => {
         console.log('SSH tunnel connection ended');
-        this.tunnel = null;
+        this.handleConnectionClose();
+      });
+
+      conn.on('close', () => {
+        console.log('SSH tunnel connection closed');
+        this.handleConnectionClose();
       });
 
       return this.localPort;
     } catch (error) {
       console.error('Failed to establish SSH tunnel:', error);
+      this.handleConnectionError(error as Error);
       throw error;
     } finally {
       this.isConnecting = false;
     }
   }
 
+  private handleConnectionError(error: Error): void {
+    if (this.isDestroyed) return;
+    
+    console.error('SSH tunnel connection error, will attempt to reconnect:', error.message);
+    this.cleanup();
+    this.scheduleReconnect();
+  }
+
+  private handleConnectionClose(): void {
+    if (this.isDestroyed) return;
+    
+    console.log('SSH tunnel connection closed, will attempt to reconnect');
+    this.cleanup();
+    this.scheduleReconnect();
+  }
+
+  private cleanup(): void {
+    if (this.tunnel) {
+      try {
+        if (this.tunnel.server && !this.tunnel.server.destroyed) {
+          this.tunnel.server.close();
+        }
+        if (this.tunnel.conn && !this.tunnel.conn.destroyed) {
+          this.tunnel.conn.end();
+        }
+      } catch (error) {
+        console.warn('Error during tunnel cleanup:', error);
+      }
+      this.tunnel = null;
+    }
+    this.localPort = 0;
+  }
+
+  private scheduleReconnect(): void {
+    if (this.isDestroyed || this.isConnecting || this.reconnectTimer) {
+      return;
+    }
+
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error(`Maximum reconnection attempts (${this.maxReconnectAttempts}) reached. SSH tunnel will not reconnect automatically.`);
+      return;
+    }
+
+    this.reconnectAttempts++;
+    
+    console.log(`Scheduling SSH tunnel reconnection in ${this.reconnectDelay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    
+    this.reconnectTimer = setTimeout(async () => {
+      this.reconnectTimer = null;
+      
+      try {
+        await this.connect();
+      } catch (error) {
+        console.error('Reconnection attempt failed:', error);
+        
+        // Exponential backoff with jitter
+        this.reconnectDelay = Math.min(
+          this.maxReconnectDelay,
+          this.reconnectDelay * 2 + Math.random() * 1000
+        );
+        
+        // Schedule next attempt
+        this.scheduleReconnect();
+      }
+    }, this.reconnectDelay);
+  }
+
   async disconnect(): Promise<void> {
+    this.isDestroyed = true;
+    
+    // Clear any pending reconnection
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
     if (!this.tunnel) {
       return;
     }
@@ -197,22 +306,37 @@ class SSHTunnel {
         }, 5000))
       ]);
       
-      this.tunnel = null;
-      this.localPort = 0;
+      this.cleanup();
       
       console.log('SSH tunnel closed successfully');
     } catch (error) {
       console.error('Error closing SSH tunnel:', error);
+      this.cleanup(); // Ensure cleanup even if there's an error
       throw error;
     }
   }
 
   isConnected(): boolean {
-    return this.tunnel !== null;
+    return this.tunnel !== null && !this.isDestroyed;
   }
 
   getLocalPort(): number {
     return this.localPort;
+  }
+
+  // Method to manually trigger reconnection
+  async reconnect(): Promise<number> {
+    console.log('Manual reconnection requested');
+    this.cleanup();
+    this.reconnectAttempts = 0;
+    this.reconnectDelay = 2000;
+    
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    
+    return this.connect();
   }
 }
 
