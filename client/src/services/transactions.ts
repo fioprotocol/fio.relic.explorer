@@ -1,8 +1,26 @@
-import { Transaction, TransactionResponse, TransactionStats } from '@shared/types/transactions';
+import {
+  Transaction,
+  TransactionResponse,
+  CursorTransactionResponse,
+  TransactionStats,
+} from '@shared/types/transactions';
+import { PaginationDirection } from '@shared/constants/pagination';
+
 import { apiClient } from './api-client';
 
-export const getTransactions = async (params: { offset: number, limit: number, block_number: number }): Promise<TransactionResponse> => {
-  const response = await apiClient.get<TransactionResponse>('/transactions', { params });
+// Implementation
+export const getTransactions = async (params: {
+  offset?: number;
+  cursor?: string;
+  direction?: PaginationDirection;
+  limit?: number;
+  block_number?: number;
+  include_total?: boolean;
+}): Promise<TransactionResponse | CursorTransactionResponse> => {
+  const response = await apiClient.get<TransactionResponse | CursorTransactionResponse>(
+    '/transactions',
+    { params }
+  );
   return response.data;
 };
 

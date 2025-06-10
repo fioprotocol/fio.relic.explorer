@@ -5,8 +5,9 @@ import { ActionButton } from 'src/components/common/ActionButton/ActionButton';
 import { Pagination } from 'src/components/common/Pagination';
 import { Loader } from 'src/components/common/Loader';
 import { AnyObject } from '@shared/types/general';
-import { UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import { PaginationProps } from 'src/hooks/usePaginationData';
 import { CardComponent } from 'src/components/layout/CardComponent';
+import { PAGINATION_MODES } from '@shared/constants/pagination';
 
 type LoadableTableProps = {
   actionButtonText?: string;
@@ -15,7 +16,6 @@ type LoadableTableProps = {
   columns: { key: string; title: string }[];
   data: AnyObject[];
   emptyState?: ReactNode;
-  loading?: boolean;
   onActionButtonClick?: () => void;
   showActionButton?: boolean;
   title?: string;
@@ -24,7 +24,7 @@ type LoadableTableProps = {
   header?: ReactNode;
   // Pagination props
   showPagination?: boolean;
-} & Partial<UsePaginationDefaultProps>;
+} & PaginationProps;
 
 export const LoadableTable: FC<LoadableTableProps> = ({
   actionButtonText,
@@ -41,6 +41,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   header,
   // Pagination props
   showPagination = true,
+  useCursorPagination = false,
   ...paginationProps
 }) => {
   // Show loading state or empty state if needed
@@ -60,7 +61,13 @@ export const LoadableTable: FC<LoadableTableProps> = ({
       {loading && <Loader absolute fullScreen />}
       {displayEmptyState}
 
-      {showPagination && <Pagination {...paginationProps} />}
+      {showPagination && (
+        <Pagination
+          {...paginationProps}
+          mode={useCursorPagination ? PAGINATION_MODES.CURSOR : PAGINATION_MODES.OFFSET}
+          loading={loading}
+        />
+      )}
 
       {showActionButton && <ActionButton onClick={onActionButtonClick} name={actionButtonText} />}
     </div>

@@ -1,28 +1,27 @@
 import { getTransactions } from 'src/services/transactions';
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import {
+  useCursorPaginationData,
+  UseCursorPaginationReturn,
+} from 'src/hooks/useCursorPaginationData';
 import { transformTransactions } from 'src/utils/transactions';
 
 import { TransformedTransaction, Transaction } from '@shared/types/transactions';
 
-
 type UseTxComponentContext = {
   transactions: TransformedTransaction[];
-} & UsePaginationDefaultProps;
+} & Omit<UseCursorPaginationReturn<Transaction>, 'data' | 'otherData'>;
 
 export const useTxComponentContext = (): UseTxComponentContext => {
-  const { 
-    data,
-    ...paginationProps
-  } = usePaginationData<Transaction>({
+  const { data, otherData, ...cursorPaginationProps } = useCursorPaginationData<Transaction>({
     action: getTransactions,
     dataKey: 'transactions',
   });
 
-  const transactions: TransformedTransaction[] = 
-    data?.map(dataItem => transformTransactions(dataItem)) || [];
+  const transactions: TransformedTransaction[] =
+    data?.map((dataItem) => transformTransactions(dataItem)) || [];
 
-  return { 
+  return {
     transactions,
-    ...paginationProps,
+    ...cursorPaginationProps,
   };
 };
