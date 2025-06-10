@@ -1,4 +1,5 @@
 import { TRANSACTION_TYPE } from '../constants/transaction';
+import { CursorResponse } from './general';
 
 export type Transaction = {
   pk_transaction_id: string;
@@ -20,6 +21,11 @@ export type TransactionResponse = {
   transactions: Transaction[];
   total: number;
 };
+
+// Cursor-based pagination response
+export type CursorTransactionResponse = CursorResponse<{
+  transactions: Transaction[];
+}>;
 
 export type TransformedTransaction = {
   id: string;

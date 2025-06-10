@@ -19,6 +19,22 @@ export type UsePaginationDefaultProps = {
   goToPage?: (page: number) => void;
 };
 
+export interface CursorPaginationProps {
+  hasNextPage?: boolean;
+  hasPrevPage?: boolean;
+  goToNext?: () => void;
+  goToPrev?: () => void;
+  goToFirst?: () => void;
+  goToLast?: () => void;
+}
+
+// Combined pagination props for both offset and cursor pagination
+export type PaginationProps = Partial<UsePaginationDefaultProps> &
+  Partial<CursorPaginationProps> & {
+    loading?: boolean;
+    useCursorPagination?: boolean;
+  };
+
 export type UsePaginationDataReturn<T, O = AnyObject> = {
   data: T[];
   loading: boolean;
@@ -27,7 +43,7 @@ export type UsePaginationDataReturn<T, O = AnyObject> = {
   otherData: O | null;
   total: number | null;
   reset?: () => void;
-} & UsePaginationDefaultProps;
+} & PaginationProps;
 
 const PAGE_PARAM_NAME = QUERY_PARAMS_NAMES.PAGE;
 
@@ -143,10 +159,12 @@ export const usePaginationData = <T, O = AnyObject>({
     loading,
     fetched,
     error,
+    total,
+    reset,
+    // Pagination props
+    useCursorPagination: false,
     currentPage,
     totalPages,
-    total,
     goToPage,
-    reset,
   };
 };
