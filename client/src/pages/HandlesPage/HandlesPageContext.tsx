@@ -1,6 +1,9 @@
 import { getHandles } from 'src/services/handles';
 
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import {
+  useCursorPaginationData,
+  UseCursorPaginationReturn,
+} from 'src/hooks/useCursorPaginationData';
 
 import { Handle } from '@shared/types/handles';
 
@@ -8,20 +11,22 @@ type UseHandlesPageContext = {
   handles: Handle[];
   total: number;
   totalActive: number;
-  loading?: boolean;
-  paginationProps: UsePaginationDefaultProps;
-};
+} & Omit<UseCursorPaginationReturn<Handle>, 'data' | 'otherData'>;
 
 export const useHandlesPageContext = (): UseHandlesPageContext => {
-  const { data, otherData, ...paginationProps } = usePaginationData<
+  const { data, otherData, ...cursorPaginationProps } = useCursorPaginationData<
     Handle,
     { all: number; active: number }
-  >({ action: getHandles });
+  >({
+    action: getHandles,
+    dataKey: 'data',
+    params: { include_total: true },
+  });
 
   return {
     handles: data || [],
     total: otherData?.all || 0,
     totalActive: otherData?.active || 0,
-    paginationProps,
+    ...cursorPaginationProps,
   };
 };

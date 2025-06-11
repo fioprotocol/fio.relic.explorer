@@ -1,4 +1,5 @@
-import { PubAddress } from "./pub-address";
+import { PubAddress } from './pub-address';
+import { CursorResponse } from './general';
 
 export interface Handle {
   pk_handle_id: number;
@@ -48,6 +49,13 @@ export interface HandlesResponse {
   all: number;
   active: number;
 }
+
+// Cursor-based pagination response for handles
+export type CursorHandlesResponse = CursorResponse<{
+  data: Handle[];
+  all?: number;
+  active?: number;
+}>;
 
 export interface HandleResponse {
   handle: Handle;
