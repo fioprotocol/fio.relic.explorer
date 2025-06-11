@@ -1,12 +1,24 @@
 import { apiClient } from './api-client';
 
-import { Handle, HandlesResponse, HandleTransactionsResponse } from '@shared/types/handles';
+import {
+  Handle,
+  HandlesResponse,
+  CursorHandlesResponse,
+  HandleTransactionsResponse,
+} from '@shared/types/handles';
+import { PaginationDirection } from '@shared/constants/pagination';
 
+// Implementation
 export const getHandles = async (params: {
-  offset: number;
-  limit: number;
-}): Promise<HandlesResponse> => {
-  const response = await apiClient.get<HandlesResponse>('/handles', { params });
+  offset?: number;
+  cursor?: string;
+  direction?: PaginationDirection;
+  limit?: number;
+  include_total?: boolean;
+}): Promise<HandlesResponse | CursorHandlesResponse> => {
+  const response = await apiClient.get<HandlesResponse | CursorHandlesResponse>('/handles', {
+    params,
+  });
   return response.data;
 };
 
