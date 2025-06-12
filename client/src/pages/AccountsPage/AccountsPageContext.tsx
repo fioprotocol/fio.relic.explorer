@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { DataItem } from 'src/components/common/DataTile';
 import { useGetData } from 'src/hooks/useGetData';
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import {
+  useCursorPaginationData,
+  UseCursorPaginationReturn,
+} from 'src/hooks/useCursorPaginationData';
 import { getAccountStats, AccountStatsResponse } from 'src/services/fio-protocol';
 import { getAccounts } from 'src/services/accounts';
 import { formatTokenValue } from 'src/utils/general';
@@ -12,12 +15,10 @@ type UseAccountsPageType = {
   stats: DataItem[];
   statsLoading: boolean;
   accounts: Account[];
-  accountsLoading: boolean;
   totalAccounts: number;
   sort: AccountSortOption;
   setSort: (option: AccountSortOption) => void;
-  paginationProps: UsePaginationDefaultProps;
-};
+} & Omit<UseCursorPaginationReturn<Account>, 'data' | 'otherData'>;
 
 export const useAccountsPageContext = (): UseAccountsPageType => {
   const [sort, setSort] = useState<AccountSortOption>(ACCOUNT_SORT_OPTIONS.ACCOUNT_ID);
@@ -28,14 +29,12 @@ export const useAccountsPageContext = (): UseAccountsPageType => {
 
   const {
     data: accounts,
-    loading: accountsLoading,
-    total,
-    ...paginationProps
-  } = usePaginationData<Account>({
+    otherData,
+    ...cursorPaginationProps
+  } = useCursorPaginationData<Account, { total: number }>({
     action: getAccounts,
-    params: {
-      sort,
-    },
+    params: { sort, include_total: true },
+    dataKey: 'data',
   });
 
   const stats: DataItem[] = [
@@ -69,10 +68,9 @@ export const useAccountsPageContext = (): UseAccountsPageType => {
     stats,
     statsLoading,
     accounts: accounts || [],
-    accountsLoading,
-    totalAccounts: total || 0,
+    totalAccounts: otherData?.total || 0,
     sort,
     setSort,
-    paginationProps,
+    ...cursorPaginationProps,
   };
 };
