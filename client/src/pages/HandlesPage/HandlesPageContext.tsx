@@ -16,7 +16,7 @@ type UseHandlesPageContext = {
 export const useHandlesPageContext = (): UseHandlesPageContext => {
   const { data, otherData, ...cursorPaginationProps } = useCursorPaginationData<
     Handle,
-    { all: number; active: number }
+    { total: number; active: number }
   >({
     action: getHandles,
     dataKey: 'data',
@@ -25,7 +25,7 @@ export const useHandlesPageContext = (): UseHandlesPageContext => {
 
   return {
     handles: data || [],
-    total: otherData?.all || 0,
+    total: otherData?.total || 0,
     totalActive: otherData?.active || 0,
     ...cursorPaginationProps,
   };
