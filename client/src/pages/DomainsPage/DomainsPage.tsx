@@ -67,16 +67,8 @@ const DomainsPage: React.FC = () => {
     setOnlyPublic,
     sort,
     setSort,
-    paginationProps,
+    ...paginationProps
   } = useDomainsPageContext();
-
-  if (domains.length === 0 && loading) {
-    return (
-      <Container className="py-5">
-        <Loader fullScreen noBg />
-      </Container>
-    );
-  }
 
   return (
     <Container className="py-3 py-md-5">
@@ -84,11 +76,11 @@ const DomainsPage: React.FC = () => {
       <div className="d-flex justify-content-start align-items-start align-items-md-center gap-2 gap-md-3 text-secondary flex-wrap mb-3 mb-md-0">
         <div className="d-flex justify-content-between align-items-center gap-1 pe-5 pe-md-0 flex-grow-1 flex-sm-grow-0">
           <span>Registered Domains:</span>
-          <span className="text-dark">{total}</span>
+          <span className="text-dark">{loading ? <Loader /> : total}</span>
         </div>
         <div className="d-flex justify-content-between align-items-center gap-1 pe-5 pe-md-0 flex-grow-1 flex-sm-grow-0">
           <span>Active Domains:</span>
-          <span className="text-dark">{totalActive}</span>
+          <span className="text-dark">{loading ? <Loader /> : totalActive}</span>
         </div>
       </div>
       <LoadableTable

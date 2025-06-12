@@ -1,22 +1,34 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 
-import pool from 'src/config/database';
+import { CursorPagination } from 'src/utils/cursorPagination';
 
 import {
   DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
   DEFAULT_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
-import { DomainsResponse } from '@shared/types/domains';
+import { CursorDomainsResponse, Domain, DomainSortOption } from '@shared/types/domains';
+import { PAGINATION_DIRECTIONS, PaginationDirection } from '@shared/constants/pagination';
 
 interface DomainsQuery {
   Querystring: {
     offset?: number;
     limit?: number;
     order?: 'asc' | 'desc';
-    sort?: 'pk_domain_id' | 'domain_name' | 'expiration_timestamp';
+    sort?: DomainSortOption;
     only_public?: boolean;
+    cursor?: string;
+    direction?: PaginationDirection;
+    include_total?: boolean;
   };
 }
+
+const getSortField = (sort: string) => {
+  // Defensive: only allow known fields
+  if (['pk_domain_id', 'domain_name', 'expiration_timestamp', 'handle_count'].includes(sort)) {
+    return sort;
+  }
+  return 'pk_domain_id';
+};
 
 const blocksRoute: FastifyPluginAsync = async (fastify) => {
   // Cast instance to use the type provider
@@ -27,10 +39,18 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          offset: { type: 'number', default: 0 },
+          // Cursor-based pagination
+          cursor: { type: 'string' },
+          direction: {
+            type: 'string',
+            enum: [PAGINATION_DIRECTIONS.NEXT, PAGINATION_DIRECTIONS.PREV],
+            default: PAGINATION_DIRECTIONS.NEXT,
+          },
+          // Common parameters
           limit: {
-            type: 'number',
+            type: 'integer',
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
+            minimum: 1,
             maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
           },
           order: { type: 'string', enum: ['asc', 'desc'] },
@@ -40,6 +60,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
             enum: ['pk_domain_id', 'handle_count', 'expiration_timestamp'],
           },
           only_public: { type: 'boolean', default: false },
+          include_total: { type: 'boolean', default: false },
         },
       },
       response: {
@@ -62,39 +83,54 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
                 },
               },
             },
+            hasNextPage: { type: 'boolean' },
+            hasPrevPage: { type: 'boolean' },
+            nextCursor: { type: ['string', 'null'] },
+            prevCursor: { type: ['string', 'null'] },
             total: { type: 'number' },
-            all: { type: 'number' },
             active: { type: 'number' },
           },
+          required: [
+            'data',
+            'hasNextPage',
+            'hasPrevPage',
+            'nextCursor',
+            'prevCursor',
+            'total',
+            'active',
+          ],
         },
       },
       tags: ['domain'],
-      summary: 'Domains',
-      description: 'Get domains',
+      summary: 'Get domains with cursor pagination',
+      description: 'Get domains using cursor-based pagination for optimal performance',
     },
   };
 
   server.get<DomainsQuery>(
     '/',
     getDomainsOpts,
-    async (
-      request: FastifyRequest<DomainsQuery>,
-      reply: FastifyReply
-    ): Promise<DomainsResponse> => {
+    async (request: FastifyRequest<DomainsQuery>, reply: FastifyReply) => {
       const {
-        offset = 0,
+        cursor,
+        direction = PAGINATION_DIRECTIONS.NEXT,
         limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+        order,
         sort = 'pk_domain_id',
         only_public = false,
       } = request.query;
 
-      let order = request.query.order;
-      if (!order) {
-        order = sort === 'expiration_timestamp' ? 'asc' : 'desc';
+      let resolvedOrder = order;
+      if (!resolvedOrder) {
+        resolvedOrder = sort === 'expiration_timestamp' ? 'asc' : 'desc';
       }
 
-      const sqlQuery = `
-        SELECT
+      try {
+        const sortField = getSortField(sort);
+        const whereClause = `domain_status = 'active'${only_public ? ' AND is_public = true' : ''}`;
+
+        // Handle handle_count sort specially
+        const selectColumns = `
           d.pk_domain_id,
           d.domain_name,
           d.is_public,
@@ -107,52 +143,93 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
             FROM handles h
             WHERE h.fk_domain_id = d.pk_domain_id
           ) as handle_count
-        FROM domains d
-        LEFT JOIN accounts a ON d.fk_owner_account_id = a.pk_account_id
-        WHERE d.domain_status = 'active'${only_public ? ' AND d.is_public = true' : ''}
-        ORDER BY ${sort} ${order}
-        LIMIT $1
-        OFFSET $2
-      `;
+        `;
 
-      // Query for total count
-      const countQuery = {
-        text: `
-        SELECT COUNT(*) as total
-        FROM domains
-        WHERE domain_status = 'active'${only_public ? ' AND is_public = true' : ''}
-      `,
-        values: [],
-      };
-      const allQuery = {
-        text: `
-        SELECT COUNT(*) as total
-        FROM domains
-      `,
-        values: [],
-      };
-      const activeQuery = {
-        text: `
-        SELECT COUNT(*) as total
-        FROM domains
-        WHERE domain_status = 'active'
-      `,
-        values: [],
-      };
+        const joinClause = 'LEFT JOIN accounts a ON d.fk_owner_account_id = a.pk_account_id';
 
-      const [handlesResult, countResult, allResult, activeResult] = await Promise.all([
-        pool.query(sqlQuery, [limit, offset]),
-        pool.query(countQuery),
-        pool.query(allQuery),
-        pool.query(activeQuery),
-      ]);
+        // For handle_count sorting, we need to use a subquery in the ORDER BY
+        const cursorColumn =
+          sort === 'handle_count'
+            ? '(SELECT COUNT(*) FROM handles h WHERE h.fk_domain_id = d.pk_domain_id)'
+            : sort === 'expiration_timestamp'
+              ? `d.${sortField}, d.pk_domain_id`
+              : `d.${sortField}`;
 
-      return {
-        data: handlesResult.rows,
-        total: parseInt(countResult.rows[0].total),
-        all: parseInt(allResult.rows[0].total),
-        active: parseInt(activeResult.rows[0].total),
-      };
+        // Parse cursor if it exists
+        let parsedCursor = cursor;
+        if (cursor) {
+          try {
+            if (cursor.trim().startsWith('{')) {
+              const cursorObj = JSON.parse(cursor);
+              parsedCursor = cursorObj.sortValue;
+            } else {
+              // Cursor passed as raw value (e.g., timestamp string)
+              parsedCursor = cursor;
+            }
+          } catch (e) {
+            console.error('Error parsing cursor:', e);
+            throw new Error('Invalid cursor format');
+          }
+        }
+
+        // Get total counts first
+        const [total, active] = await Promise.all([
+          CursorPagination.getTotalCount({
+            table: 'domains d',
+          }),
+          CursorPagination.getTotalCount({
+            table: 'domains',
+            whereClause: "domain_status = 'active'",
+          }),
+        ]);
+
+        const result = await CursorPagination.paginate<Domain>({
+          table: 'domains d',
+          cursorColumn,
+          orderDirection: resolvedOrder.toUpperCase() as 'ASC' | 'DESC',
+          limit,
+          cursor: parsedCursor,
+          direction,
+          whereClause,
+          selectColumns,
+          joinClause,
+          resultField: sort,
+          isTimestampSort: sort === 'expiration_timestamp',
+        });
+
+        // Format cursors for response
+        let nextCursor = result.nextCursor;
+        let prevCursor = result.prevCursor;
+        if (nextCursor) {
+          const lastRow = result.data[result.data.length - 1];
+          nextCursor = JSON.stringify({
+            sortValue: nextCursor,
+            pk_domain_id: lastRow.pk_domain_id,
+          });
+        }
+        if (prevCursor) {
+          const firstRow = result.data[0];
+          prevCursor = JSON.stringify({
+            sortValue: prevCursor,
+            pk_domain_id: firstRow.pk_domain_id,
+          });
+        }
+
+        const response: CursorDomainsResponse = {
+          data: result.data,
+          hasNextPage: result.hasNextPage,
+          hasPrevPage: result.hasPrevPage,
+          nextCursor,
+          prevCursor,
+          total,
+          active,
+        };
+
+        return reply.send(response);
+      } catch (error) {
+        console.error('Error in domains pagination:', error);
+        return reply.code(500).send({ error: 'An error occurred while fetching domains' });
+      }
     }
   );
 };

@@ -1,6 +1,6 @@
 import { getDomains } from 'src/services/domains';
 
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import { useCursorPaginationData, UseCursorPaginationReturn } from 'src/hooks/useCursorPaginationData';
 
 import { Domain, DomainSortOption } from '@shared/types/domains';
 import { useState } from 'react';
@@ -13,28 +13,31 @@ type UseDomainsPageContext = {
   setOnlyPublic: (onlyPublic: boolean) => void;
   sort: DomainSortOption;
   setSort: (sort: DomainSortOption) => void;
-  loading?: boolean;
-  paginationProps: UsePaginationDefaultProps;
-};
+  loading: boolean;
+} & Omit<UseCursorPaginationReturn<Domain>, 'data' | 'otherData'>;
 
 export const useDomainsPageContext = (): UseDomainsPageContext => {
   const [onlyPublic, setOnlyPublic] = useState(true);
   const [sort, setSort] = useState<DomainSortOption>('pk_domain_id');
 
-  const { data, otherData, loading, ...paginationProps } = usePaginationData<
+  const { data, otherData, loading, ...cursorPaginationProps } = useCursorPaginationData<
     Domain,
-    { all: number; active: number }
-  >({ action: getDomains, params: { only_public: onlyPublic, sort } });
+    { total: number; active: number }
+  >({
+    action: getDomains,
+    dataKey: 'data',
+    params: { only_public: onlyPublic, sort, include_total: true },
+  });
 
   return {
     domains: data || [],
-    total: otherData?.all || 0,
+    total: otherData?.total || 0,
     totalActive: otherData?.active || 0,
     onlyPublic,
     setOnlyPublic,
     sort,
     setSort,
     loading,
-    paginationProps,
+    ...cursorPaginationProps,
   };
 };
