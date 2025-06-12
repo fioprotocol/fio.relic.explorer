@@ -16,6 +16,7 @@ export interface CursorPaginationOptions {
   joinClause?: string;
   resultField?: string;
   isTimestampSort?: boolean;
+  cursorExpression?: string;
 }
 
 export interface CursorPaginationResult<T> extends CursorResponse<{ data: T[] }> {
@@ -86,7 +87,8 @@ export class CursorPagination {
       selectColumns = '*',
       joinClause = '',
       resultField,
-      isTimestampSort = false
+      isTimestampSort = false,
+      cursorExpression,
     } = options;
 
     // For last page (PREV without cursor), we need to get the total count first
@@ -145,7 +147,7 @@ export class CursorPagination {
     // Rest of the pagination logic for normal cases
     const { condition: cursorCondition, values: cursorValues } = this.buildCursorCondition({
       cursor,
-      cursorColumn,
+      cursorColumn: cursorExpression || cursorColumn,
       orderDirection,
       direction,
       paramOffset: whereValues.length,

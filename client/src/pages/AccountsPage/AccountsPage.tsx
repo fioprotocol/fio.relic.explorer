@@ -13,6 +13,7 @@ import { ROUTES } from 'src/constants/routes';
 
 import { AccountSortOption } from '@shared/types/accounts';
 import { ACCOUNT_SORT_OPTIONS } from '@shared/constants/accounts';
+import { Loader } from 'src/components/common/Loader';
 
 const SORT_OPTIONS: SortOption<AccountSortOption>[] = [
   {
@@ -57,37 +58,30 @@ const columns = [
 ];
 
 const AccountsPage: FC = () => {
-  const {
-    stats,
-    statsLoading,
-    accounts,
-    accountsLoading,
-    totalAccounts,
-    sort,
-    setSort,
-    paginationProps
-  } = useAccountsPageContext();
+  const { stats, statsLoading, accounts, totalAccounts, sort, setSort, ...paginationProps } =
+    useAccountsPageContext();
 
   const data = useMemo(() => {
     return accounts.map((account) => ({
       key: account.pk_account_id,
       account: (
-        <Link to={`${ROUTES.accounts.path}/${account.account_name}`}>
-          {account.account_name}
-        </Link>
+        <Link to={`${ROUTES.accounts.path}/${account.account_name}`}>{account.account_name}</Link>
       ),
       handles: account.handle_count,
       domains: account.domain_count,
-      fioBalance: <Badge variant='white'>{account.fio_balance_suf}</Badge>,
-      creationDate: <Badge variant='white'>{formatDate(account.block_timestamp)}</Badge>,
+      fioBalance: <Badge variant="white">{account.fio_balance_suf}</Badge>,
+      creationDate: <Badge variant="white">{formatDate(account.block_timestamp)}</Badge>,
     }));
   }, [accounts]);
 
   return (
     <Container className="py-3 py-md-5">
       <h4 className="mb-4">Accounts</h4>
-      <p className="f-size-sm">
-        Account Holders: <span className="text-dark fw-bold">{totalAccounts}</span>
+      <p className="f-size-sm d-flex align-items-center gap-2">
+        Account Holders:{' '}
+        <span className="text-dark fw-bold">
+          {paginationProps?.loading && !accounts?.length ? <Loader /> : totalAccounts}
+        </span>
       </p>
       <DataTile items={stats} columns={3} loading={statsLoading} />
       <LoadableTable
@@ -95,17 +89,12 @@ const AccountsPage: FC = () => {
           <div className="d-flex justify-content-between align-items-center gap-1 flex-wrap">
             <div className="text-nowrap">All Accounts</div>
             <div className="d-flex justify-content-md-between justify-content-end align-items-center gap-2 gap-md-5 flex-wrap">
-              <SortDropdown
-                options={SORT_OPTIONS}
-                currentSort={sort}
-                onSortChange={setSort}
-              />
+              <SortDropdown options={SORT_OPTIONS} currentSort={sort} onSortChange={setSort} />
             </div>
           </div>
         }
         columns={columns}
         data={data}
-        loading={accountsLoading}
         {...paginationProps}
         showInCardComponent
         className="mb-5"

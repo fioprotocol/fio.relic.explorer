@@ -1,5 +1,6 @@
 import { ACCOUNT_SORT_OPTIONS } from '@shared/constants/accounts';
 import { TransactionType } from './transactions';
+import { CursorResponse } from './general';
 
 export interface Account {
   pk_account_id: number;
@@ -24,6 +25,9 @@ export interface AccountsResponse {
   data: Account[];
   total: number;
 }
+
+// Cursor-based pagination response for accounts
+export type CursorAccountsResponse = CursorResponse<{ data: Account[] }>;
 
 export type AccountTransaction = {
   action_name: string;
