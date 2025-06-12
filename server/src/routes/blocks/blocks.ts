@@ -1,31 +1,36 @@
-import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+// import { FromSchema } from 'json-schema-to-ts';
 
 import pool from 'src/config/database';
-
+// import { Block } from '../../types';
 import {
   DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
   DEFAULT_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
-import { BlocksResponse } from '@shared/types/blocks';
+import { Block, CursorBlocksResponse } from '@shared/types/blocks';
+import { PAGINATION_DIRECTIONS, PaginationDirection } from '@shared/constants/pagination';
+import { CursorPagination } from 'src/utils/cursorPagination';
 
-interface BlocksQuery {
+interface CursorPaginationQuery {
   Querystring: {
-    offset?: number;
+    cursor?: string;
+    direction?: PaginationDirection;
     limit?: number;
   };
 }
 
-const blocksRoute: FastifyPluginAsync = async (fastify) => {
-  // Cast instance to use the type provider
-  const server = fastify.withTypeProvider();
-
-  // Health check endpoint
-  const getBlocksOpts: RouteShorthandOptions = {
+const blocksRoutes = async (fastify: FastifyInstance) => {
+  const getBlocksOpts = {
     schema: {
       querystring: {
         type: 'object',
         properties: {
-          offset: { type: 'number', default: 0 },
+          cursor: { type: 'string' },
+          direction: {
+            type: 'string',
+            enum: [PAGINATION_DIRECTIONS.NEXT, PAGINATION_DIRECTIONS.PREV],
+            default: PAGINATION_DIRECTIONS.NEXT,
+          },
           limit: {
             type: 'number',
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
@@ -42,120 +47,95 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
               items: {
                 type: 'object',
                 properties: {
-                  pk_block_number: { type: 'number' },
+                  pk_block_number: { type: 'string' },
                   stamp: { type: 'string' },
                   block_id: { type: 'string' },
                   producer_account_name: { type: 'string' },
                   schedule_version: { type: 'number' },
-                  transaction_count: { type: 'number' },
+                  transactions_count: { type: 'number' },
                 },
               },
             },
+            total: { type: 'number' },
             current_block: {
               type: 'object',
               properties: {
-                pk_block_number: { type: 'number' },
+                pk_block_number: { type: 'string' },
                 stamp: { type: 'string' },
                 block_id: { type: 'string' },
                 producer_account_name: { type: 'string' },
                 schedule_version: { type: 'number' },
-                transaction_count: { type: 'number' },
+                transactions_count: { type: 'number' },
               },
+              nullable: true,
             },
-            total: { type: 'number' },
+            hasNextPage: { type: 'boolean' },
+            hasPrevPage: { type: 'boolean' },
+            nextCursor: { type: ['string', 'null'] },
+            prevCursor: { type: ['string', 'null'] },
           },
         },
       },
-      tags: ['block'],
+      tags: ['blocks'],
       summary: 'Blocks',
-      description: 'Get blocks',
+      description: 'Get blocks list with cursor pagination',
     },
   };
 
-  server.get<BlocksQuery>(
+  fastify.get(
     '/',
     getBlocksOpts,
-    async (request: FastifyRequest<BlocksQuery>, reply: FastifyReply): Promise<BlocksResponse> => {
-      const { offset = 0, limit = DEFAULT_REQUEST_ITEMS_LIMIT } = request.query;
+    async (
+      request: FastifyRequest<CursorPaginationQuery>,
+      reply: FastifyReply
+    ): Promise<CursorBlocksResponse> => {
+      const {
+        cursor,
+        direction = PAGINATION_DIRECTIONS.NEXT,
+        limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+      } = request.query;
 
-      // pagination here implemented by pk_block_number calculations assuming that
-      // pk_block_number is increamenting by 1 from 1 to MAX(pk_block_number) and there would be no deletions.
-      // COUNT(*) executes too long when we have such amount of data (hundreds of millions)
-      // todo: check if there could be missing records and if they could be deleted. 
-      // if so we need to create one more table to store count and update it using triggers.
-      const sqlQuery = `
-        SELECT
-          b.pk_block_number,
-          b.stamp,
-          b.block_id,
-          b.producer_account_name,
-          b.schedule_version,
-          (
-            SELECT COUNT(*)
-            FROM transactions t
-            WHERE t.fk_block_number = b.pk_block_number
-          ) as transactions_count
-        FROM
-          blocks b
-        WHERE
-          b.pk_block_number <= (SELECT MAX(pk_block_number) - $2 FROM blocks)
-        GROUP BY
-          b.pk_block_number,
-          b.stamp,
-          b.block_id,
-          b.producer_account_name,
-          b.schedule_version
-        ORDER BY
-          b.pk_block_number DESC
-        LIMIT $1
+      const selectColumns = `
+        b.pk_block_number,
+        b.stamp,
+        b.block_id,
+        b.producer_account_name,
+        b.schedule_version,
+        (SELECT COUNT(*) FROM transactions t WHERE t.fk_block_number = b.pk_block_number) as transactions_count
       `;
 
-       const countQuery = {
-        text: `
-        SELECT MAX(pk_block_number) as total
-        FROM blocks
-      `,
-        values: [],
-      };
+      // Pre-fetch total count using MAX() for performance
+      const totalQuery = `SELECT MAX(pk_block_number) as total FROM blocks`;
+      const totalResult = await pool.query(totalQuery);
+      const total = parseInt(totalResult.rows[0].total);
 
-      // Query for total count
-      const currentBlockQuery = {
-        text: `
-        SELECT
-          b.pk_block_number,
-          b.stamp,
-          b.block_id,
-          b.producer_account_name,
-          b.schedule_version,
-          (
-            SELECT COUNT(*)
-            FROM transactions t
-            WHERE t.fk_block_number = b.pk_block_number
-          ) as transaction_count
-        FROM
-          blocks b
-        ORDER BY
-          b.pk_block_number DESC
-        LIMIT 1
-      `,
-        values: [],
-      };
+      // Fetch the current block and the paginated data in parallel
+      const currentBlockQuery = `SELECT ${selectColumns} FROM blocks b ORDER BY b.pk_block_number DESC LIMIT 1`;
 
-      const [countResult, result, currentBlockResult] = await Promise.all([
-        pool.query(countQuery),
-        pool.query(sqlQuery, [limit, offset]),
-        offset === 0 ? Promise.resolve({ rows: [] }) : pool.query(currentBlockQuery),
+      const [result, currentBlockResult] = await Promise.all([
+        CursorPagination.paginate<Block>({
+          table: 'blocks b',
+          cursorColumn: 'b.pk_block_number',
+          orderDirection: 'DESC',
+          limit,
+          cursor,
+          direction,
+          selectColumns,
+        }),
+        pool.query(currentBlockQuery),
       ]);
 
-      const total = parseInt(countResult.rows[0].total);
-
       return {
-        data: result.rows,
-        current_block: offset === 0 ? result.rows[0] : currentBlockResult.rows[0],
+        data: result.data,
+        hasNextPage: result.hasNextPage,
+        hasPrevPage: result.hasPrevPage,
+        nextCursor: result.nextCursor,
+        prevCursor: result.prevCursor,
         total,
+        current_block: currentBlockResult.rows[0],
       };
     }
   );
 };
 
-export default blocksRoute;
+export default blocksRoutes;

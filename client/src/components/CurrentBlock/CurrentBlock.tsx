@@ -11,24 +11,27 @@ import { ROUTES } from 'src/constants/routes';
 import { Producer } from 'src/services/bpmonitor';
 import { Block } from '@shared/types/blocks';
 
-const CurrentBlock: React.FC<{ currentBlock: Block; producer?: Producer }> = ({
-  currentBlock,
-  producer,
-}) => {
+const CurrentBlock: React.FC<{
+  currentBlock: Block | undefined;
+  producer?: Producer;
+  loading: boolean;
+}> = ({ currentBlock, producer, loading }) => {
   return (
     <DataTile
       title="Current block"
       items={[
         {
           title: 'Block Number',
-          value: formatBlockNumber(currentBlock.pk_block_number),
+          value: currentBlock?.pk_block_number
+            ? formatBlockNumber(currentBlock.pk_block_number)
+            : 'N/A',
         },
         {
           title: 'Producer',
           value: (
             <ProducerTile
               name={producer?.candidate_name}
-              account={currentBlock.producer_account_name}
+              account={currentBlock?.producer_account_name || 'N/A'}
               handle={producer?.fio_address}
             />
           ),
@@ -36,24 +39,30 @@ const CurrentBlock: React.FC<{ currentBlock: Block; producer?: Producer }> = ({
         },
         {
           title: 'Transactions',
-          value: currentBlock.transaction_count,
+          value: currentBlock?.transactions_count || 'N/A',
           narrowWidth: true,
         },
         {
           title: 'Date',
-          value: formatDate(currentBlock.stamp),
+          value: currentBlock?.stamp ? formatDate(currentBlock.stamp) : 'N/A',
         },
         {
           title: 'Block ID',
-          value: (
-            <Link to={`${ROUTES.blocks.path}/${currentBlock.pk_block_number}`} className="word-break-all">
+          value: currentBlock?.pk_block_number ? (
+            <Link
+              to={`${ROUTES.blocks.path}/${currentBlock.pk_block_number}`}
+              className="word-break-all"
+            >
               {currentBlock.block_id}
             </Link>
+          ) : (
+            'N/A'
           ),
           wideWidth: true,
         },
       ]}
       columns={3}
+      loading={loading}
     />
   );
 };

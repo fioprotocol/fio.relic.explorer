@@ -91,55 +91,48 @@ export class CursorPagination {
       cursorExpression,
     } = options;
 
-    // For last page (PREV without cursor), we need to get the total count first
+    // Optimized "last page" query (PREV without cursor)
     if (direction === PAGINATION_DIRECTIONS.PREV && !cursor) {
-      const totalCount = await this.getTotalCount({
-        table,
-        whereClause,
-        whereValues,
-        joinClause
-      });
-
-      // Calculate the offset to get the last page
-      const offset = Math.max(0, totalCount - limit);
+      const oppositeOrderDirection = orderDirection === 'ASC' ? 'DESC' : 'ASC';
+      const lastPageOrderByClause = cursorColumn.includes(', ')
+        ? cursorColumn.split(', ').map(col => `${col} ${oppositeOrderDirection}`).join(', ')
+        : `${cursorColumn} ${oppositeOrderDirection}`;
       
-      // For last page, we need to use the original order
       const query = `
-        SELECT ${selectColumns}
-        FROM ${table} ${joinClause}
-        ${whereClause ? `WHERE ${whereClause}` : ''}
-        ORDER BY ${cursorColumn.split(', ').join(` ${orderDirection}, `)} ${orderDirection}
-        LIMIT ${limit}
-        OFFSET ${offset}
-      `;
+          SELECT ${selectColumns}
+          FROM ${table} ${joinClause}
+          ${whereClause ? `WHERE ${whereClause}` : ''}
+          ORDER BY ${lastPageOrderByClause}
+          LIMIT ${limit}
+        `;
+      
+      const { rows } = await pool.query(query, whereValues);
+      const data = rows.reverse(); // Reverse to get the correct order for the user
 
-      const result = await pool.query(query, whereValues);
-      let rows = result.rows as T[];
+      const hasNextPage = false; // This is the last page
+      const hasPrevPage = data.length > 0; // If we got results, assume there could be more before them
 
-      // Handle cursor extraction for composite columns
-      let prevCursorValue: string | null = null;
-      if (offset > 0 && rows.length > 0) {
-        if (cursorColumn.includes(', ') && isTimestampSort) {
-          const [timestampCol, idCol] = cursorColumn.split(', ');
-          const timestampField = timestampCol.split('.').pop()!;
-          const idField = idCol.split('.').pop()!;
-          const firstRow = rows[0] as Record<string, unknown>;
-
-          prevCursorValue = JSON.stringify({
-            sortValue: firstRow[timestampField],
-            pk_domain_id: firstRow[idField]
-          });
-        } else {
-          prevCursorValue = this.extractCursorValue(rows[0] as Record<string, unknown>, cursorColumn, resultField);
-        }
+      // Cursors need to be calculated for potential navigation away from this last page
+      const { prevCursor, nextCursor } = this.calculateLastPageCursors({
+        rows: data,
+        cursorColumn,
+        resultField,
+        isTimestampSort,
+      });
+      
+      // We can get totalCount for free here in most cases if needed, but not required by this path.
+      // To be consistent, we should still try to get it if the user requested.
+      let totalCount: number | undefined;
+      if (whereClause) { // Only count if there's a filter, otherwise it is too slow
+          totalCount = await this.getTotalCount({ table, whereClause, whereValues, joinClause });
       }
 
       return {
-        data: rows,
-        hasNextPage: false,
-        hasPrevPage: offset > 0,
-        nextCursor: null,
-        prevCursor: prevCursorValue,
+        data,
+        hasNextPage,
+        hasPrevPage,
+        nextCursor, 
+        prevCursor,
         totalCount
       };
     }
@@ -471,12 +464,12 @@ export class CursorPagination {
   /**
    * Extract cursor value from a row
    */
-  private static extractCursorValue(row: Record<string, unknown>, cursorColumn: string, resultField?: string): string | null {
+  private static extractCursorValue(row: Record<string, unknown>, cursorColumn: string, cursorExpression?: string): string | null {
     if (!row) return null;
 
     // For subquery columns, use the provided result field name
     const columnName = cursorColumn.startsWith('(')
-      ? (resultField || cursorColumn.split(' ').pop()!.replace(/[()]/g, ''))
+      ? (cursorExpression || cursorColumn.split(' ').pop()!.replace(/[()]/g, ''))
       : cursorColumn.split('.').pop()!;
 
     const value = row[columnName];
@@ -487,5 +480,49 @@ export class CursorPagination {
     }
 
     return String(value);
+  }
+
+  /**
+   * Helper to calculate cursors for the special "last page" case.
+   */
+  private static calculateLastPageCursors<T>(params: {
+    rows: T[],
+    cursorColumn: string,
+    resultField?: string,
+    isTimestampSort?: boolean
+  }): { prevCursor: string | null, nextCursor: string | null } {
+    const { rows, cursorColumn, resultField, isTimestampSort } = params;
+    if (rows.length === 0) {
+      return { prevCursor: null, nextCursor: null };
+    }
+
+    const firstRow = rows[0] as Record<string, unknown>;
+    const lastRow = rows[rows.length - 1] as Record<string, unknown>;
+
+    let firstCursor: string | null;
+    let lastCursor: string | null;
+
+    if (cursorColumn.includes(', ') && isTimestampSort) {
+      const [timestampCol, idCol] = cursorColumn.split(', ');
+      const timestampField = timestampCol.split('.').pop()!;
+      const idField = idCol.split('.').pop()!;
+      
+      firstCursor = JSON.stringify({
+        sortValue: firstRow[timestampField],
+        pk_domain_id: firstRow[idField]
+      });
+      lastCursor = JSON.stringify({
+        sortValue: lastRow[timestampField],
+        pk_domain_id: lastRow[idField]
+      });
+    } else {
+      firstCursor = this.extractCursorValue(firstRow, cursorColumn, resultField);
+      lastCursor = this.extractCursorValue(lastRow, cursorColumn, resultField);
+    }
+
+    // From the perspective of the last page:
+    // The "previous" cursor points to the start of the current view, allowing you to go further back.
+    // The "next" cursor points to the end of the current view, allowing you to go forward again.
+    return { prevCursor: firstCursor, nextCursor: lastCursor };
   }
 } 

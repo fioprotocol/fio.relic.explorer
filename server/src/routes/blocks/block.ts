@@ -38,7 +38,7 @@ const blockRoute: FastifyPluginAsync = async (fastify) => {
                     block_id: { type: 'string' },
                     producer_account_name: { type: 'string' },
                     schedule_version: { type: 'number' },
-                    transaction_count: { type: 'number' },
+                    transactions_count: { type: 'number' },
                   },
                 },
                 previous_block_number: { type: 'number' },
@@ -71,7 +71,7 @@ const blockRoute: FastifyPluginAsync = async (fastify) => {
               SELECT COUNT(*)
               FROM transactions t
               WHERE t.fk_block_number = b.pk_block_number
-            ) as transaction_count
+            ) as transactions_count
           FROM
             blocks b
           WHERE

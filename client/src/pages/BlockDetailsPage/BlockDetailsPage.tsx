@@ -106,7 +106,7 @@ const BlockDetailsPage: React.FC = () => {
               },
               {
                 title: 'Transactions',
-                value: block.transaction_count,
+                value: block?.transactions_count || 'N/A',
               },
             ]}
           />
