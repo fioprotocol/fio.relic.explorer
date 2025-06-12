@@ -46,14 +46,12 @@ export interface HandleTransaction {
 export interface HandlesResponse {
   data: Handle[];
   total: number;
-  all: number;
   active: number;
 }
 
 // Cursor-based pagination response for handles
 export type CursorHandlesResponse = CursorResponse<{
   data: Handle[];
-  all?: number;
   active?: number;
 }>;
 
