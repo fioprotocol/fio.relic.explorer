@@ -77,12 +77,12 @@ const AccountsPage: FC = () => {
   return (
     <Container className="py-3 py-md-5">
       <h4 className="mb-4">Accounts</h4>
-      <p className="f-size-sm d-flex align-items-center gap-2">
+      <div className="f-size-sm d-flex align-items-center gap-2 mb-3">
         Account Holders:{' '}
         <span className="text-dark fw-bold">
           {paginationProps?.loading && !accounts?.length ? <Loader /> : totalAccounts}
         </span>
-      </p>
+      </div>
       <DataTile items={stats} columns={3} loading={statsLoading} />
       <LoadableTable
         header={

@@ -1,20 +1,22 @@
 import {
   Block,
-  BlocksResponse,
   CurrentBlockResponse,
   BlockResponse,
   BlockResponseData,
   BlocksDateResponse,
+  CursorBlocksResponse,
 } from '@shared/types/blocks';
 
 import { apiClient } from './api-client';
+import { PaginationDirection } from '@shared/constants/pagination';
 
 export const getBlocks = async (params: {
-  offset: number;
-  limit: number;
-}): Promise<BlocksResponse> => {
-  const response = await apiClient.get<BlocksResponse>('/blocks', { params });
-  return response.data;
+  cursor?: string;
+  direction?: PaginationDirection;
+  limit?: number;
+}): Promise<CursorBlocksResponse> => {
+  const { data } = await apiClient.get<CursorBlocksResponse>('/blocks', { params });
+  return data;
 };
 
 export const getCurrent = async (): Promise<Block> => {

@@ -1,24 +1,38 @@
+import {
+  useCursorPaginationData,
+  UseCursorPaginationReturn,
+} from 'src/hooks/useCursorPaginationData';
 import { getBlocks } from 'src/services/blocks';
-
-import useProducers from 'src/hooks/useProducers';
-
 import { Block } from '@shared/types/blocks';
+import useProducers from 'src/hooks/useProducers';
 import { ProducerMap } from 'src/services/bpmonitor';
 
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
 type UseBlocksPageContext = {
   blocks: Block[];
+  blocksLoading: boolean;
   currentBlock?: Block;
   producers: ProducerMap;
-  loading?: boolean;
-} & UsePaginationDefaultProps;
+  totalBlocks: number;
+} & Omit<UseCursorPaginationReturn<Block>, 'data' | 'otherData' | 'loading'>;
 
 export const useBlocksPageContext = (): UseBlocksPageContext => {
   const { producers } = useProducers();
-  const { data, otherData, ...paginationProps } = usePaginationData<
-    Block,
-    { current_block: Block }
-  >({ action: getBlocks });
+  const {
+    data: blocks,
+    otherData,
+    loading,
+    ...cursorPaginationProps
+  } = useCursorPaginationData<Block, { total: number; current_block: Block }>({
+    action: getBlocks,
+    dataKey: 'data',
+  });
 
-  return { blocks: data, currentBlock: otherData?.current_block, producers, ...paginationProps };
+  return {
+    blocks: blocks || [],
+    blocksLoading: loading,
+    currentBlock: otherData?.current_block,
+    producers,
+    totalBlocks: otherData?.total || 0,
+    ...cursorPaginationProps,
+  };
 };
