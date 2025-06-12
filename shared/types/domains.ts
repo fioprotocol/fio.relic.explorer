@@ -1,4 +1,5 @@
 import { Handle } from './handles';
+import { CursorResponse } from './general';
 
 export interface Domain {
   pk_domain_id: number;
@@ -29,7 +30,7 @@ export type DomainSortOption =
 export interface DomainsResponse {
   data: Domain[];
   total: number;
-  all: number;
+
   active: number;
 }
 
@@ -53,4 +54,15 @@ export interface DomainTransactionsResponse {
 export interface DomainHandlesResponse {
   handles: Handle[];
   total: number;
+}
+
+// Cursor-based pagination response for domains
+export interface CursorDomainsResponse {
+  data: Domain[];
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  nextCursor: string | null;
+  prevCursor: string | null;
+  total: number;
+  active: number;
 }

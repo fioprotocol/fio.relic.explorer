@@ -1,18 +1,29 @@
 import { apiClient } from './api-client';
 
-import { Domain, DomainsResponse, DomainTransactionsResponse } from '@shared/types/domains';
+import {
+  Domain,
+  DomainsResponse,
+  CursorDomainsResponse,
+  DomainTransactionsResponse,
+  DomainSortOption,
+} from '@shared/types/domains';
 import { Handle } from '@shared/types/handles';
+import { PaginationDirection } from '@shared/constants/pagination';
 
-export const getDomains = async (params: {
-  offset: number;
-  limit: number;
-  order: 'asc' | 'desc';
-  sort: 'pk_domain_id' | 'domain_name' | 'expiration_timestamp';
-  only_public: boolean;
-}): Promise<DomainsResponse> => {
-  const response = await apiClient.get<DomainsResponse>('/domains', { params });
+export async function getDomains(params: {
+  cursor?: string;
+  direction?: PaginationDirection;
+  limit?: number;
+  order?: 'asc' | 'desc';
+  sort?: DomainSortOption;
+  only_public?: boolean;
+  include_total?: boolean;
+}): Promise<DomainsResponse | CursorDomainsResponse> {
+  const response = await apiClient.get<DomainsResponse | CursorDomainsResponse>('/domains', {
+    params,
+  });
   return response.data;
-};
+}
 
 export const getDomain = async ({ domain }: { domain: string }): Promise<Domain> => {
   const { data } = await apiClient.get<Domain>(`/domains/${domain}`);

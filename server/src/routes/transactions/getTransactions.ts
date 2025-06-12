@@ -197,12 +197,12 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
         // Optionally get total count (expensive operation)
         let total: number | undefined;
         if (include_total) {
-          total = await CursorPagination.getTotalCount(
-            'transactions t',
+          total = await CursorPagination.getTotalCount({
+            table: 'transactions t',
             whereClause,
             whereValues,
-            'LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id'
-          );
+            joinClause: 'LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id'
+        });
         }
 
         const response: CursorTransactionResponse = {
