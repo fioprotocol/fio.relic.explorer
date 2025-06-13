@@ -26,17 +26,20 @@ const HANDLES_TABLE_COLUMNS = [
 ];
 
 export const RegisteredHandles: FC<{ domain: string }> = ({ domain }) => {
-  const { handles, loading, paginationData } = useRegisteredHandlesContext({ domain });
+  const { handles, loading, paginationData, error } = useRegisteredHandlesContext({ domain });
 
   if (!handles) return <Loader />;
-  if (!handles.length)
+  if (!handles.length && !error && !loading)
     return (
       <Alert
         variant="danger"
         title="No Registered FIO Handles"
-        message="There are no registered FIO Handles associated with this FIO Handle."
+        message="There are no registered FIO Handles associated with this FIO Domain."
       />
     );
+
+  if (error)
+    return <Alert variant="danger" title="Error fetching FIO Handles" message={error.message} />;
 
   return (
     <LoadableTable

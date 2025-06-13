@@ -90,7 +90,7 @@ const domainRoute: FastifyPluginAsync = async (fastify) => {
       const domainResult = await pool.query(sqlQuery, [domain]);
 
       if (domainResult.rows.length === 0) {
-        return reply.status(404).send({ error: 'Handle not found' });
+        return reply.status(404).send({ message: `Domain ${domain} not found` });
       }
 
       const chainData = await getTableRows<FioChainDomain>(setTableRowsParams(domain));

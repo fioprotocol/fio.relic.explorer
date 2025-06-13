@@ -1,4 +1,5 @@
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import { useCursorPaginationData } from 'src/hooks/useCursorPaginationData';
+import { PaginationProps } from 'src/hooks/usePaginationData';
 import { getDomainTransactions } from 'src/services/domains';
 
 import { DomainTransaction } from '@shared/types/domains';
@@ -6,7 +7,7 @@ import { DomainTransaction } from '@shared/types/domains';
 type UseTransactionsContext = {
   transactions?: DomainTransaction[];
   loading: boolean;
-  paginationData: UsePaginationDefaultProps;
+  paginationData: Partial<PaginationProps>;
 };
 
 export const useTransactionsContext = ({ domain }: { domain: string }): UseTransactionsContext => {
@@ -15,11 +16,10 @@ export const useTransactionsContext = ({ domain }: { domain: string }): UseTrans
     fetched,
     loading,
     ...paginationData
-  } = usePaginationData<DomainTransaction>({
-    dataKey: 'transactions',
+  } = useCursorPaginationData<DomainTransaction>({
+    dataKey: 'data',
     action: getDomainTransactions,
     params: { domain },
-    withNavigation: false,
   });
 
   return {

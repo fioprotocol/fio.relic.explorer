@@ -4,11 +4,12 @@ import {
   Domain,
   DomainsResponse,
   CursorDomainsResponse,
-  DomainTransactionsResponse,
   DomainSortOption,
 } from '@shared/types/domains';
-import { Handle } from '@shared/types/handles';
+import { CursorHandlesResponse } from '@shared/types/handles';
 import { PaginationDirection } from '@shared/constants/pagination';
+import { DomainTransaction } from '@shared/types/domains';
+import { CursorResponse } from '@shared/types/general';
 
 export async function getDomains(params: {
   cursor?: string;
@@ -31,24 +32,45 @@ export const getDomain = async ({ domain }: { domain: string }): Promise<Domain>
   return data;
 };
 
-export const getDomainHandles = async ({ domain }: { domain: string }): Promise<Handle[]> => {
-  const { data } = await apiClient.get<Handle[]>(`/domains/${domain}/handles`);
+export const getDomainHandles = async ({
+  domain,
+  limit,
+  cursor,
+  direction,
+}: {
+  domain: string;
+  limit?: number;
+  cursor?: string;
+  direction?: PaginationDirection;
+}): Promise<CursorHandlesResponse> => {
+  const { data } = await apiClient.get<CursorHandlesResponse>(`/domains/${domain}/handles`, {
+    params: {
+      limit,
+      cursor,
+      direction,
+    },
+  });
 
   return data;
 };
 
+// Cursor-based domain transactions
+export type CursorDomainTransactionsResponse = CursorResponse<{ data: DomainTransaction[] }>;
+
 export const getDomainTransactions = async ({
   domain,
-  offset,
   limit,
+  cursor,
+  direction,
 }: {
   domain: string;
-  offset?: number;
   limit?: number;
-}): Promise<DomainTransactionsResponse> => {
-  const { data } = await apiClient.get<DomainTransactionsResponse>(
+  cursor?: string;
+  direction?: PaginationDirection;
+}): Promise<CursorDomainTransactionsResponse> => {
+  const { data } = await apiClient.get<CursorDomainTransactionsResponse>(
     `/domains/${domain}/transactions`,
-    { params: { offset, limit } }
+    { params: { limit, cursor, direction } }
   );
 
   return data;

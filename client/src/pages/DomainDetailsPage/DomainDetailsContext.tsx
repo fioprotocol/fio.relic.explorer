@@ -16,7 +16,10 @@ type UseDomainDetailsContext = {
 
 export const useDomainDetailsContext = (): UseDomainDetailsContext => {
   const { id: domain } = useParams();
-  const { response, loading, error } = useGetData<DomainResponse>({ action: getDomain, params: { domain } });
+  const { response, loading, error } = useGetData<DomainResponse>({
+    action: getDomain,
+    params: { domain },
+  });
 
   return {
     domainParam: domain,

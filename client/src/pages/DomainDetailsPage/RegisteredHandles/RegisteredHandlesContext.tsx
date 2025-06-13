@@ -1,12 +1,14 @@
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import { useCursorPaginationData } from 'src/hooks/useCursorPaginationData';
+import { PaginationProps } from 'src/hooks/usePaginationData';
 import { getDomainHandles } from 'src/services/domains';
 
 import { Handle } from '@shared/types/handles';
 
 type UseRegisteredHandlesContext = {
+  error: Error | null;
   handles?: Handle[];
   loading: boolean;
-  paginationData: UsePaginationDefaultProps;
+  paginationData: Partial<PaginationProps>;
 };
 
 export const useRegisteredHandlesContext = ({
@@ -18,15 +20,16 @@ export const useRegisteredHandlesContext = ({
     data: handles,
     fetched,
     loading,
+    error,
     ...paginationData
-  } = usePaginationData<Handle>({
-    dataKey: 'handles',
+  } = useCursorPaginationData<Handle>({
+    dataKey: 'data',
     action: getDomainHandles,
     params: { domain },
-    withNavigation: false,
   });
 
   return {
+    error,
     handles: fetched ? handles : undefined,
     loading,
     paginationData,
