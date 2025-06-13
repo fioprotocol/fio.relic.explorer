@@ -1,32 +1,33 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 
-import pool from 'src/config/database';
-
 import {
-  DEFAULT_REQUEST_ITEMS_LIMIT,
-  DEFAULT_REQUEST_ITEMS_OFFSET,
   DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
+  DEFAULT_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
 
 import { validateDomainRegex } from '@shared/util/fio';
 
-import { DomainHandlesResponse } from '@shared/types/domains';
+import { CursorHandlesResponse } from '@shared/types/handles';
+import { Handle } from '@shared/types/handles';
+import { PAGINATION_DIRECTIONS, PaginationDirection } from '@shared/constants/pagination';
+import { CursorPagination } from 'src/utils/cursorPagination';
 
-interface domainHandlesQuery {
+interface DomainHandlesQuery {
   Params: {
     domain: string;
   };
   Querystring: {
-    limit: number;
-    offset: number;
+    limit?: number;
+    cursor?: string;
+    direction?: PaginationDirection;
+    include_total?: boolean;
   };
 }
 
 const handlesRoute: FastifyPluginAsync = async (fastify) => {
-  // Cast instance to use the type provider
   const server = fastify.withTypeProvider();
 
-  const getTransactionsOpts: RouteShorthandOptions = {
+  const getHandlesOpts: RouteShorthandOptions = {
     schema: {
       params: {
         type: 'object',
@@ -37,20 +38,26 @@ const handlesRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          offset: { type: 'integer', default: DEFAULT_REQUEST_ITEMS_OFFSET, minimum: 0 },
+          cursor: { type: 'string' },
+          direction: {
+            type: 'string',
+            enum: [PAGINATION_DIRECTIONS.NEXT, PAGINATION_DIRECTIONS.PREV],
+            default: PAGINATION_DIRECTIONS.NEXT,
+          },
           limit: {
             type: 'integer',
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
             minimum: 1,
             maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
           },
+          include_total: { type: 'boolean', default: false },
         },
       },
       response: {
         200: {
           type: 'object',
           properties: {
-            handles: {
+            data: {
               type: 'array',
               items: {
                 type: 'object',
@@ -59,72 +66,92 @@ const handlesRoute: FastifyPluginAsync = async (fastify) => {
                   handle: { type: 'string' },
                   handle_status: { type: 'string' },
                   owner_account_name: { type: 'string' },
+                  domain_name: { type: 'string' },
                 },
               },
             },
+            hasNextPage: { type: 'boolean' },
+            hasPrevPage: { type: 'boolean' },
+            nextCursor: { type: ['string', 'null'] },
+            prevCursor: { type: ['string', 'null'] },
             total: { type: 'number' },
           },
+          required: ['data', 'hasNextPage', 'hasPrevPage', 'nextCursor', 'prevCursor'],
         },
       },
       tags: ['Handles'],
-      summary: 'Handle Transactions',
-      description: 'Get handle transactions',
+      summary: 'Domain handles with cursor pagination',
+      description: 'Get handles registered under a domain using cursor-based pagination',
     },
   };
 
-  server.get<domainHandlesQuery>(
+  server.get<DomainHandlesQuery>(
     '/',
-    getTransactionsOpts,
-    async (
-      request: FastifyRequest<domainHandlesQuery>,
-      reply: FastifyReply
-    ): Promise<DomainHandlesResponse> => {
-      const { domain } = request.params;
-      const { limit, offset } = request.query;
+    getHandlesOpts,
+    async (request: FastifyRequest<DomainHandlesQuery>, reply: FastifyReply) => {
+      const {
+        cursor,
+        direction = PAGINATION_DIRECTIONS.NEXT,
+        limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+        include_total = false,
+      } = request.query;
 
-      const transactionsQuery = {
-        text: `
-          SELECT
+      const { domain } = request.params;
+
+      try {
+        const selectColumns = `
           h.pk_handle_id,
           h.handle,
           h.handle_status,
           a.account_name as owner_account_name,
           d.domain_name
-          FROM
-            handles h
-            JOIN domains d ON h.fk_domain_id = d.pk_domain_id
-            LEFT JOIN accounts a ON h.fk_owner_account_id = a.pk_account_id
-          WHERE
-            d.domain_name = $1
-          ORDER BY h.pk_handle_id DESC
-          LIMIT $2
-          OFFSET $3
-      `,
-        values: [domain, limit, offset],
-      };
+        `;
 
-      const countQuery = {
-        text: `
-          SELECT
-            COUNT(*) as total
-          FROM
-            handles h
-            JOIN domains d ON h.fk_domain_id = d.pk_domain_id
-          WHERE
-            d.domain_name = $1
-      `,
-        values: [domain],
-      };
+        const joinClause = `
+          JOIN domains d ON h.fk_domain_id = d.pk_domain_id
+          LEFT JOIN accounts a ON h.fk_owner_account_id = a.pk_account_id
+        `;
 
-      const [transactionsResult, countResult] = await Promise.all([
-        pool.query(transactionsQuery),
-        pool.query(countQuery),
-      ]);
+        const whereClause = 'd.domain_name = $1';
+        const whereValues = [domain];
 
-      return {
-        handles: transactionsResult.rows,
-        total: parseInt(countResult.rows[0].total),
-      };
+        const result = await CursorPagination.paginate<Handle>({
+          table: 'handles h',
+          cursorColumn: 'h.pk_handle_id',
+          orderDirection: 'DESC',
+          limit,
+          cursor,
+          direction,
+          whereClause,
+          whereValues,
+          selectColumns,
+          joinClause,
+        });
+
+        let total: number | undefined;
+        if (include_total) {
+          total = await CursorPagination.getTotalCount({
+            table: 'handles h',
+            joinClause,
+            whereClause,
+            whereValues,
+          });
+        }
+
+        const response: CursorHandlesResponse = {
+          data: result.data,
+          hasNextPage: result.hasNextPage,
+          hasPrevPage: result.hasPrevPage,
+          nextCursor: result.nextCursor,
+          prevCursor: result.prevCursor,
+          ...(total !== undefined && { total }),
+        };
+
+        return reply.send(response);
+      } catch (error) {
+        fastify.log.error('Error fetching domain handles with cursor pagination:', error);
+        return reply.code(500).send({ message: 'Internal server error' });
+      }
     }
   );
 };

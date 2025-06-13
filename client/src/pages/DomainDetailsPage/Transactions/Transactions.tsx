@@ -3,7 +3,6 @@ import { FC } from 'react';
 import { useTransactionsContext } from './TransactionsContext';
 
 import { Alert } from 'src/components/common/Alert';
-import { Loader } from 'src/components/common/Loader';
 import { LoadableTable } from 'src/components/common/LoadableTable';
 
 import { transformTransactions } from 'src/utils/transactions';
@@ -19,18 +18,20 @@ TRANSACTIONS_TABLE_COLUMNS.splice(
 export const Transactions: FC<{ domain: string }> = ({ domain }) => {
   const { transactions, loading, paginationData } = useTransactionsContext({ domain });
 
-  if (!transactions) return <Loader />;
-  if (!transactions.length) return <Alert hasDash={false} title="No transactions found" />;
+  if (!transactions?.length && !loading)
+    return <Alert hasDash={false} title="No transactions found" />;
 
   return (
     <LoadableTable
       columns={TRANSACTIONS_TABLE_COLUMNS}
-      data={transactions.map(({ pk_handle_activity_id, ...rest }) =>
-        transformTransactions({
-          pk_transaction_id: `${pk_handle_activity_id}`,
-          ...rest,
-        })
-      )}
+      data={
+        transactions?.map(({ pk_handle_activity_id, ...rest }) =>
+          transformTransactions({
+            pk_transaction_id: `${pk_handle_activity_id}`,
+            ...rest,
+          })
+        ) || []
+      }
       showPagination
       loading={loading}
       {...paginationData}

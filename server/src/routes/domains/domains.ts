@@ -228,7 +228,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         return reply.send(response);
       } catch (error) {
         console.error('Error in domains pagination:', error);
-        return reply.code(500).send({ error: 'An error occurred while fetching domains' });
+        return reply.code(500).send({ message: 'An error occurred while fetching domains' });
       }
     }
   );

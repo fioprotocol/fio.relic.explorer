@@ -8,6 +8,7 @@ import { AnyObject } from '@shared/types/general';
 import { PaginationProps } from 'src/hooks/usePaginationData';
 import { CardComponent } from 'src/components/layout/CardComponent';
 import { PAGINATION_MODES } from '@shared/constants/pagination';
+import { Alert } from '../Alert';
 
 type LoadableTableProps = {
   actionButtonText?: string;
@@ -16,6 +17,8 @@ type LoadableTableProps = {
   columns: { key: string; title: string }[];
   data: AnyObject[];
   emptyState?: ReactNode;
+  error?: Error | null | string;
+  errorHeader?: string;
   onActionButtonClick?: () => void;
   showActionButton?: boolean;
   title?: string;
@@ -42,6 +45,8 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   // Pagination props
   showPagination = true,
   useCursorPagination = false,
+  error,
+  errorHeader,
   ...paginationProps
 }) => {
   // Show loading state or empty state if needed
@@ -59,6 +64,13 @@ export const LoadableTable: FC<LoadableTableProps> = ({
       />
 
       {loading && <Loader absolute fullScreen />}
+      {error && !loading && !data?.length && (
+        <Alert
+          variant="danger"
+          title={errorHeader || 'Error'}
+          message={typeof error === 'string' ? error : error?.message}
+        />
+      )}
       {displayEmptyState}
 
       {showPagination && (

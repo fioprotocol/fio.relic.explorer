@@ -106,11 +106,7 @@ const DomainsPage: React.FC = () => {
                   Only Public
                 </label>
               </div>
-              <SortDropdown
-                options={SORT_OPTIONS}
-                currentSort={sort}
-                onSortChange={setSort}
-              />
+              <SortDropdown options={SORT_OPTIONS} currentSort={sort} onSortChange={setSort} />
             </div>
           </div>
         }
@@ -147,6 +143,7 @@ const DomainsPage: React.FC = () => {
         {...paginationProps}
         showInCardComponent
         className="mb-5"
+        errorHeader="Error fetching domains list"
       />
     </Container>
   );

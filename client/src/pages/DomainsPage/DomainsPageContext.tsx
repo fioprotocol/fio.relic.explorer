@@ -1,6 +1,9 @@
 import { getDomains } from 'src/services/domains';
 
-import { useCursorPaginationData, UseCursorPaginationReturn } from 'src/hooks/useCursorPaginationData';
+import {
+  useCursorPaginationData,
+  UseCursorPaginationReturn,
+} from 'src/hooks/useCursorPaginationData';
 
 import { Domain, DomainSortOption } from '@shared/types/domains';
 import { useState } from 'react';

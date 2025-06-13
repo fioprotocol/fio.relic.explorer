@@ -24,6 +24,19 @@ const DomainDetailsPage: React.FC = () => {
     return (
       <Container className="py-5">
         <BackButton />
+        <Alert
+          variant="danger"
+          title={`Error fetching domain ${domainParam} details`}
+          message={typeof error === 'string' ? error : error.message}
+        />
+      </Container>
+    );
+  }
+
+  if (!domain && !error && !loading) {
+    return (
+      <Container className="py-5">
+        <BackButton />
         <Alert variant="danger" title="Not found">
           Domain <span className="fw-bold">{domainParam}</span> is not found
         </Alert>
