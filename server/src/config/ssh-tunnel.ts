@@ -67,7 +67,7 @@ class SSHTunnel {
   private localPort: number = 0;
   private isConnecting: boolean = false;
   private reconnectAttempts: number = 0;
-  private maxReconnectAttempts: number = 5;
+  private maxReconnectAttempts: number = Infinity; // unlimited reconnection attempts
   private reconnectDelay: number = 2000; // Start with 2 seconds
   private maxReconnectDelay: number = 30000; // Max 30 seconds
   private reconnectTimer: NodeJS.Timeout | null = null;
