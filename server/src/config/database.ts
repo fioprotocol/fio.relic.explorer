@@ -39,7 +39,10 @@ const getDatabaseConfig = async () => {
       rejectUnauthorized: false
     } : undefined,
     max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 30000, // How long a client is allowed to remain idle before being closed
+    idleTimeoutMillis: 300000, // 5 minutes before an idle client is closed
+    allowExitOnIdle: false, // keep Node process alive even when pool is idle
+    keepAlive: true, // ensure TCP keep-alives are sent
+    keepAliveInitialDelayMillis: 30000, // 30-s delay before first keep-alive packet
     connectionTimeoutMillis: 10000, // Increased timeout for SSH connections
   };
 };
@@ -86,6 +89,13 @@ const initializePool = async (): Promise<Pool> => {
     }
   }
 
+  // Pre-warm the pool so first real request is fast
+  try {
+    await pool.query('SELECT 1');
+  } catch (warmErr) {
+    console.warn('Database pre-warm query failed:', warmErr);
+  }
+
   return pool;
 };
 
@@ -120,3 +130,13 @@ const poolProxy = new Proxy({} as Pool, {
 
 // For backward compatibility, export the pool proxy
 export default poolProxy;
+
+// Immediately initialise and warm the pool at application startup
+(async () => {
+  try {
+    await initializePool();
+    console.log('Database pool initialised and warmed');
+  } catch (initErr) {
+    console.error('Failed to initialise database pool at startup:', initErr);
+  }
+})();
