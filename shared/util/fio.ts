@@ -7,7 +7,7 @@ export const validateHandleRegex =
   '^(?=.{3,64}$)[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?@[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?$';
 
 export const validateDomainRegex =
-  '^(?=.{3,64}$)[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?$';
+  '^(?=.{1,62}$)[a-zA-Z0-9](?:(?!-{2,})[a-zA-Z0-9-]*[a-zA-Z0-9]+)?$';
 
 export const getTableRows = async <T>(params: GetTableRawsParams): Promise<GetTableRowsResponse<T>> => {
   const response = await fetch(`${NODE_URLS[0]}${FIO_API_VERSION}/chain/get_table_rows`, {
