@@ -5,7 +5,7 @@ import { TX_TABLE_COLUMNS } from './TxComponent';
 import { useTxInfiniteUpdateConext } from './TxInfiniteUpdateComponentConext';
 
 export const TxInfiniteUpdateComponent: FC = () => {
-  const { transactions, loading, onActionButtonClick } = useTxInfiniteUpdateConext();
+  const { transactions, loading, error, onActionButtonClick } = useTxInfiniteUpdateConext();
 
   return (
     <div className="my-4">
@@ -18,6 +18,8 @@ export const TxInfiniteUpdateComponent: FC = () => {
         onActionButtonClick={onActionButtonClick}
         showPagination={false}
         loading={loading}
+        emptyStateMessage="No transactions found"
+        error={error}
       />
     </div>
   );

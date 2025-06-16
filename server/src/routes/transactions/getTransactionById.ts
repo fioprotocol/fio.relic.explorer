@@ -52,7 +52,7 @@ const getTransactionByIdRoute: FastifyPluginAsync = async (fastify) => {
         404: {
           type: 'object',
           properties: {
-            error: { type: 'string' },
+            message: { type: 'string' },
           },
         },
       },
@@ -95,7 +95,7 @@ const getTransactionByIdRoute: FastifyPluginAsync = async (fastify) => {
 
       if (transactionResult.rows.length === 0) {
         reply.code(404);
-        return { error: 'Transaction not found' };
+        return { message: 'Transaction not found' };
       }
 
       const transaction = transactionResult.rows[0];
@@ -129,7 +129,7 @@ const getTransactionByIdRoute: FastifyPluginAsync = async (fastify) => {
     } catch (error) {
       console.error('Error fetching transaction:', error);
       reply.code(500);
-      return { error: 'Internal server error' };
+      return { message: 'Internal server error' };
     }
   });
 };

@@ -12,6 +12,7 @@ import { TransactionHistoryResponse } from '@shared/types/fio-api-server';
 import { TransactionDetailResponse, TransactionDetails } from '@shared/types/transactions';
 
 type UseTransactionDetailsPageContext = {
+  error: Error | null | string;
   id: string | undefined;
   loading: boolean;
   transaction: TransactionDetails;
@@ -23,7 +24,7 @@ type UseTransactionDetailsPageContext = {
 export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageContext => {
   const { id } = useParams();
 
-  const { response, loading } = useGetData<TransactionDetailResponse>({
+  const { response, loading, error } = useGetData<TransactionDetailResponse>({
     action: getTransactionById,
     params: { id },
   });
@@ -58,6 +59,7 @@ export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageCon
   ];
 
   return {
+    error,
     id,
     loading: loading || rawDataLoading || chainInfoLoading,
     transaction: response?.data,

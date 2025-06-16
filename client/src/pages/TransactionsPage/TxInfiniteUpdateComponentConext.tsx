@@ -16,6 +16,7 @@ import {
 } from '@shared/types/transactions';
 
 type UseTxInfiniteUpdateConextProps = {
+  error: Error | null | string;
   transactions: TransformedTransaction[];
   loading: boolean;
   onActionButtonClick: () => void;
@@ -28,7 +29,7 @@ export const useTxInfiniteUpdateConext = (): UseTxInfiniteUpdateConextProps => {
     navigate(ROUTES.transactions.path);
   }, [navigate]);
 
-  const { response, loading } = useGetData<TransactionResponse>({
+  const { response, loading, error } = useGetData<TransactionResponse>({
     action: getTransactions,
     params: { limit: DEFAULT_REQUEST_ITEMS_LIMIT, offset: 0 },
     interval: DEFAULT_REFRESH_INTERVAL,
@@ -39,6 +40,7 @@ export const useTxInfiniteUpdateConext = (): UseTxInfiniteUpdateConextProps => {
     [];
 
   return {
+    error,
     loading: loading && transactions.length === 0, // Show loading only on fisrst load. Next loadings should be not shown because of infinite update.
     transactions,
     onActionButtonClick,

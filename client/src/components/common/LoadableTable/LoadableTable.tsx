@@ -17,6 +17,7 @@ type LoadableTableProps = {
   columns: { key: string; title: string }[];
   data: AnyObject[];
   emptyState?: ReactNode;
+  emptyStateMessage?: string;
   error?: Error | null | string;
   errorHeader?: string;
   onActionButtonClick?: () => void;
@@ -35,6 +36,7 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   columns,
   data = [],
   emptyState,
+  emptyStateMessage,
   loading = false,
   onActionButtonClick,
   showActionButton,
@@ -50,7 +52,14 @@ export const LoadableTable: FC<LoadableTableProps> = ({
   ...paginationProps
 }) => {
   // Show loading state or empty state if needed
-  const displayEmptyState = !loading && data.length === 0 ? emptyState : undefined;
+  const displayEmptyState =
+    !loading && !error && data.length === 0 ? (
+      emptyState ? (
+        emptyState
+      ) : (
+        <Alert variant="info" title="No data" message={emptyStateMessage || 'No data found'} />
+      )
+    ) : undefined;
 
   const tableRender = (): ReactNode => (
     <div className="d-flex w-100 position-relative flex-column align-items-center gap-3">

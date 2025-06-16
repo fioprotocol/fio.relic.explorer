@@ -1,4 +1,10 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  CancelTokenSource,
+} from 'axios';
 import { config } from '../config';
 
 import { API_PREFIX } from '@shared/constants/network';
@@ -38,7 +44,7 @@ export class ApiClient {
       timeout: clientConfig.timeout || 30000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         ...clientConfig.headers,
       },
     });
@@ -63,9 +69,11 @@ export class ApiClient {
 
     if (error.response) {
       // Server responded with a status code outside of 2xx range
-      apiError.message = error.response.data && typeof error.response.data === 'object' 
-        ? ((error.response.data as AnyObject)?.message as string) || `Request failed with status code ${error.response.status}`
-        : `Request failed with status code ${error.response.status}`;
+      apiError.message =
+        error.response.data && typeof error.response.data === 'object'
+          ? ((error.response.data as AnyObject)?.message as string) ||
+            `Request failed with status code ${error.response.status}`
+          : `Request failed with status code ${error.response.status}`;
     } else if (error.request) {
       // Request was made but no response received
       apiError.message = 'No response received from server';

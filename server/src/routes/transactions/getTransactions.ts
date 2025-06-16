@@ -201,8 +201,8 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
             table: 'transactions t',
             whereClause,
             whereValues,
-            joinClause: 'LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id'
-        });
+            joinClause: 'LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id',
+          });
         }
 
         const response: CursorTransactionResponse = {
@@ -269,7 +269,7 @@ const getTransactionsRoute: FastifyPluginAsync = async (fastify) => {
     } catch (error) {
       fastify.log.error('Error in transaction pagination:', error);
       reply.code(500);
-      return { error: 'Internal server error' };
+      return { message: 'Cannot fetch transactions' };
     }
   });
 };
