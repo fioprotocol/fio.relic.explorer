@@ -82,6 +82,7 @@ const HandlesPage: React.FC = () => {
         {...paginationProps}
         loading={loading}
         showInCardComponent
+        emptyStateMessage="No handles found"
         className="mb-5"
       />
     </Container>
