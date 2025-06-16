@@ -19,18 +19,21 @@ TRANSACTIONS_TABLE_COLUMNS.splice(
 export const Transactions: FC<{ handle: string }> = ({ handle }) => {
   const { transactions, loading, paginationData } = useTransactionsContext({ handle });
 
-  if (!transactions) return <Loader />;
-  if (!transactions.length) return <Alert hasDash={false} title="No transactions found" />;
+  if (!transactions && loading) return <Loader />;
+  if (!transactions?.length && !loading)
+    return <Alert hasDash={false} title="No transactions found" />;
 
   return (
     <LoadableTable
       columns={TRANSACTIONS_TABLE_COLUMNS}
-      data={transactions.map(({ pk_handle_activity_id, ...rest }) =>
-        transformTransactions({
-          pk_transaction_id: `${pk_handle_activity_id}`,
-          ...rest,
-        })
-      )}
+      data={
+        transactions?.map(({ pk_handle_activity_id, ...rest }) =>
+          transformTransactions({
+            pk_transaction_id: `${pk_handle_activity_id}`,
+            ...rest,
+          })
+        ) || []
+      }
       showPagination
       loading={loading}
       emptyStateMessage="No transactions found"

@@ -1,22 +1,25 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
 
-import pool from 'src/config/database';
-
 import {
   DEFAULT_REQUEST_ITEMS_LIMIT,
-  DEFAULT_REQUEST_ITEMS_OFFSET,
   DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
 
-import { HandleTransactionsResponse } from '@shared/types/handles';
+import { CursorPagination } from 'src/utils/cursorPagination';
+import { PAGINATION_DIRECTIONS, PaginationDirection } from '@shared/constants/pagination';
 
-interface handleQuery {
+import { HandleTransaction } from '@shared/types/handles';
+import { CursorResponse } from '@shared/types/general';
+
+interface HandleTransactionsQuery {
   Params: {
     handle: string;
   };
   Querystring: {
-    limit: number;
-    offset: number;
+    limit?: number;
+    cursor?: string;
+    direction?: PaginationDirection;
+    include_total?: boolean;
   };
 }
 
@@ -24,7 +27,7 @@ const handleTransactionsRoute: FastifyPluginAsync = async (fastify) => {
   // Cast instance to use the type provider
   const server = fastify.withTypeProvider();
 
-  // Health check endpoint
+  // Cursor-based pagination endpoint
   const getTransactionsOpts: RouteShorthandOptions = {
     schema: {
       params: {
@@ -36,20 +39,26 @@ const handleTransactionsRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          offset: { type: 'integer', default: DEFAULT_REQUEST_ITEMS_OFFSET, minimum: 0 },
+          cursor: { type: 'string' },
+          direction: {
+            type: 'string',
+            enum: [PAGINATION_DIRECTIONS.NEXT, PAGINATION_DIRECTIONS.PREV],
+            default: PAGINATION_DIRECTIONS.NEXT,
+          },
           limit: {
             type: 'integer',
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
             minimum: 1,
             maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
           },
+          include_total: { type: 'boolean', default: false },
         },
       },
       response: {
         200: {
           type: 'object',
           properties: {
-            transactions: {
+            data: {
               type: 'array',
               items: {
                 type: 'object',
@@ -66,76 +75,96 @@ const handleTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                 },
               },
             },
+            hasNextPage: { type: 'boolean' },
+            hasPrevPage: { type: 'boolean' },
+            nextCursor: { type: ['string', 'null'] },
+            prevCursor: { type: ['string', 'null'] },
             total: { type: 'number' },
           },
+          required: ['data', 'hasNextPage', 'hasPrevPage', 'nextCursor', 'prevCursor'],
         },
       },
       tags: ['Handles'],
-      summary: 'Handle Transactions',
-      description: 'Get handle transactions',
+      summary: 'Handle Transactions with cursor pagination',
+      description: 'Get handle transactions using cursor-based pagination',
     },
   };
 
-  server.get<handleQuery>(
+  server.get<HandleTransactionsQuery>(
     '/',
     getTransactionsOpts,
     async (
-      request: FastifyRequest<handleQuery>,
+      request: FastifyRequest<HandleTransactionsQuery>,
       reply: FastifyReply
-    ): Promise<HandleTransactionsResponse> => {
+    ): Promise<CursorResponse<{ data: HandleTransaction[] }>> => {
+      const {
+        cursor,
+        direction = PAGINATION_DIRECTIONS.NEXT,
+        limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+        include_total = false,
+      } = request.query;
+
       const { handle } = request.params;
-      const { limit, offset } = request.query;
 
-      const transactionsQuery = {
-        text: `
-          SELECT
-            ha.pk_handle_activity_id,
-            ha.handle_activity_type,
-            ha.block_timestamp,
-            t.transaction_id,
-            t.action_name,
-            t.tpid,
-            t.fee,
-            t.result_status,
-            a.account_name
-          FROM
-            handleactivities ha
-            LEFT JOIN handles h ON ha.fk_handle_id = h.pk_handle_id
-            JOIN transactions t ON ha.fk_transaction_id = t.pk_transaction_id
-            LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id
-          WHERE
-            h.handle = $1
-          ORDER BY
-            ha.block_timestamp DESC
-          LIMIT $2
-          OFFSET $3
-      `,
-        values: [handle, limit, offset],
-      };
+      try {
+        const selectColumns = `
+          ha.pk_handle_activity_id,
+          ha.handle_activity_type,
+          ha.block_timestamp,
+          t.transaction_id,
+          t.action_name,
+          t.tpid,
+          t.fee,
+          t.result_status,
+          a.account_name
+        `;
 
-      const countQuery = {
-        text: `
-          SELECT
-            COUNT(*) as total
-          FROM
-            handleactivities ha
-            LEFT JOIN handles h ON ha.fk_handle_id = h.pk_handle_id
-            JOIN transactions t ON ha.fk_transaction_id = t.pk_transaction_id
-          WHERE
-            h.handle = $1
-      `,
-        values: [handle],
-      };
+        const joinClause = `
+          JOIN handles h ON ha.fk_handle_id = h.pk_handle_id
+          JOIN transactions t ON ha.fk_transaction_id = t.pk_transaction_id
+          LEFT JOIN accounts a ON t.fk_account_id = a.pk_account_id
+        `;
 
-      const [transactionsResult, countResult] = await Promise.all([
-        pool.query(transactionsQuery),
-        pool.query(countQuery),
-      ]);
+        const whereClause = 'h.handle = $1';
+        const whereValues = [handle];
 
-      return {
-        transactions: transactionsResult.rows,
-        total: parseInt(countResult.rows[0].total),
-      };
+        const result = await CursorPagination.paginate<HandleTransaction>({
+          table: 'handleactivities ha',
+          cursorColumn: 'ha.pk_handle_activity_id',
+          orderDirection: 'DESC',
+          limit,
+          cursor,
+          direction,
+          whereClause,
+          whereValues,
+          selectColumns,
+          joinClause,
+        });
+
+        let total: number | undefined;
+        if (include_total) {
+          total = await CursorPagination.getTotalCount({
+            table: 'handleactivities ha',
+            joinClause,
+            whereClause,
+            whereValues,
+          });
+        }
+
+        const response: CursorResponse<{ data: HandleTransaction[] }> = {
+          data: result.data,
+          hasNextPage: result.hasNextPage,
+          hasPrevPage: result.hasPrevPage,
+          nextCursor: result.nextCursor,
+          prevCursor: result.prevCursor,
+          ...(total !== undefined && { total }),
+        };
+
+        return reply.send(response);
+      } catch (error) {
+        fastify.log.error('Error fetching handle transactions with cursor pagination:', error);
+        return reply.code(500).send({ error: 'Internal server error' });
+      }
     }
   );
 };
