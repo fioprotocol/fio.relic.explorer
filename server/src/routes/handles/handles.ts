@@ -156,7 +156,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
         return response;
       } catch (error) {
         fastify.log.error('Error in handles pagination:', error);
-        reply.code(500).send({ error: 'Internal server error' });
+        reply.code(500).send({ message: 'Internal server error' });
         return;
       }
     }

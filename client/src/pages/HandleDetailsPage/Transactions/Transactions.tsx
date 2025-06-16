@@ -33,6 +33,7 @@ export const Transactions: FC<{ handle: string }> = ({ handle }) => {
       )}
       showPagination
       loading={loading}
+      emptyStateMessage="No transactions found"
       {...paginationData}
     />
   );
