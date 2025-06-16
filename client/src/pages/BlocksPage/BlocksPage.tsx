@@ -75,6 +75,7 @@ const BlocksPage: FC = () => {
         title="All Blocks"
         showInCardComponent
         loading={blocksLoading}
+        emptyStateMessage="No blocks found"
         {...paginationProps}
       />
     </Container>
