@@ -43,6 +43,21 @@ const TransactionDetailsPage: FC = () => {
     useTransactionDetailsPageContext();
   const tabRowStyle = 'm-0 gap-4 d-flex flex-column flex-md-row flex-wrap w-100';
 
+  if (error) {
+    return (
+      <Container className="py-5">
+        <BackButton />
+        {!loading && error && (
+          <Alert
+            variant="danger"
+            title="Error"
+            message={typeof error === 'string' ? error : error?.message}
+          />
+        )}
+      </Container>
+    );
+  }
+
   return (
     <Container className="py-5">
       <BackButton />
@@ -126,13 +141,6 @@ const TransactionDetailsPage: FC = () => {
         </Tabs>
         {!loading && !error && (!transaction || Object.keys(transaction).length === 0) && (
           <Alert variant="info" title="No data" message="No data found for this transaction" />
-        )}
-        {!loading && error && (
-          <Alert
-            variant="danger"
-            title="Error"
-            message={typeof error === 'string' ? error : error?.message}
-          />
         )}
       </CardComponent>
     </Container>
