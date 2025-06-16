@@ -4,8 +4,9 @@ import {
   Handle,
   HandlesResponse,
   CursorHandlesResponse,
-  HandleTransactionsResponse,
+  HandleTransaction,
 } from '@shared/types/handles';
+import { CursorResponse } from '@shared/types/general';
 import { PaginationDirection } from '@shared/constants/pagination';
 
 // Implementation
@@ -28,18 +29,23 @@ export const getHandle = async ({ handle }: { handle: string }): Promise<Handle>
   return data;
 };
 
+// Cursor-based handle transactions
+export type CursorHandleTransactionsResponse = CursorResponse<{ data: HandleTransaction[] }>;
+
 export const getHandleTransactions = async ({
   handle,
-  offset,
   limit,
+  cursor,
+  direction,
 }: {
   handle: string;
-  offset?: number;
   limit?: number;
-}): Promise<HandleTransactionsResponse> => {
-  const { data } = await apiClient.get<HandleTransactionsResponse>(
+  cursor?: string;
+  direction?: PaginationDirection;
+}): Promise<CursorHandleTransactionsResponse> => {
+  const { data } = await apiClient.get<CursorHandleTransactionsResponse>(
     `/handles/${handle}/transactions`,
-    { params: { offset, limit } }
+    { params: { limit, cursor, direction } }
   );
 
   return data;
