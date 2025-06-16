@@ -21,13 +21,21 @@ const COLUMNS = [
 export const FioHandlesTab: FC = () => {
   const { loading, handles, paginationData } = useFioHandlesTabContext();
 
-  return <LoadableTable columns={COLUMNS} data={handles?.map(({ handle, handle_status }) => ({
-    handle: <Link to={`${ROUTES.handles.path}/${handle}`}>{handle}</Link>,
-    handle_status: <Badge
-      variant="white"
-      className="text-uppercase"
-    >
-      {handle_status}
-    </Badge>,
-  }))} loading={loading} showPagination {...paginationData} />;
+  return (
+    <LoadableTable
+      columns={COLUMNS}
+      data={handles?.map(({ handle, handle_status }) => ({
+        handle: <Link to={`${ROUTES.handles.path}/${handle}`}>{handle}</Link>,
+        handle_status: (
+          <Badge variant="white" className="text-uppercase">
+            {handle_status}
+          </Badge>
+        ),
+      }))}
+      loading={loading}
+      showPagination
+      emptyStateMessage="No handles found"
+      {...paginationData}
+    />
+  );
 };

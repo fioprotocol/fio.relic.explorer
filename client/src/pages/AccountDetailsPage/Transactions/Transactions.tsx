@@ -50,6 +50,7 @@ export const Transactions: FC = () => {
       customMobileDesign={<TransactionsMobile transactions={transactions} />}
       loading={loading}
       showPagination
+      emptyStateMessage="No transactions found"
       {...paginationData}
     />
   );

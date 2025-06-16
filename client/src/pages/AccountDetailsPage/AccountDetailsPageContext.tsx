@@ -54,6 +54,7 @@ const calculateAccruedStakingRewards = (fioBalance?: FioBalanceResponse): string
 
 type UseAccountDetailsPageContext = {
   account?: string;
+  accountDataError: Error | null | string;
   blockNumber?: number;
   date?: string;
   loading: boolean;
@@ -75,7 +76,7 @@ export const useAccountDetailsPageContext = (): UseAccountDetailsPageContext => 
     params: { accountName: account },
   });
 
-  const { response: accountData, loading: accountDataLoading } = useGetData<AccountResponse>({
+  const { response: accountData, loading: accountDataLoading, error: accountDataError } = useGetData<AccountResponse>({
     action: getAccount,
     params: { account },
   });
@@ -153,6 +154,7 @@ export const useAccountDetailsPageContext = (): UseAccountDetailsPageContext => 
     account,
     blockNumber: accountData?.data?.fk_block_number,
     date: accountData?.data?.block_timestamp,
+    accountDataError,
     loading:
       chainDataLoading ||
       accountDataLoading ||

@@ -1,6 +1,7 @@
 import { useParams } from 'react-router';
 
-import { usePaginationData, UsePaginationDefaultProps } from 'src/hooks/usePaginationData';
+import { useCursorPaginationData } from 'src/hooks/useCursorPaginationData';
+import { PaginationProps } from 'src/hooks/usePaginationData';
 import { getAccountTransactions } from 'src/services/accounts';
 
 import { AccountTransaction } from '@shared/types/accounts';
@@ -8,7 +9,7 @@ import { AccountTransaction } from '@shared/types/accounts';
 type UseTransactionsContext = {
   loading: boolean;
   transactions: AccountTransaction[];
-  paginationData: UsePaginationDefaultProps;
+  paginationData: Partial<PaginationProps>;
 };
 
 export const useTransactionsContext = (): UseTransactionsContext => {
@@ -18,12 +19,12 @@ export const useTransactionsContext = (): UseTransactionsContext => {
     data: transactions,
     loading: transactionsLoading,
     ...paginationData
-  } = usePaginationData<AccountTransaction>({
+  } = useCursorPaginationData<AccountTransaction>({
     action: getAccountTransactions,
     params: {
-      account: account,
+      account,
     },
-    dataKey: 'transactions',
+    dataKey: 'data',
   });
 
   return {

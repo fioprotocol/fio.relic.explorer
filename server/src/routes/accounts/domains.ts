@@ -2,10 +2,14 @@ import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions
 import pool from 'src/config/database';
 import {
   DEFAULT_REQUEST_ITEMS_LIMIT,
-  DEFAULT_REQUEST_ITEMS_OFFSET,
   DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
-import { AccountDomainResponse } from '@shared/types/accounts';
+
+import { CursorPagination } from 'src/utils/cursorPagination';
+import { PAGINATION_DIRECTIONS, PaginationDirection } from '@shared/constants/pagination';
+
+import { AccountDomain } from '@shared/types/accounts';
+import { CursorResponse } from '@shared/types/general';
 
 interface AccountDomainsParams {
   Params: {
@@ -13,7 +17,9 @@ interface AccountDomainsParams {
   };
   Querystring: {
     limit?: number;
-    offset?: number;
+    cursor?: string;
+    direction?: PaginationDirection;
+    include_total?: boolean;
   };
 }
 
@@ -32,13 +38,19 @@ const accountDomainsRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          offset: { type: 'integer', default: DEFAULT_REQUEST_ITEMS_OFFSET, minimum: 0 },
+          cursor: { type: 'string' },
+          direction: {
+            type: 'string',
+            enum: [PAGINATION_DIRECTIONS.NEXT, PAGINATION_DIRECTIONS.PREV],
+            default: PAGINATION_DIRECTIONS.NEXT,
+          },
           limit: {
             type: 'integer',
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
             minimum: 1,
             maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
           },
+          include_total: { type: 'boolean', default: false },
         },
       },
       response: {
@@ -58,19 +70,24 @@ const accountDomainsRoute: FastifyPluginAsync = async (fastify) => {
                 },
               },
             },
+            hasNextPage: { type: 'boolean' },
+            hasPrevPage: { type: 'boolean' },
+            nextCursor: { type: ['string', 'null'] },
+            prevCursor: { type: ['string', 'null'] },
             total: { type: 'number' },
           },
+          required: ['data', 'hasNextPage', 'hasPrevPage', 'nextCursor', 'prevCursor'],
         },
         404: {
           type: 'object',
           properties: {
-            error: { type: 'string' }
-          }
-        }
+            message: { type: 'string' },
+          },
+        },
       },
       tags: ['Accounts'],
-      summary: 'Account FIO Domains',
-      description: 'Get FIO domains for a specific account',
+      summary: 'Account FIO Domains with cursor pagination',
+      description: 'Get FIO domains for a specific account using cursor-based pagination',
     },
   };
 
@@ -80,9 +97,14 @@ const accountDomainsRoute: FastifyPluginAsync = async (fastify) => {
     async (
       request: FastifyRequest<AccountDomainsParams>,
       reply: FastifyReply
-    ): Promise<AccountDomainResponse> => {
+    ): Promise<CursorResponse<{ data: AccountDomain[] }>> => {
       const { account } = request.params;
-      const { limit, offset } = request.query;
+      const {
+        cursor,
+        direction = PAGINATION_DIRECTIONS.NEXT,
+        limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+        include_total = false,
+      } = request.query;
 
       // Get account ID first
       const accountIdQuery = {
@@ -100,66 +122,70 @@ const accountDomainsRoute: FastifyPluginAsync = async (fastify) => {
         if (accountResult.rows.length === 0) {
           reply.code(404);
           return {
-            data: [],
-            total: 0,
-            error: 'Account not found'
+            message: "Account's domains not found",
           } as any;
         }
 
         const accountId = accountResult.rows[0].pk_account_id;
 
-        // Query to get domains for the account
-        const domainsQuery = {
-          text: `
-            SELECT 
-              d.domain_name,
-              d.is_public,
-              d.domain_status as status,
-              d.expiration_timestamp,
-              (
-                SELECT COUNT(*) 
-                FROM handles h 
-                WHERE h.fk_domain_id = d.pk_domain_id
-              ) as handles_count
-            FROM domains d
-            WHERE d.fk_owner_account_id = $1
-            ORDER BY d.domain_name ASC
-            LIMIT $2
-            OFFSET $3
-          `,
-          values: [accountId, limit, offset],
+        const selectColumns = `
+          d.pk_domain_id,
+          d.domain_name,
+          d.is_public,
+          d.domain_status as status,
+          d.expiration_timestamp,
+          (
+            SELECT COUNT(*) FROM handles h WHERE h.fk_domain_id = d.pk_domain_id
+          ) as handles_count
+        `;
+
+        const result = await CursorPagination.paginate<AccountDomain & { pk_domain_id: number }>({
+          table: 'domains d',
+          cursorColumn: 'd.pk_domain_id',
+          orderDirection: 'DESC',
+          limit,
+          cursor,
+          direction,
+          whereClause: 'd.fk_owner_account_id = $1',
+          whereValues: [accountId],
+          selectColumns,
+        });
+
+        let total: number | undefined;
+        if (include_total) {
+          total = await CursorPagination.getTotalCount({
+            table: 'domains d',
+            whereClause: 'd.fk_owner_account_id = $1',
+            whereValues: [accountId],
+          });
+        }
+
+        const data = result.data.map(
+          ({ domain_name, is_public, status, expiration_timestamp, handles_count }) => ({
+            domain_name,
+            is_public,
+            status,
+            expiration_timestamp,
+            handles_count,
+          })
+        );
+
+        const response: CursorResponse<{ data: AccountDomain[] }> = {
+          data,
+          hasNextPage: result.hasNextPage,
+          hasPrevPage: result.hasPrevPage,
+          nextCursor: result.nextCursor,
+          prevCursor: result.prevCursor,
+          ...(total !== undefined && { total }),
         };
 
-        // Count query
-        const countQuery = {
-          text: `
-            SELECT COUNT(*) as total
-            FROM domains
-            WHERE fk_owner_account_id = $1
-          `,
-          values: [accountId],
-        };
-
-        const [domainsResult, countResult] = await Promise.all([
-          pool.query(domainsQuery),
-          pool.query(countQuery),
-        ]);
-
-        return {
-          data: domainsResult.rows,
-          total: parseInt(countResult.rows[0].total),
-        };
+        return reply.send(response);
       } catch (error) {
         console.error('Error fetching account FIO domains:', error);
-        reply.code(500);
-        return {
-          data: [],
-          total: 0,
-          error: 'Failed to fetch account FIO domains',
-        } as any;
+        return reply.code(500).send({ error: 'Internal server error' });
       }
     }
   );
 };
 
-export default accountDomainsRoute; 
+export default accountDomainsRoute;

@@ -2,18 +2,21 @@ import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions
 import pool from 'src/config/database';
 import {
   DEFAULT_REQUEST_ITEMS_LIMIT,
-  DEFAULT_REQUEST_ITEMS_OFFSET,
   DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
-import { AccountTransactionsResponse } from '@shared/types/accounts';
+import { AccountTransaction } from '@shared/types/accounts';
+import { PAGINATION_DIRECTIONS, PaginationDirection } from '@shared/constants/pagination';
+import { CursorResponse } from '@shared/types/general';
 
 interface AccountTransactionsQuery {
   Params: {
     account: string;
   };
   Querystring: {
-    limit: number;
-    offset: number;
+    limit?: number;
+    cursor?: string;
+    direction?: PaginationDirection;
+    include_total?: boolean;
   };
 }
 
@@ -32,20 +35,26 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          offset: { type: 'integer', default: DEFAULT_REQUEST_ITEMS_OFFSET, minimum: 0 },
+          cursor: { type: 'string' },
+          direction: {
+            type: 'string',
+            enum: [PAGINATION_DIRECTIONS.NEXT, PAGINATION_DIRECTIONS.PREV],
+            default: PAGINATION_DIRECTIONS.NEXT,
+          },
           limit: {
             type: 'integer',
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
             minimum: 1,
             maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
           },
+          include_total: { type: 'boolean', default: false },
         },
       },
       response: {
         200: {
           type: 'object',
           properties: {
-            transactions: {
+            data: {
               type: 'array',
               items: {
                 type: 'object',
@@ -56,18 +65,23 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                   action_name: { type: 'string' },
                   fee: { type: 'string' },
                   fio_tokens: { type: ['string', 'null'] },
-                  transaction_type: { type: 'string' }, // SENDER or RECEIVER
+                  transaction_type: { type: 'string' },
                   request_data: { type: 'string' },
                 },
               },
             },
+            hasNextPage: { type: 'boolean' },
+            hasPrevPage: { type: 'boolean' },
+            nextCursor: { type: ['string', 'null'] },
+            prevCursor: { type: ['string', 'null'] },
             total: { type: 'number' },
           },
+          required: ['data', 'hasNextPage', 'hasPrevPage', 'nextCursor', 'prevCursor'],
         },
       },
       tags: ['Accounts'],
-      summary: 'Account Transactions',
-      description: 'Get transactions for a specific account',
+      summary: 'Account Transactions with cursor pagination',
+      description: 'Get transactions for a specific account using cursor-based pagination',
     },
   };
 
@@ -77,121 +91,153 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
     async (
       request: FastifyRequest<AccountTransactionsQuery>,
       reply: FastifyReply
-    ): Promise<AccountTransactionsResponse> => {
+    ): Promise<CursorResponse<{ data: AccountTransaction[] }>> => {
+      const {
+        cursor,
+        direction = PAGINATION_DIRECTIONS.NEXT,
+        limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+        include_total = false,
+      } = request.query;
+
       const { account } = request.params;
-      const { limit, offset } = request.query;
 
       try {
-        // First get the account_id
-        const accountQuery = {
-          text: 'SELECT pk_account_id FROM accounts WHERE account_name = $1',
-          values: [account],
-        };
-        
-        const accountResult = await pool.query(accountQuery);
-        
+        // Retrieve account_id first
+        const accountResult = await pool.query('SELECT pk_account_id FROM accounts WHERE account_name = $1', [account]);
+
         if (accountResult.rows.length === 0) {
-          return {
-            transactions: [],
-            total: 0
-          };
+          return reply.send({
+            data: [],
+            hasNextPage: false,
+            hasPrevPage: false,
+            nextCursor: null,
+            prevCursor: null,
+            total: 0,
+          });
         }
-        
+
         const accountId = accountResult.rows[0].pk_account_id;
-        
-        // Combined query with database-level pagination
-        const transactionsQuery = {
-          text: `
-            WITH combined_transactions AS (
-              -- Sender transactions
-              SELECT 
-                t.pk_transaction_id,
-                t.transaction_id,
-                t.block_timestamp,
-                t.action_name,
-                t.fee,
-                t.request_data,
-                'SENDER' as transaction_type,
-                CAST(COALESCE(tt.total_amount, NULL) AS TEXT) as fio_tokens
-              FROM transactions t
-              LEFT JOIN (
-                SELECT 
-                  fk_transaction_id, 
-                  SUM(fio_suf_amount) as total_amount
-                FROM tokentransfers 
-                WHERE fk_payer_account_id = $1
-                GROUP BY fk_transaction_id
-              ) tt ON t.pk_transaction_id = tt.fk_transaction_id
-              WHERE t.fk_account_id = $1
-              
-              UNION ALL
-              
-              -- Receiver transactions
-              SELECT 
-                t.pk_transaction_id,
-                t.transaction_id,
-                t.block_timestamp,
-                t.action_name,
-                t.fee,
-                t.request_data,
-                'RECEIVER' as transaction_type,
-                CAST(COALESCE(tt.total_amount, NULL) AS TEXT) as fio_tokens
-              FROM accountactivities aa
-              JOIN transactions t ON aa.fk_transaction_id = t.pk_transaction_id
-              LEFT JOIN (
-                SELECT 
-                  fk_transaction_id, 
-                  SUM(fio_suf_amount) as total_amount
-                FROM tokentransfers 
-                WHERE fk_payee_account_id = $1
-                GROUP BY fk_transaction_id
-              ) tt ON t.pk_transaction_id = tt.fk_transaction_id
-              WHERE aa.fk_account_id = $1
-                AND t.fk_account_id != $1
-            )
-            SELECT * FROM combined_transactions
-            ORDER BY pk_transaction_id DESC
-            LIMIT $2 OFFSET $3
-          `,
-          values: [accountId, limit, offset],
-        };
 
-        // Get total count efficiently
-        const countQuery = {
-          text: `
+        // Build cursor condition
+        let cursorCondition = '';
+        const queryValues: (string | number)[] = [accountId];
+
+        if (cursor) {
+          const operator = direction === PAGINATION_DIRECTIONS.NEXT ? '<' : '>';
+          cursorCondition = `AND pk_transaction_id ${operator} $${queryValues.length + 1}`;
+          queryValues.push(cursor);
+        }
+
+        // Determine order direction for query
+        const orderDirection = direction === PAGINATION_DIRECTIONS.PREV ? 'ASC' : 'DESC';
+
+        // Build combined CTE query
+        const limitPlus = limit + 1;
+        queryValues.push(limitPlus);
+
+        const combinedQuery = `
+          WITH combined_transactions AS (
+            -- Sender transactions
             SELECT 
-              (
-                SELECT COUNT(*) 
-                FROM transactions 
-                WHERE fk_account_id = $1
-              ) + 
-              (
-                SELECT COUNT(*) 
-                FROM accountactivities 
-                WHERE fk_account_id = $1
+              t.pk_transaction_id,
+              t.transaction_id,
+              t.block_timestamp,
+              t.action_name,
+              t.fee,
+              t.request_data,
+              'SENDER' as transaction_type,
+              CAST(COALESCE(tt.total_amount, NULL) AS TEXT) as fio_tokens
+            FROM transactions t
+            LEFT JOIN (
+              SELECT fk_transaction_id, SUM(fio_suf_amount) as total_amount
+              FROM tokentransfers 
+              WHERE fk_payer_account_id = $1
+              GROUP BY fk_transaction_id
+            ) tt ON t.pk_transaction_id = tt.fk_transaction_id
+            WHERE t.fk_account_id = $1
+
+            UNION ALL
+
+            -- Receiver transactions
+            SELECT 
+              t.pk_transaction_id,
+              t.transaction_id,
+              t.block_timestamp,
+              t.action_name,
+              t.fee,
+              t.request_data,
+              'RECEIVER' as transaction_type,
+              CAST(COALESCE(tt.total_amount, NULL) AS TEXT) as fio_tokens
+            FROM accountactivities aa
+            JOIN transactions t ON aa.fk_transaction_id = t.pk_transaction_id
+            LEFT JOIN (
+              SELECT fk_transaction_id, SUM(fio_suf_amount) as total_amount
+              FROM tokentransfers 
+              WHERE fk_payee_account_id = $1
+              GROUP BY fk_transaction_id
+            ) tt ON t.pk_transaction_id = tt.fk_transaction_id
+            WHERE aa.fk_account_id = $1 AND t.fk_account_id != $1
+          )
+          SELECT * FROM combined_transactions
+          WHERE 1=1 ${cursorCondition}
+          ORDER BY pk_transaction_id ${orderDirection}
+          LIMIT $${queryValues.length}
+        `;
+
+        let { rows } = await pool.query(combinedQuery, queryValues);
+
+        const hasMorePages = rows.length > limit;
+        if (hasMorePages) {
+          rows = rows.slice(0, limit);
+        }
+
+        if (direction === PAGINATION_DIRECTIONS.PREV) {
+          rows.reverse();
+        }
+
+        let hasNextPage: boolean;
+        let hasPrevPage: boolean;
+
+        if (direction === PAGINATION_DIRECTIONS.NEXT) {
+          hasNextPage = hasMorePages;
+          hasPrevPage = !!cursor;
+        } else {
+          hasNextPage = !!cursor;
+          hasPrevPage = hasMorePages;
+        }
+
+        const nextCursor = hasNextPage && rows.length > 0 ? rows[rows.length - 1].pk_transaction_id : null;
+        const prevCursor = hasPrevPage && rows.length > 0 ? rows[0].pk_transaction_id : null;
+
+        let total: number | undefined;
+        if (include_total) {
+          const countQuery = {
+            text: `
+              SELECT (
+                SELECT COUNT(*) FROM transactions WHERE fk_account_id = $1
+              ) + (
+                SELECT COUNT(*) FROM accountactivities WHERE fk_account_id = $1
               ) as total
-          `,
-          values: [accountId],
+            `,
+            values: [accountId],
+          };
+          const countResult = await pool.query(countQuery.text, countQuery.values);
+          total = parseInt(countResult.rows[0].total);
+        }
+
+        const response: CursorResponse<{ data: AccountTransaction[] }> = {
+          data: rows,
+          hasNextPage,
+          hasPrevPage,
+          nextCursor,
+          prevCursor,
+          ...(total !== undefined && { total }),
         };
 
-        // Execute both queries in parallel
-        const [transactionsResult, countResult] = await Promise.all([
-          pool.query(transactionsQuery),
-          pool.query(countQuery),
-        ]);
-        
-        return {
-          transactions: transactionsResult.rows,
-          total: parseInt(countResult.rows[0].total),
-        };
+        return reply.send(response);
       } catch (error) {
-        console.error('Error fetching account transactions:', error);
-        reply.code(500);
-        return {
-          transactions: [],
-          total: 0,
-          error: 'Failed to fetch account transactions',
-        } as any;
+        console.error('Error fetching account transactions with cursor pagination:', error);
+        return reply.code(500).send({ error: 'Internal server error' });
       }
     }
   );
