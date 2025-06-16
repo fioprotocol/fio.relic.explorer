@@ -13,6 +13,7 @@ import { JsonSyntaxHighlighter } from 'src/components/common/JsonSyntaxHighlight
 import { JsonDataRender } from 'src/components/common/JsonDataRender';
 import { DetailsPagesHeaderItem } from 'src/components/common/DetailsPagesHeaderItem';
 import { IrreversibleStatus } from 'src/components/IrreversibleStatus';
+import { Alert } from 'src/components/common/Alert';
 
 import { ROUTES } from 'src/constants/routes';
 import { formatDate } from 'src/utils/general';
@@ -38,7 +39,7 @@ const ContractActionBadge: FC<{ contractActionName: string; actionName: string }
 };
 
 const TransactionDetailsPage: FC = () => {
-  const { id, loading, transaction, lastIrreversibleBlockNumber, stats, rawData } =
+  const { error, id, loading, transaction, lastIrreversibleBlockNumber, stats, rawData } =
     useTransactionDetailsPageContext();
   const tabRowStyle = 'm-0 gap-4 d-flex flex-column flex-md-row flex-wrap w-100';
 
@@ -100,7 +101,7 @@ const TransactionDetailsPage: FC = () => {
             </div>
           </Tab.Pane>
           <Tab.Pane eventKey="traces" title="Traces">
-            {transaction?.traces.map((trace, key) => (
+            {transaction?.traces?.map((trace, key) => (
               <div
                 key={key}
                 className={`${tabRowStyle} border-bottom py-4 ${key === transaction?.traces.length - 1 ? 'border-bottom-0' : ''}`}
@@ -123,6 +124,16 @@ const TransactionDetailsPage: FC = () => {
             </div>
           </Tab.Pane>
         </Tabs>
+        {!loading && !error && (!transaction || Object.keys(transaction).length === 0) && (
+          <Alert variant="info" title="No data" message="No data found for this transaction" />
+        )}
+        {!loading && error && (
+          <Alert
+            variant="danger"
+            title="Error"
+            message={typeof error === 'string' ? error : error?.message}
+          />
+        )}
       </CardComponent>
     </Container>
   );

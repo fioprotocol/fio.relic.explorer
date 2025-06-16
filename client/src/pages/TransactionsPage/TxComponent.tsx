@@ -14,10 +14,7 @@ export const TX_TABLE_COLUMNS: TableColumn[] = [
 ];
 
 export const TxComponent: FC = () => {
-  const {
-    transactions,
-    ...paginationProps
-  } = useTxComponentContext();
+  const { transactions, ...paginationProps } = useTxComponentContext();
 
   return (
     <LoadableTable
@@ -26,6 +23,7 @@ export const TxComponent: FC = () => {
       title="All Transactions"
       showPagination
       showInCardComponent
+      emptyStateMessage="No transactions found"
       {...paginationProps}
     />
   );
