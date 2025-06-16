@@ -4,9 +4,9 @@ import {
   CursorAccountsResponse,
   AccountSortOption,
   AccountResponse,
-  AccountTransactionsResponse,
-  AccountFioHandlesResponse,
-  AccountDomainResponse,
+  CursorAccountTransactionsResponse,
+  CursorAccountFioHandlesResponse,
+  CursorAccountDomainsResponse,
 } from '@shared/types/accounts';
 import { PaginationDirection } from '@shared/constants/pagination';
 
@@ -32,15 +32,17 @@ export const getAccount = async ({ account }: { account: string }): Promise<Acco
 export const getAccountTransactions = async ({
   account,
   limit,
-  offset,
+  cursor,
+  direction,
 }: {
   account: string;
-  limit: number;
-  offset: number;
-}): Promise<AccountTransactionsResponse> => {
-  const response = await apiClient.get<AccountTransactionsResponse>(
+  limit?: number;
+  cursor?: string;
+  direction?: PaginationDirection;
+}): Promise<CursorAccountTransactionsResponse> => {
+  const response = await apiClient.get<CursorAccountTransactionsResponse>(
     `/accounts/${account}/transactions`,
-    { params: { limit, offset } }
+    { params: { limit, cursor, direction } }
   );
   return response.data;
 };
@@ -48,15 +50,17 @@ export const getAccountTransactions = async ({
 export const getAccountFioHandles = async ({
   account,
   limit,
-  offset,
+  cursor,
+  direction,
 }: {
   account: string;
-  limit: number;
-  offset: number;
-}): Promise<AccountFioHandlesResponse> => {
-  const response = await apiClient.get<AccountFioHandlesResponse>(
+  limit?: number;
+  cursor?: string;
+  direction?: PaginationDirection;
+}): Promise<CursorAccountFioHandlesResponse> => {
+  const response = await apiClient.get<CursorAccountFioHandlesResponse>(
     `/accounts/${account}/fio-handles`,
-    { params: { limit, offset } }
+    { params: { limit, cursor, direction } }
   );
   return response.data;
 };
@@ -64,14 +68,17 @@ export const getAccountFioHandles = async ({
 export const getAccountDomains = async ({
   account,
   limit,
-  offset,
+  cursor,
+  direction,
 }: {
   account: string;
-  limit: number;
-  offset: number;
-}): Promise<AccountDomainResponse> => {
-  const response = await apiClient.get<AccountDomainResponse>(`/accounts/${account}/domains`, {
-    params: { limit, offset },
-  });
+  limit?: number;
+  cursor?: string;
+  direction?: PaginationDirection;
+}): Promise<CursorAccountDomainsResponse> => {
+  const response = await apiClient.get<CursorAccountDomainsResponse>(
+    `/accounts/${account}/domains`,
+    { params: { limit, cursor, direction } }
+  );
   return response.data;
 };

@@ -8,6 +8,7 @@ import { Badge } from 'src/components/common/Badge';
 import { Tabs } from 'src/components/common/Tabs';
 import DataTile from 'src/components/common/DataTile/DataTile';
 import { CardComponent } from 'src/components/layout/CardComponent';
+import { Alert } from 'src/components/common/Alert';
 
 import { ROUTES } from 'src/constants/routes';
 import { formatDate } from 'src/utils/general';
@@ -23,6 +24,7 @@ import { useAccountDetailsPageContext } from './AccountDetailsPageContext';
 const AccountDetailsPage: FC = () => {
   const {
     account,
+    accountDataError,
     publicKey,
     date,
     blockNumber,
@@ -35,6 +37,21 @@ const AccountDetailsPage: FC = () => {
     votes,
     votingProxy,
   } = useAccountDetailsPageContext();
+
+  if (accountDataError && !loading) {
+    return (
+      <Container className="py-5">
+        <BackButton />
+        <Alert
+          variant="danger"
+          title="Error"
+          message={
+            typeof accountDataError === 'string' ? accountDataError : accountDataError?.message
+          }
+        />
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-5">

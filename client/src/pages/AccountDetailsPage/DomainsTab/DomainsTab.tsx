@@ -52,6 +52,7 @@ export const DomainsTab: FC = () => {
       )}
       loading={loading}
       showPagination
+      emptyStateMessage="No domains found"
       {...paginationData}
     />
   );

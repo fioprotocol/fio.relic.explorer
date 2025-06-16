@@ -40,19 +40,12 @@ export type AccountTransaction = {
   request_data: string;
 }
 
-export type AccountTransactionsResponse = {
-  transactions: AccountTransaction[];
-  total: number;
-};
+// Cursor-based pagination response for account transactions
+export type CursorAccountTransactionsResponse = CursorResponse<{ data: AccountTransaction[] }>;
 
 export type AccounFioHandle = {
   handle: string;
   handle_status: string;
-};
-
-export type AccountFioHandlesResponse = {
-  data: AccounFioHandle[];
-  total: number;
 };
 
 export type AccountDomain = {
@@ -63,7 +56,7 @@ export type AccountDomain = {
   expiration_timestamp: string;
 };
 
-export type AccountDomainResponse = {
-  data: AccountDomain[];
-  total: number;
-};
+// Cursor-based pagination responses for account-related resources
+export type CursorAccountFioHandlesResponse = CursorResponse<{ data: AccounFioHandle[] }>;
+
+export type CursorAccountDomainsResponse = CursorResponse<{ data: AccountDomain[] }>;

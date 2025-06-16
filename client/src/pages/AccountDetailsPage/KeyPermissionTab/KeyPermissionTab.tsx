@@ -4,12 +4,23 @@ import { JsonSyntaxHighlighter } from 'src/components/common/JsonSyntaxHighlight
 import { Loader } from 'src/components/common/Loader';
 
 import { useKeyPermissionTabContext } from './KeyPermissionTabContext';
+import { Alert } from 'src/components/common/Alert';
 
 export const KeyPermissionTab: FC = () => {
-  const { keyPermissionsData, loading } = useKeyPermissionTabContext();
+  const { keyPermissionsData, loading, error } = useKeyPermissionTabContext();
 
-  if (loading) {
+  if (loading && !error) {
     return <Loader />;
+  }
+
+  if (error) {
+    return (
+      <Alert
+        variant="danger"
+        title="Error"
+        message={typeof error === 'string' ? error : error?.message}
+      />
+    );
   }
 
   if (!keyPermissionsData) {
@@ -21,4 +32,4 @@ export const KeyPermissionTab: FC = () => {
       <JsonSyntaxHighlighter json={{ permissions: keyPermissionsData.permissions }} />
     </div>
   );
-}; 
+};

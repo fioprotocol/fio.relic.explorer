@@ -2,10 +2,14 @@ import { FastifyPluginAsync, FastifyRequest, FastifyReply, RouteShorthandOptions
 import pool from 'src/config/database';
 import {
   DEFAULT_REQUEST_ITEMS_LIMIT,
-  DEFAULT_REQUEST_ITEMS_OFFSET,
   DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
 } from '@shared/constants/network';
-import { AccountFioHandlesResponse } from '@shared/types/accounts';
+
+import { CursorPagination } from 'src/utils/cursorPagination';
+import { PAGINATION_DIRECTIONS, PaginationDirection } from '@shared/constants/pagination';
+
+import { AccounFioHandle } from '@shared/types/accounts';
+import { CursorResponse } from '@shared/types/general';
 
 interface AccountFioHandlesParams {
   Params: {
@@ -13,7 +17,9 @@ interface AccountFioHandlesParams {
   };
   Querystring: {
     limit?: number;
-    offset?: number;
+    cursor?: string;
+    direction?: PaginationDirection;
+    include_total?: boolean;
   };
 }
 
@@ -32,13 +38,19 @@ const accountFioHandlesRoute: FastifyPluginAsync = async (fastify) => {
       querystring: {
         type: 'object',
         properties: {
-          offset: { type: 'integer', default: DEFAULT_REQUEST_ITEMS_OFFSET, minimum: 0 },
+          cursor: { type: 'string' },
+          direction: {
+            type: 'string',
+            enum: [PAGINATION_DIRECTIONS.NEXT, PAGINATION_DIRECTIONS.PREV],
+            default: PAGINATION_DIRECTIONS.NEXT,
+          },
           limit: {
             type: 'integer',
             default: DEFAULT_REQUEST_ITEMS_LIMIT,
             minimum: 1,
             maximum: DEFAULT_MAX_REQUEST_ITEMS_LIMIT,
           },
+          include_total: { type: 'boolean', default: false },
         },
       },
       response: {
@@ -55,19 +67,24 @@ const accountFioHandlesRoute: FastifyPluginAsync = async (fastify) => {
                 },
               },
             },
+            hasNextPage: { type: 'boolean' },
+            hasPrevPage: { type: 'boolean' },
+            nextCursor: { type: ['string', 'null'] },
+            prevCursor: { type: ['string', 'null'] },
             total: { type: 'number' },
           },
+          required: ['data', 'hasNextPage', 'hasPrevPage', 'nextCursor', 'prevCursor'],
         },
         404: {
           type: 'object',
           properties: {
-            error: { type: 'string' }
-          }
-        }
+            message: { type: 'string' },
+          },
+        },
       },
       tags: ['Accounts'],
-      summary: 'Account FIO Handles',
-      description: 'Get FIO handles for a specific account',
+      summary: 'Account FIO Handles with cursor pagination',
+      description: 'Get FIO handles for a specific account using cursor-based pagination',
     },
   };
 
@@ -77,9 +94,14 @@ const accountFioHandlesRoute: FastifyPluginAsync = async (fastify) => {
     async (
       request: FastifyRequest<AccountFioHandlesParams>,
       reply: FastifyReply
-    ): Promise<AccountFioHandlesResponse> => {
+    ): Promise<CursorResponse<{ data: AccounFioHandle[] }>> => {
       const { account } = request.params;
-      const { limit, offset } = request.query;
+      const {
+        cursor,
+        direction = PAGINATION_DIRECTIONS.NEXT,
+        limit = DEFAULT_REQUEST_ITEMS_LIMIT,
+        include_total = false,
+      } = request.query;
 
       // Get account ID first
       const accountIdQuery = {
@@ -97,59 +119,58 @@ const accountFioHandlesRoute: FastifyPluginAsync = async (fastify) => {
         if (accountResult.rows.length === 0) {
           reply.code(404);
           return {
-            data: [],
-            total: 0,
-            error: 'Account not found'
+            message: "Account's handles not found",
           } as any;
         }
 
         const accountId = accountResult.rows[0].pk_account_id;
 
-        // Query to get handles for the account
-        const handlesQuery = {
-          text: `
-            SELECT 
-              handle,
-              handle_status
-            FROM handles
-            WHERE fk_owner_account_id = $1
-            ORDER BY handle ASC
-            LIMIT $2
-            OFFSET $3
-          `,
-          values: [accountId, limit, offset],
+        // Use cursor pagination on handles table
+        const selectColumns = `
+          h.pk_handle_id,
+          h.handle,
+          h.handle_status
+        `;
+
+        const result = await CursorPagination.paginate<AccounFioHandle & { pk_handle_id: number }>({
+          table: 'handles h',
+          cursorColumn: 'h.pk_handle_id',
+          orderDirection: 'DESC',
+          limit,
+          cursor,
+          direction,
+          whereClause: 'h.fk_owner_account_id = $1',
+          whereValues: [accountId],
+          selectColumns,
+        });
+
+        let total: number | undefined;
+        if (include_total) {
+          total = await CursorPagination.getTotalCount({
+            table: 'handles h',
+            whereClause: 'h.fk_owner_account_id = $1',
+            whereValues: [accountId],
+          });
+        }
+
+        const data = result.data.map(({ handle, handle_status }) => ({ handle, handle_status }));
+
+        const response: CursorResponse<{ data: AccounFioHandle[] }> = {
+          data,
+          hasNextPage: result.hasNextPage,
+          hasPrevPage: result.hasPrevPage,
+          nextCursor: result.nextCursor,
+          prevCursor: result.prevCursor,
+          ...(total !== undefined && { total }),
         };
 
-        // Count query
-        const countQuery = {
-          text: `
-            SELECT COUNT(*) as total
-            FROM handles
-            WHERE fk_owner_account_id = $1
-          `,
-          values: [accountId],
-        };
-
-        const [handlesResult, countResult] = await Promise.all([
-          pool.query(handlesQuery),
-          pool.query(countQuery),
-        ]);
-
-        return {
-          data: handlesResult.rows,
-          total: parseInt(countResult.rows[0].total),
-        };
+        return reply.send(response);
       } catch (error) {
         console.error('Error fetching account FIO handles:', error);
-        reply.code(500);
-        return {
-          data: [],
-          total: 0,
-          error: 'Failed to fetch account FIO handles',
-        } as any;
+        return reply.code(500).send({ message: 'Internal server error' });
       }
     }
   );
 };
 
-export default accountFioHandlesRoute; 
+export default accountFioHandlesRoute;

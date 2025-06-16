@@ -97,6 +97,7 @@ const AccountsPage: FC = () => {
         data={data}
         {...paginationProps}
         showInCardComponent
+        emptyStateMessage="No accounts found"
         className="mb-5"
       />
     </Container>

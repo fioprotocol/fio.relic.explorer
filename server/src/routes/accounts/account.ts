@@ -44,7 +44,7 @@ const accountRoute: FastifyPluginAsync = async (fastify) => {
         404: {
           type: 'object',
           properties: {
-            error: { type: 'string' }
+            message: { type: 'string' }
           }
         }
       },
@@ -89,7 +89,7 @@ const accountRoute: FastifyPluginAsync = async (fastify) => {
 
       if (result.rows.length === 0) {
         reply.code(404);
-        return { error: 'Account not found' };
+        return { message: 'Account not found' };
       }
 
       return { data: result.rows[0] as AccountDetails };
