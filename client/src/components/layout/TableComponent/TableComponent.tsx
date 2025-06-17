@@ -9,6 +9,7 @@ export interface TableColumn {
   align?: 'start' | 'center' | 'end';
   verticalAlign?: 'baseline' | 'top' | 'middle' | 'bottom';
   mobileRow?: [row: number, col: number];
+  className?: string;
 }
 
 export interface TableProps {
@@ -76,7 +77,7 @@ export const TableComponent: React.FC<TableProps> = ({
                   {columns.map((column) => (
                     <td
                       key={`${index}-${column.key}`}
-                      className={`py-3 px-4 bg-transparent ${column.align ? `text-${column.align}` : ''} ${column.verticalAlign ? `align-${column.verticalAlign}` : ''}`}
+                      className={`py-3 px-4 bg-transparent ${column.align ? `text-${column.align}` : ''} ${column.verticalAlign ? `align-${column.verticalAlign}` : ''} ${column.className}`}
                     >
                       {Array.isArray(record[column.key])
                         ? JSON.stringify(record[column.key])

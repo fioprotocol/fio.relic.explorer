@@ -33,6 +33,13 @@ CREATE INDEX IF NOT EXISTS idx_tokentransfers_fk_payee_account_id ON tokentransf
 -- Composite index for optimizing the token transfer aggregation queries
 CREATE INDEX IF NOT EXISTS idx_tokentransfers_txid_payer_composite ON tokentransfers(fk_transaction_id, fk_payer_account_id);
 CREATE INDEX IF NOT EXISTS idx_tokentransfers_txid_payee_composite ON tokentransfers(fk_transaction_id, fk_payee_account_id);
+-- optimises:  fk_payer_account_id = ?  + GROUP BY fk_transaction_id
+CREATE INDEX IF NOT EXISTS idx_tokentransfers_payer_txid_composite
+  ON tokentransfers(fk_payer_account_id, fk_transaction_id);
+
+-- optimises:  fk_payee_account_id = ?  + JOIN … ON fk_transaction_id
+CREATE INDEX IF NOT EXISTS idx_tokentransfers_payee_txid_composite
+  ON tokentransfers(fk_payee_account_id, fk_transaction_id);
 
 -- Basic indexes for common sort fields
 CREATE INDEX IF NOT EXISTS idx_accounts_pk_account_id ON accounts(pk_account_id);

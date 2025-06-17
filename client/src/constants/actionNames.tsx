@@ -3,11 +3,20 @@ import { ReactElement } from 'react';
 import { AnyObject } from '@shared/types/general';
 import { truncateLongText } from 'src/utils/general';
 import { formatFioAmount } from 'src/utils/fio';
+import { TRANSACTION_TYPE } from '@shared/constants/transaction';
 
 export interface ActionInfo {
   description: string;
   details?: string;
-  formatDetails?: (data: AnyObject, className?: string) => string | ReactElement;
+  formatDetails?: ({
+    data,
+    className,
+    transactionType,
+  }: {
+    data: AnyObject;
+    className?: string;
+    transactionType?: string;
+  }) => string | ReactElement;
 }
 
 export interface FeeRatio {
@@ -69,7 +78,8 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   newfioacc: {
     description: 'New FIO Chain Account',
     details: 'fio_public_key',
-    formatDetails: (data: AnyObject): string => truncateLongText(data?.fio_public_key || ''),
+    formatDetails: ({ data }: { data: AnyObject }): string =>
+      truncateLongText(data?.fio_public_key || ''),
   },
   addperm: {
     description: 'Add Permission',
@@ -79,7 +89,7 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   recordobt: {
     description: 'Record FIO Data',
-    formatDetails: (data: AnyObject): string =>
+    formatDetails: ({ data }: { data: AnyObject }): string =>
       `From ${data?.payer_fio_address || ''} to ${data?.payee_fio_address || ''}`,
   },
   addaddress: {
@@ -132,7 +142,7 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   setdomainpub: {
     description: 'Change Domain Setting',
-    formatDetails: (data: AnyObject): string =>
+    formatDetails: ({ data }: { data: AnyObject }): string =>
       `${data?.fio_domain} ${data?.is_public ? 'public' : 'private'}`,
   },
   wrapdomain: {
@@ -145,7 +155,7 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   newfundsreq: {
     description: 'New FIO Request',
-    formatDetails: (data: AnyObject): string =>
+    formatDetails: ({ data }: { data: AnyObject }): string =>
       `From ${data?.payee_fio_address || ''} to ${data?.payer_fio_address || ''}`,
   },
   cancelfndreq: {
@@ -157,32 +167,46 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   trnsfiopubky: {
     description: 'Transfer FIO Tokens',
-    formatDetails: (data: AnyObject, className?: string): ReactElement => (
+    formatDetails: ({
+      data,
+      className,
+      transactionType,
+    }: {
+      data: AnyObject;
+      className?: string;
+      transactionType?: string;
+    }): ReactElement => (
       <>
-        <span className={className}>{formatFioAmount({ amount: data?.amount })}</span> to {truncateLongText(data?.payee_public_key || '')}
+        <span className={className}>{formatFioAmount({ amount: data?.amount })}</span>{' '}
+        {transactionType === TRANSACTION_TYPE.SENDER ? 'to' : 'from'}{' '}
+        {truncateLongText(data?.payee_public_key || '')}
       </>
     ),
   },
   trnsloctoks: {
     description: 'Transfer and lock FIO Tokens',
-    formatDetails: (data: AnyObject): string =>
+    formatDetails: ({ data }: { data: AnyObject }): string =>
       `${formatFioAmount({ amount: data?.amount })} to ${truncateLongText(data?.payee_public_key || '')}`,
   },
   stakefio: {
     description: 'Stake FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })}`,
+    formatDetails: ({ data }: { data: AnyObject }): string =>
+      `${formatFioAmount({ amount: data?.amount })}`,
   },
   unstakefio: {
     description: 'Unstake FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })}`,
+    formatDetails: ({ data }: { data: AnyObject }): string =>
+      `${formatFioAmount({ amount: data?.amount })}`,
   },
   wraptokens: {
     description: 'Wrap FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.amount })} to ${data?.chain_code || ''}`,
+    formatDetails: ({ data }: { data: AnyObject }): string =>
+      `${formatFioAmount({ amount: data?.amount })} to ${data?.chain_code || ''}`,
   },
   retire: {
     description: 'Burn FIO Tokens',
-    formatDetails: (data: AnyObject): string => `${formatFioAmount({ amount: data?.quantity })}`,
+    formatDetails: ({ data }: { data: AnyObject }): string =>
+      `${formatFioAmount({ amount: data?.quantity })}`,
   },
   addnft: {
     description: 'Sign NFTs',
