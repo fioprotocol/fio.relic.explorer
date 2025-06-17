@@ -168,6 +168,10 @@ a {
   cursor: pointer;
 }
 
+.nowrap {
+  white-space: nowrap !important;
+}
+
 @include media-breakpoint-down(sm) {
   .text-truncate-max-w {
     max-width: 10rem;

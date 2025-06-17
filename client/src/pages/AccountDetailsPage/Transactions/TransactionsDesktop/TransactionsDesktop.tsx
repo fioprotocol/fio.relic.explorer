@@ -18,12 +18,13 @@ import { TRANSACTION_TYPE } from '@shared/constants/transaction';
 
 import styles from '../Transactions.module.scss';
 
-
 type TransactionsDesktopProps = {
   transactions: AccountTransaction[];
 };
 
-export const transactionsDesktop = ({ transactions }: TransactionsDesktopProps): {
+export const transactionsDesktop = ({
+  transactions,
+}: TransactionsDesktopProps): {
   className: string;
   status: ReactNode;
   transaction_hash: ReactNode;
@@ -49,6 +50,15 @@ export const transactionsDesktop = ({ transactions }: TransactionsDesktopProps):
       const hasFees = fee && fee !== '0';
       const hasFioTokens = fio_tokens && fio_tokens !== '0';
 
+      // Pre-compute fee related formatting for clarity
+      const feeTextColorClass = !hasFees
+        ? 'text-dark'
+        : isSender
+          ? 'text-danger'
+          : 'text-secondary';
+
+      const feePrefix = isSender && hasFees ? '-' : '';
+
       return {
         className: isSender ? styles.senderRow : '',
         status: isSender ? (
@@ -62,10 +72,7 @@ export const transactionsDesktop = ({ transactions }: TransactionsDesktopProps):
         ) : null,
         transaction_hash: (
           <div className="d-flex flex-row align-items-center justify-content-between gap-2">
-            <Link
-              to={`${ROUTES.transactions.path}/${transaction_id}`}
-              className="flex-shrink-0"
-            >
+            <Link to={`${ROUTES.transactions.path}/${transaction_id}`} className="flex-shrink-0">
               {truncateLongText(transaction_id?.toString())}
             </Link>
             <CopyButton
@@ -81,13 +88,12 @@ export const transactionsDesktop = ({ transactions }: TransactionsDesktopProps):
           actionInfo: transformActionInfo(action_name),
           request_data,
           className: isSender ? 'text-danger' : isReceiver ? styles.receiver : '',
+          transactionType: transaction_type,
         }),
         fee:
-          hasFees ? (
-            <span
-              className={`f-size-xs ${isSender ? 'text-danger' : isReceiver ? 'text-secondary' : 'text-dark'}`}
-            >
-              {isSender ? '-' : ''}
+          fee != null ? (
+            <span className={`f-size-xs ${feeTextColorClass}`}>
+              {feePrefix}
               {formatFioAmount({ amount: fee })}
             </span>
           ) : null,
@@ -96,11 +102,11 @@ export const transactionsDesktop = ({ transactions }: TransactionsDesktopProps):
             <Badge
               className={`border border-1 bg-white f-size-xs ${styles.tokenBadge} ${!hasFioTokens ? 'border-secondary text-secondary' : isSender ? 'border-danger text-danger' : isReceiver ? styles.receiver : ''}`}
             >
-              {isReceiver ? hasFioTokens ? '+' : '-' : '-'}
+              {isReceiver ? (hasFioTokens ? '+' : '-') : '-'}
               {formatFioAmount({ amount: fio_tokens || fee })}
             </Badge>
           ) : null,
       };
     }
-  )
+  );
 };

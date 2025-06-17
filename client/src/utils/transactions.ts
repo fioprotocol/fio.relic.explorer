@@ -23,15 +23,21 @@ export const transformDetails = ({
   actionInfo,
   request_data,
   className,
+  transactionType,
 }: {
   actionInfo: ActionInfo;
   request_data?: string;
   className?: string;
+  transactionType?: string;
 }): string | null => {
   let details = null;
 
   if (actionInfo.formatDetails && request_data) {
-    details = actionInfo.formatDetails(JSON.parse(request_data), className);
+    details = actionInfo.formatDetails({
+      data: JSON.parse(request_data),
+      className,
+      transactionType,
+    });
   } else if (actionInfo.details && request_data) {
     details = JSON.parse(request_data)[actionInfo.details] || details;
   }

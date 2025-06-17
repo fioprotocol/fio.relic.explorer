@@ -32,6 +32,7 @@ const COLUMNS = [
     key: 'fee',
     title: 'Fees',
     align: 'end',
+    className: 'nowrap',
   },
   {
     key: 'fio_tokens',
