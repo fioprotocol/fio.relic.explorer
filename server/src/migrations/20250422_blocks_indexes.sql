@@ -38,6 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_tokentransfers_txid_payee_composite ON tokentrans
 CREATE INDEX IF NOT EXISTS idx_accounts_pk_account_id ON accounts(pk_account_id);
 CREATE INDEX IF NOT EXISTS idx_accounts_block_timestamp ON accounts(block_timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_accounts_fio_balance_suf ON accounts(fio_balance_suf DESC);
+CREATE INDEX IF NOT EXISTS idx_accounts_balance_id ON accounts (fio_balance_suf ASC, pk_account_id ASC);
 
 -- Indexes for handle and domain relationships to optimize count aggregations (consolidated)
 CREATE INDEX IF NOT EXISTS idx_handles_fk_owner_account_id ON handles(fk_owner_account_id);
