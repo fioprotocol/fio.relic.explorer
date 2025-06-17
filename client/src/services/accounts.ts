@@ -1,6 +1,5 @@
 import { apiClient } from './api-client';
 import {
-  AccountsResponse,
   CursorAccountsResponse,
   AccountSortOption,
   AccountResponse,
@@ -17,8 +16,8 @@ export const getAccounts = async (params: {
   order?: 'asc' | 'desc';
   sort?: AccountSortOption;
   include_total?: boolean;
-}): Promise<CursorAccountsResponse | AccountsResponse> => {
-  const response = await apiClient.get<CursorAccountsResponse | AccountsResponse>('/accounts', {
+}): Promise<CursorAccountsResponse> => {
+  const response = await apiClient.get<CursorAccountsResponse>('/accounts', {
     params,
   });
   return response.data;

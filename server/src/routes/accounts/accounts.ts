@@ -156,14 +156,16 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
       const isSimpleSort =
         sort === ACCOUNT_SORT_OPTIONS.ACCOUNT_ID || sort === ACCOUNT_SORT_OPTIONS.BALANCE;
 
-      if (isSimpleSort) {
-        const getOperator = (o: 'asc' | 'desc', nav: PaginationDirection): string => {
-          if (nav === PAGINATION_DIRECTIONS.NEXT) {
-            return o === 'desc' ? '<' : '>';
-          }
-          return o === 'desc' ? '>' : '<';
-        };
+      const isCountSort =
+        sort === ACCOUNT_SORT_OPTIONS.HANDLES || sort === ACCOUNT_SORT_OPTIONS.DOMAINS;
 
+      // Helper to choose comparison operator based on sort order and navigation direction
+      const getOperator = (o: 'asc' | 'desc', nav: PaginationDirection): string => {
+        if (nav === PAGINATION_DIRECTIONS.NEXT) return o === 'desc' ? '<' : '>';
+        return o === 'desc' ? '>' : '<';
+      };
+
+      if (isSimpleSort) {
         const effectiveOrder =
           direction === PAGINATION_DIRECTIONS.PREV ? (order === 'desc' ? 'asc' : 'desc') : order;
 
@@ -174,8 +176,17 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
         const queryParams: (string | number)[] = [];
 
         if (cursor) {
-          cursorWhere = `WHERE ${orderByField} ${getOperator(order, direction)} $1`;
-          queryParams.push(cursor);
+          if (sort === ACCOUNT_SORT_OPTIONS.BALANCE && cursor.trim().startsWith('{')) {
+            // Composite cursor with balance and pk_account_id
+            const { balance: cursorBalance, pk_account_id: cursorId } = JSON.parse(cursor);
+
+            // For balance duplicates, compare balance first, then id as tiebreaker
+            cursorWhere = `WHERE (${orderByField} ${getOperator(order, direction)} $1 OR (${orderByField} = $1 AND a.pk_account_id ${getOperator(order, direction)} $2))`;
+            queryParams.push(cursorBalance, cursorId);
+          } else {
+            cursorWhere = `WHERE ${orderByField} ${getOperator(order, direction)} $1`;
+            queryParams.push(cursor);
+          }
         }
 
         const limitParamIndex = queryParams.length + 1;
@@ -186,7 +197,7 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
             SELECT a.pk_account_id, a.account_name, a.fio_balance_suf, a.block_timestamp
             FROM accounts a
             ${cursorWhere}
-            ORDER BY ${orderByField} ${effectiveOrder}
+            ORDER BY ${orderByField} ${effectiveOrder}, a.pk_account_id ${effectiveOrder}
             LIMIT $${limitParamIndex}
           )
           SELECT
@@ -196,7 +207,7 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
             COALESCE(d.domain_count, 0) AS domain_count
           FROM sorted_accounts sa
           ${joinClause.replace(/a\.pk_account_id/g, 'sa.pk_account_id')}
-          ORDER BY ${orderByField.replace('a.', 'sa.')} ${effectiveOrder}
+          ORDER BY ${orderByField.replace('a.', 'sa.')} ${effectiveOrder}, sa.pk_account_id ${effectiveOrder}
         `;
 
         let { rows } = await pool.query(optimizedQuery, queryParams);
@@ -221,9 +232,30 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
           hasPrevPage = hasMoreInDirection;
         }
 
-        const cursorField = sort === ACCOUNT_SORT_OPTIONS.BALANCE ? 'fio_balance_suf' : 'pk_account_id';
-        const nextCursor = hasNextPage && data.length > 0 ? String(data[data.length - 1][cursorField]) : null;
-        const prevCursor = hasPrevPage && data.length > 0 ? String(data[0][cursorField]) : null;
+        let nextCursor: string | null = null;
+        let prevCursor: string | null = null;
+
+        if (hasNextPage && data.length > 0) {
+          if (sort === ACCOUNT_SORT_OPTIONS.BALANCE) {
+            nextCursor = JSON.stringify({
+              balance: data[data.length - 1].fio_balance_suf,
+              pk_account_id: data[data.length - 1].pk_account_id,
+            });
+          } else {
+            nextCursor = String(data[data.length - 1].pk_account_id);
+          }
+        }
+
+        if (hasPrevPage && data.length > 0) {
+          if (sort === ACCOUNT_SORT_OPTIONS.BALANCE) {
+            prevCursor = JSON.stringify({
+              balance: data[0].fio_balance_suf,
+              pk_account_id: data[0].pk_account_id,
+            });
+          } else {
+            prevCursor = String(data[0].pk_account_id);
+          }
+        }
 
         let total: number | undefined;
         if (include_total) {
@@ -237,6 +269,100 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
           nextCursor: nextCursor,
           prevCursor: prevCursor,
           total,
+        } as CursorAccountsResponse;
+      }
+
+      /* ------------------------------------------------------------------
+       *  Optimized cursor pagination for HANDLE / DOMAIN count sorts
+       * ------------------------------------------------------------------ */
+      if (isCountSort) {
+        const countColumnAlias = sort === ACCOUNT_SORT_OPTIONS.HANDLES ? 'handle_count' : 'domain_count';
+        const countColumnExpr = sort === ACCOUNT_SORT_OPTIONS.HANDLES ? 'COALESCE(h.handle_count,0)' : 'COALESCE(d.domain_count,0)';
+
+        const effectiveOrder =
+          direction === PAGINATION_DIRECTIONS.PREV ? (order === 'desc' ? 'asc' : 'desc') : order;
+
+        let cursorWhere = '';
+        const queryParams: (string | number)[] = [];
+
+        if (cursor) {
+          const mainOp = getOperator(order, direction);
+          const idOp = mainOp; // same operator suffices for stable ordering
+
+          if (cursor.trim().startsWith('{')) {
+            const { count: cursorCount, pk_account_id: cursorId } = JSON.parse(cursor);
+            cursorWhere = `WHERE (${countColumnExpr} ${mainOp} $1 OR (${countColumnExpr} = $1 AND a.pk_account_id ${idOp} $2))`;
+            queryParams.push(cursorCount, cursorId);
+          } else {
+            cursorWhere = `WHERE ${countColumnExpr} ${mainOp} $1`;
+            queryParams.push(cursor);
+          }
+        }
+
+        const limitParamIndex = queryParams.length + 1;
+        queryParams.push(limit + 1);
+
+        const baseSelect = `
+          SELECT a.pk_account_id, a.account_name, a.block_timestamp, a.fio_balance_suf,
+                 COALESCE(h.handle_count, 0) AS handle_count,
+                 COALESCE(d.domain_count, 0) AS domain_count
+          FROM accounts a
+          ${joinClause}
+        `;
+
+        const optimizedQuery = `
+          WITH sorted_accounts AS (
+            ${baseSelect}
+            ${cursorWhere}
+            ORDER BY ${countColumnExpr} ${effectiveOrder}, a.pk_account_id ${effectiveOrder}
+            LIMIT $${limitParamIndex}
+          )
+          SELECT * FROM sorted_accounts
+          ORDER BY ${countColumnAlias} ${effectiveOrder}, pk_account_id ${effectiveOrder};
+        `;
+
+        let { rows } = await pool.query(optimizedQuery, queryParams);
+
+        const hasMoreInDirection = rows.length > limit;
+        if (hasMoreInDirection) rows = rows.slice(0, limit);
+        if (direction === PAGINATION_DIRECTIONS.PREV) rows.reverse();
+
+        const data = rows as Account[];
+
+        const hasNextPage =
+          direction === PAGINATION_DIRECTIONS.NEXT ? hasMoreInDirection : !!cursor;
+        const hasPrevPage =
+          direction === PAGINATION_DIRECTIONS.NEXT ? !!cursor : hasMoreInDirection;
+
+        let nextCursor: string | null = null;
+        let prevCursor: string | null = null;
+
+        if (hasNextPage && data.length > 0) {
+          nextCursor = JSON.stringify({
+            count: data[data.length - 1][countColumnAlias as keyof Account],
+            pk_account_id: data[data.length - 1].pk_account_id,
+          });
+        }
+
+        if (hasPrevPage && data.length > 0) {
+          prevCursor = JSON.stringify({
+            count: data[0][countColumnAlias as keyof Account],
+            pk_account_id: data[0].pk_account_id,
+          });
+        }
+
+        let total: number | undefined;
+        if (include_total) {
+          total = await CursorPagination.getTotalCount({ table: 'accounts' });
+        }
+
+        return {
+          data,
+          hasNextPage,
+          hasPrevPage,
+          nextCursor,
+          prevCursor,
+          ...(total !== undefined && { total }),
         } as CursorAccountsResponse;
       }
 
@@ -270,4 +396,4 @@ const accountsRoute: FastifyPluginAsync = async (fastify) => {
   );
 };
 
-export default accountsRoute; 
+export default accountsRoute;

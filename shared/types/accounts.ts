@@ -21,11 +21,6 @@ export interface AccountResponse {
 
 export type AccountSortOption = typeof ACCOUNT_SORT_OPTIONS[keyof typeof ACCOUNT_SORT_OPTIONS];
 
-export interface AccountsResponse {
-  data: Account[];
-  total: number;
-}
-
 // Cursor-based pagination response for accounts
 export type CursorAccountsResponse = CursorResponse<{ data: Account[] }>;
 
