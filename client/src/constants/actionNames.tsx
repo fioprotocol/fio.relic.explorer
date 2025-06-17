@@ -185,8 +185,21 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   trnsloctoks: {
     description: 'Transfer and lock FIO Tokens',
-    formatDetails: ({ data }: { data: AnyObject }): string =>
-      `${formatFioAmount({ amount: data?.amount })} to ${truncateLongText(data?.payee_public_key || '')}`,
+    formatDetails: ({
+      data,
+      className,
+      transactionType,
+    }: {
+      data: AnyObject;
+      className?: string;
+      transactionType?: string;
+    }): ReactElement => (
+      <>
+        <span className={className}>{formatFioAmount({ amount: data?.amount })}</span>{' '}
+        {transactionType === TRANSACTION_TYPE.SENDER ? 'to' : 'from'}{' '}
+        {truncateLongText(data?.payee_public_key || '')}
+      </>
+    ),
   },
   stakefio: {
     description: 'Stake FIO Tokens',
