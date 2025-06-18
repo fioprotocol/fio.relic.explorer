@@ -23,7 +23,7 @@ const DomainDetailsPage: React.FC = () => {
   if (error) {
     return (
       <Container className="py-5">
-        <BackButton />
+        <BackButton fallbackBackTo={ROUTES.domains.path} />
         <Alert
           variant="danger"
           title={`Error fetching domain ${domainParam} details`}
@@ -36,7 +36,7 @@ const DomainDetailsPage: React.FC = () => {
   if (!domain && !error && !loading) {
     return (
       <Container className="py-5">
-        <BackButton />
+        <BackButton fallbackBackTo={ROUTES.domains.path} />
         <Alert variant="danger" title="Not found">
           Domain <span className="fw-bold">{domainParam}</span> is not found
         </Alert>
@@ -46,7 +46,7 @@ const DomainDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton />
+      <BackButton fallbackBackTo={ROUTES.domains.path} />
       <h4>FIO Domain: {domain?.domain_name || domainParam}</h4>
 
       <div className="d-flex justify-content-end align-items-start align-items-md-center flex-wrap flex-column flex-md-row mb-4 gap-2 gap-md-5 f-size-sm lh-1">

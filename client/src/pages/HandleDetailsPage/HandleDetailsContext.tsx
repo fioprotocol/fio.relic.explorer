@@ -16,13 +16,17 @@ type UseHandleDetailsContext = {
 
 export const useHandleDetailsContext = (): UseHandleDetailsContext => {
   const { id: handle } = useParams();
-  const { response, loading, error } = useGetData<HandleResponse>({ action: getHandle, params: { handle } });
+
+  const { response, loading, error } = useGetData<HandleResponse>({
+    action: getHandle,
+    params: { handle },
+  });
 
   return {
     handleParam: handle,
     handle: response?.handle,
     chainData: response?.chainData,
     loading,
-    error
+    error,
   };
 };

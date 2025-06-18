@@ -41,7 +41,7 @@ const AccountDetailsPage: FC = () => {
   if (accountDataError && !loading) {
     return (
       <Container className="py-5">
-        <BackButton />
+        <BackButton fallbackBackTo={ROUTES.accounts.path} />
         <Alert
           variant="danger"
           title="Error"
@@ -55,7 +55,7 @@ const AccountDetailsPage: FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton />
+      <BackButton fallbackBackTo={ROUTES.accounts.path} />
       <div className="d-flex flex-row flex-wrap align-items-center gap-2">
         <h4 className="lh-1">Account: {account}</h4>
         {isBlockProducer && <Badge variant="white">Block Producer</Badge>}

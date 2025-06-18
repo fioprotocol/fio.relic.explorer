@@ -46,7 +46,7 @@ const TransactionDetailsPage: FC = () => {
   if (error) {
     return (
       <Container className="py-5">
-        <BackButton />
+        <BackButton fallbackBackTo={ROUTES.transactions.path} />
         {!loading && error && (
           <Alert
             variant="danger"
@@ -60,7 +60,7 @@ const TransactionDetailsPage: FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton />
+      <BackButton fallbackBackTo={ROUTES.transactions.path} />
       <h4>Transaction</h4>
       <div className="d-flex flex-column flex-md-row flex-wrap w-100 mb-4 gap-3 f-size-sm">
         <DetailsPagesHeaderItem title="Transaction ID:" value={id} inTheSameRow />

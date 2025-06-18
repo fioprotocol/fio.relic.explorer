@@ -20,6 +20,7 @@ export const useTransactionsContext = ({ handle }: { handle: string }): UseTrans
     dataKey: 'data',
     action: getHandleTransactions,
     params: { handle },
+    ready: !!handle,
   });
 
   return {
