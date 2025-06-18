@@ -58,7 +58,7 @@ export const transactionsDesktop = ({
           ? 'text-danger'
           : 'text-secondary';
 
-      const feePrefix = isSender && hasFees ? '-' : '';
+      const feePrefix = isSender && hasFees ? '- ' : '';
 
       return {
         className: isSender ? styles.senderRow : '',
@@ -104,7 +104,7 @@ export const transactionsDesktop = ({
             <Badge
               className={`border border-1 bg-white f-size-xs ${styles.tokenBadge} ${!hasFioTokens ? 'border-secondary text-secondary' : isSender ? 'border-danger text-danger' : isReceiver ? styles.receiver : ''}`}
             >
-              {isReceiver ? (hasFioTokens ? '+' : '-') : '-'}
+              {isReceiver ? (hasFioTokens ? '+ ' : '- ') : '- '}
               {formatFioAmount({ amount: fio_tokens || fee })}
             </Badge>
           ) : null,
