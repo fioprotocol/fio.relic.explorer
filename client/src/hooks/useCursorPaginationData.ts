@@ -116,7 +116,7 @@ export const useCursorPaginationData = <T, O = AnyObject>({
         setFetched(true);
       }
     },
-    [action, dataKey, limit, serializedParams]
+    [action, dataKey, limit, serializedParams, ready]
   );
 
   // Navigation functions

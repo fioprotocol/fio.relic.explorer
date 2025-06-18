@@ -6,7 +6,6 @@ import Container from 'src/components/layout/Container';
 import { CardComponent } from 'src/components/layout/CardComponent';
 import { BackButton } from 'src/components/common/BackButton';
 import { Badge } from 'src/components/common/Badge';
-import { Loader } from 'src/components/common/Loader';
 import { Alert } from 'src/components/common/Alert';
 import { Tabs } from 'src/components/common/Tabs';
 import { Transactions } from './Transactions/Transactions';
