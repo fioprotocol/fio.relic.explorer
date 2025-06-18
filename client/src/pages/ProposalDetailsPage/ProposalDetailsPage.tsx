@@ -38,7 +38,7 @@ const ProposalDetailsPage: React.FC = () => {
   if (error) {
     return (
       <Container className="py-5" title="Multisig TX">
-        <BackButton />
+        <BackButton fallbackBackTo={ROUTES.proposals.path} />
         <Alert variant="danger" title="Error fetching proposal details" message={error.message} />
       </Container>
     );
@@ -46,7 +46,7 @@ const ProposalDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton />
+      <BackButton fallbackBackTo={ROUTES.proposals.path} />
       <h4>Multisig TX</h4>
       <div className="d-block d-lg-flex justify-content-between align-items-center mb-4 gap-5 f-size-sm lh-1"></div>
 

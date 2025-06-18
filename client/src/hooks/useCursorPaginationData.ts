@@ -10,6 +10,7 @@ type UseCursorPaginationDataProps = {
   dataKey?: string;
   limit?: number;
   autoFetch?: boolean;
+  ready?: boolean;
 };
 
 export type UseCursorPaginationReturn<T, O = AnyObject> = {
@@ -35,6 +36,7 @@ export const useCursorPaginationData = <T, O = AnyObject>({
   dataKey = 'data',
   limit = DEFAULT_REQUEST_ITEMS_LIMIT,
   autoFetch = true,
+  ready = true,
 }: UseCursorPaginationDataProps): UseCursorPaginationReturn<T, O> => {
   const [data, setData] = useState<T[]>([]);
   const [otherData, setOtherData] = useState<O | null>(null);
@@ -57,6 +59,8 @@ export const useCursorPaginationData = <T, O = AnyObject>({
   // Function to fetch data based on cursor and direction
   const fetchData = useCallback(
     async (cursor: string | null, direction: PaginationDirection) => {
+      if (!ready) return;
+
       setLoading(true);
       setError(null);
 

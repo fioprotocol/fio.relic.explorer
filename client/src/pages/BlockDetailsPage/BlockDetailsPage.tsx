@@ -37,7 +37,7 @@ const BlockDetailsPage: React.FC = () => {
   if (error) {
     return (
       <Container className="py-5">
-        <BackButton />
+        <BackButton fallbackBackTo={ROUTES.blocks.path} />
         <Alert variant="danger" title="Error fetching block details" message={error.message} />
       </Container>
     );
@@ -45,7 +45,7 @@ const BlockDetailsPage: React.FC = () => {
 
   return (
     <Container className="py-5">
-      <BackButton />
+      <BackButton fallbackBackTo={ROUTES.blocks.path} />
       <h4>Block: #{formatBlockNumber(block_number || 0)}</h4>
       {!block || loading ? (
         <Loader fullScreen noBg />
