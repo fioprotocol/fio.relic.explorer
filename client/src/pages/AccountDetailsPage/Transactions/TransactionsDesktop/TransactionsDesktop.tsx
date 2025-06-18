@@ -43,6 +43,7 @@ export const transactionsDesktop = ({
       request_data,
       fee,
       fio_tokens,
+      payer_public_key,
     }) => {
       const isSender = transaction_type === TRANSACTION_TYPE.SENDER;
       const isReceiver = transaction_type === TRANSACTION_TYPE.RECEIVER;
@@ -89,6 +90,7 @@ export const transactionsDesktop = ({
           request_data,
           className: isSender ? 'text-danger' : isReceiver ? styles.receiver : '',
           transactionType: transaction_type,
+          payer_public_key,
         }),
         fee:
           fee != null ? (

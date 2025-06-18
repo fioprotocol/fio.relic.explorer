@@ -67,6 +67,7 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                   fio_tokens: { type: ['string', 'null'] },
                   transaction_type: { type: 'string' },
                   request_data: { type: 'string' },
+                  payer_public_key: { type: ['string', 'null'] },
                 },
               },
             },
@@ -145,7 +146,8 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
               t.fee,
               t.request_data,
               'SENDER' AS transaction_type,
-              CAST(COALESCE(stt.total_amount, NULL) AS TEXT) AS fio_tokens
+              CAST(COALESCE(stt.total_amount, NULL) AS TEXT) AS fio_tokens,
+              NULL::TEXT AS payer_public_key
             FROM transactions t
             LEFT JOIN (
               SELECT fk_transaction_id, SUM(fio_suf_amount) AS total_amount
@@ -164,7 +166,8 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
               t.fee,
               t.request_data,
               'RECEIVER' AS transaction_type,
-              CAST(COALESCE(rtt.total_amount, NULL) AS TEXT) AS fio_tokens
+              CAST(COALESCE(rtt.total_amount, NULL) AS TEXT) AS fio_tokens,
+              NULL::TEXT AS payer_public_key
             FROM accountactivities aa
             JOIN transactions t ON aa.fk_transaction_id = t.pk_transaction_id
             LEFT JOIN (
@@ -184,11 +187,13 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
               t.fee,
               t.request_data,
               'RECEIVER' AS transaction_type,
-              CAST(SUM(tt.fio_suf_amount) AS TEXT) AS fio_tokens
+              CAST(SUM(tt.fio_suf_amount) AS TEXT) AS fio_tokens,
+              acc.public_key AS payer_public_key
             FROM tokentransfers tt
             JOIN transactions t ON tt.fk_transaction_id = t.pk_transaction_id
+            JOIN accounts acc ON acc.pk_account_id = tt.fk_payer_account_id
             WHERE tt.fk_payee_account_id = $1 AND t.fk_account_id <> $1
-            GROUP BY t.pk_transaction_id, t.transaction_id, t.block_timestamp, t.action_name, t.fee, t.request_data
+            GROUP BY t.pk_transaction_id, t.transaction_id, t.block_timestamp, t.action_name, t.fee, t.request_data, tt.fk_payer_account_id, acc.public_key
           ),
           combined_transactions AS (
             SELECT * FROM sender_transactions

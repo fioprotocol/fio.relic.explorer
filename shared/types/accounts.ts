@@ -33,6 +33,7 @@ export type AccountTransaction = {
   transaction_id: string;
   transaction_type: TransactionType;
   request_data: string;
+  payer_public_key?: string | null;
 }
 
 // Cursor-based pagination response for account transactions
