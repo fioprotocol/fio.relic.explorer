@@ -25,12 +25,14 @@ export const transformDetails = ({
   className,
   transactionType,
   payer_public_key,
+  payer_account_name,
 }: {
   actionInfo: ActionInfo;
   request_data?: string;
   className?: string;
   transactionType?: string;
   payer_public_key?: string | null;
+  payer_account_name?: string | null;
 }): string | null => {
   let details = null;
 
@@ -40,6 +42,7 @@ export const transformDetails = ({
       className,
       transactionType,
       payer_public_key,
+      payer_account_name,
     });
   } else if (actionInfo.details && request_data) {
     details = JSON.parse(request_data)[actionInfo.details] || details;

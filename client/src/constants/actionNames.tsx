@@ -8,16 +8,12 @@ import { TRANSACTION_TYPE } from '@shared/constants/transaction';
 export interface ActionInfo {
   description: string;
   details?: string;
-  formatDetails?: ({
-    data,
-    className,
-    transactionType,
-    payer_public_key,
-  }: {
+  formatDetails?: (formatDetailsProps: {
     data: AnyObject;
     className?: string;
     transactionType?: string;
     payer_public_key?: string | null;
+    payer_account_name?: string | null;
   }) => string | ReactElement;
 }
 
@@ -168,25 +164,37 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
   },
   trnsfiopubky: {
     description: 'Transfer FIO Tokens',
-    formatDetails: ({ data, className, transactionType, payer_public_key }): ReactElement => (
+    formatDetails: ({
+      data,
+      className,
+      transactionType,
+      payer_public_key,
+      payer_account_name,
+    }): ReactElement => (
       <>
         <span className={className}>{formatFioAmount({ amount: data?.amount })}</span>{' '}
         {transactionType === TRANSACTION_TYPE.SENDER ? 'to' : 'from'}{' '}
         {transactionType === TRANSACTION_TYPE.SENDER
           ? truncateLongText(data?.payee_public_key || '')
-          : truncateLongText(payer_public_key || '')}
+          : truncateLongText(payer_public_key || payer_account_name || 'N/A')}
       </>
     ),
   },
   trnsloctoks: {
     description: 'Transfer and lock FIO Tokens',
-    formatDetails: ({ data, className, transactionType, payer_public_key }): ReactElement => (
+    formatDetails: ({
+      data,
+      className,
+      transactionType,
+      payer_public_key,
+      payer_account_name,
+    }): ReactElement => (
       <>
         <span className={className}>{formatFioAmount({ amount: data?.amount })}</span>{' '}
         {transactionType === TRANSACTION_TYPE.SENDER ? 'to' : 'from'}{' '}
         {transactionType === TRANSACTION_TYPE.SENDER
           ? truncateLongText(data?.payee_public_key || '')
-          : truncateLongText(payer_public_key || '')}
+          : truncateLongText(payer_public_key || payer_account_name || 'N/A')}
       </>
     ),
   },

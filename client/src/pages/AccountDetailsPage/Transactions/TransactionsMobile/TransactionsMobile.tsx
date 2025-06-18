@@ -31,6 +31,7 @@ export const TransactionsMobile: FC<{ transactions: AccountTransaction[] }> = ({
           fee,
           fio_tokens,
           payer_public_key,
+          payer_account_name,
         }) => {
           const isSender = transaction_type === TRANSACTION_TYPE.SENDER;
           const isReceiver = transaction_type === TRANSACTION_TYPE.RECEIVER;
@@ -117,6 +118,7 @@ export const TransactionsMobile: FC<{ transactions: AccountTransaction[] }> = ({
                       className: isSender ? 'text-danger' : isReceiver ? styles.receiver : '',
                       transactionType: transaction_type,
                       payer_public_key,
+                      payer_account_name,
                     })}
                   </div>
                 </div>
