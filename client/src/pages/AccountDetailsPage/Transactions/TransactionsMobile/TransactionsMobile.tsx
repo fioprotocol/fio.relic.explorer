@@ -75,7 +75,7 @@ export const TransactionsMobile: FC<{ transactions: AccountTransaction[] }> = ({
                   <Badge
                     className={`d-flex border border-1 bg-white f-size-xs align-items-center ${styles.tokenBadge} ${!hasFioTokens ? 'border-secondary text-secondary' : isSender ? 'border-danger text-danger' : isReceiver ? styles.receiver : ''}`}
                   >
-                    {isReceiver ? (hasFioTokens ? '+' : '-') : '-'}
+                    {isReceiver ? (hasFioTokens ? '+ ' : '- ') : '- '}
                     {formatFioAmount({ amount: fio_tokens || fee })}
                   </Badge>
                 ) : null}
@@ -93,7 +93,7 @@ export const TransactionsMobile: FC<{ transactions: AccountTransaction[] }> = ({
                         <span
                           className={`f-size-xs ${isSender ? 'text-danger' : isReceiver ? 'text-secondary' : 'text-dark'}`}
                         >
-                          {isSender ? '-' : ''}
+                          {isSender ? '- ' : ''}
                           {formatFioAmount({ amount: fee })}
                         </span>
                       </div>
