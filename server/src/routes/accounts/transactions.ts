@@ -68,6 +68,7 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                   transaction_type: { type: 'string' },
                   request_data: { type: 'string' },
                   payer_public_key: { type: ['string', 'null'] },
+                  payer_account_name: { type: ['string', 'null'] },
                 },
               },
             },
@@ -104,7 +105,10 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
 
       try {
         // Retrieve account_id first
-        const accountResult = await pool.query('SELECT pk_account_id FROM accounts WHERE account_name = $1', [account]);
+        const accountResult = await pool.query(
+          'SELECT pk_account_id FROM accounts WHERE account_name = $1',
+          [account]
+        );
 
         if (accountResult.rows.length === 0) {
           return reply.send({
@@ -147,7 +151,8 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
               t.request_data,
               'SENDER' AS transaction_type,
               CAST(COALESCE(stt.total_amount, NULL) AS TEXT) AS fio_tokens,
-              NULL::TEXT AS payer_public_key
+              NULL::TEXT AS payer_public_key,
+              NULL::TEXT AS payer_account_name
             FROM transactions t
             LEFT JOIN (
               SELECT fk_transaction_id, SUM(fio_suf_amount) AS total_amount
@@ -167,9 +172,11 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
               t.request_data,
               'RECEIVER' AS transaction_type,
               CAST(COALESCE(rtt.total_amount, NULL) AS TEXT) AS fio_tokens,
-              NULL::TEXT AS payer_public_key
+              acc.public_key AS payer_public_key,
+              acc.account_name AS payer_account_name
             FROM accountactivities aa
             JOIN transactions t ON aa.fk_transaction_id = t.pk_transaction_id
+            JOIN accounts acc ON acc.pk_account_id = t.fk_account_id
             LEFT JOIN (
               SELECT fk_transaction_id, SUM(fio_suf_amount) AS total_amount
               FROM tokentransfers
@@ -188,12 +195,13 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
               t.request_data,
               'RECEIVER' AS transaction_type,
               CAST(SUM(tt.fio_suf_amount) AS TEXT) AS fio_tokens,
-              acc.public_key AS payer_public_key
+              acc.public_key AS payer_public_key,
+              acc.account_name AS payer_account_name
             FROM tokentransfers tt
             JOIN transactions t ON tt.fk_transaction_id = t.pk_transaction_id
             JOIN accounts acc ON acc.pk_account_id = tt.fk_payer_account_id
             WHERE tt.fk_payee_account_id = $1 AND t.fk_account_id <> $1
-            GROUP BY t.pk_transaction_id, t.transaction_id, t.block_timestamp, t.action_name, t.fee, t.request_data, tt.fk_payer_account_id, acc.public_key
+            GROUP BY t.pk_transaction_id, t.transaction_id, t.block_timestamp, t.action_name, t.fee, t.request_data, tt.fk_payer_account_id, acc.public_key, acc.account_name
           ),
           combined_transactions AS (
             SELECT * FROM sender_transactions
@@ -230,7 +238,8 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
           hasPrevPage = hasMorePages;
         }
 
-        const nextCursor = hasNextPage && rows.length > 0 ? rows[rows.length - 1].pk_transaction_id : null;
+        const nextCursor =
+          hasNextPage && rows.length > 0 ? rows[rows.length - 1].pk_transaction_id : null;
         const prevCursor = hasPrevPage && rows.length > 0 ? rows[0].pk_transaction_id : null;
 
         let total: number | undefined;
