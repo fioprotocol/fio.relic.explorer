@@ -1,40 +1,57 @@
 import { Pool } from 'pg';
+import { createTunnel } from 'tunnel-ssh';
+import { readFileSync } from 'fs';
 import dotenv from 'dotenv';
-
-import { createSSHTunnel } from './ssh-tunnel';
 
 // Load environment variables
 dotenv.config();
 
-// Initialize SSH tunnel if needed
-const sshTunnel = createSSHTunnel();
-
-// Function to get database configuration
-const getDatabaseConfig = async () => {
-  let dbHost = process.env.DB_HOST || 'localhost';
-  let dbPort = parseInt(process.env.DB_PORT || '5432');
-
-  // If SSH tunnel is configured, establish it and use localhost
-  if (sshTunnel) {
+// Function to decode base64 SSH key if needed
+const decodeSSHKey = (keyString: string): string => {
+  if (!keyString) return keyString;
+  
+  // If it's already a regular SSH key or file path, return as-is
+  if (keyString.includes('-----BEGIN') || 
+      keyString.includes('ssh-rsa') || 
+      keyString.includes('ssh-ed25519') ||
+      keyString.includes('/') ||  // likely a file path
+      keyString.includes('\\')) { // Windows file path
+    return keyString;
+  }
+  
+  // Clean the string (remove whitespace and newlines)
+  const cleanedKey = keyString.replace(/\s+/g, '');
+  
+  // Check if it looks like base64
+  const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
+  
+  if (cleanedKey.length > 0 && cleanedKey.length % 4 === 0 && base64Regex.test(cleanedKey)) {
     try {
-      const localPort = await sshTunnel.connect();
-      dbHost = '127.0.0.1';
-      dbPort = localPort;
-      console.log(`Using SSH tunnel: connecting to database via localhost:${localPort}`);
+      const decoded = Buffer.from(cleanedKey, 'base64').toString('utf8');
+      
+      // Verify the decoded content looks like an SSH key
+      if (decoded.includes('-----BEGIN') || 
+          decoded.includes('ssh-rsa') || 
+          decoded.includes('ssh-ed25519')) {
+        console.log('Successfully decoded base64 SSH key');
+        return decoded;
+      }
     } catch (error) {
-      console.error('Failed to establish SSH tunnel, falling back to direct connection:', error);
-      // Fall back to direct connection
-      dbHost = process.env.DB_HOST || 'localhost';
-      dbPort = parseInt(process.env.DB_PORT || '5432');
+      console.warn('Failed to decode as base64, using key as-is:', error);
     }
   }
+  
+  return keyString;
+};
 
-  return {
-    host: dbHost,
-    port: dbPort,
-    database: process.env.DB_NAME || '',
-    user: process.env.DB_USER || '',
-    password: process.env.DB_PASSWORD || '',
+// Create database configuration
+const createPoolConfig = (): any => {
+  const poolConfig: any = {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     ssl: process.env.DB_SSL === 'true' ? {
       rejectUnauthorized: false
     } : undefined,
@@ -43,100 +60,187 @@ const getDatabaseConfig = async () => {
     allowExitOnIdle: false, // keep Node process alive even when pool is idle
     keepAlive: true, // ensure TCP keep-alives are sent
     keepAliveInitialDelayMillis: 30000, // 30-s delay before first keep-alive packet
-    connectionTimeoutMillis: 10000, // Increased timeout for SSH connections
+    connectionTimeoutMillis: 10000, // Connection timeout
   };
+
+  return poolConfig;
 };
 
-// Create pool with async configuration
-let pool: Pool | undefined;
-let signalHandlersRegistered = false; // Track if signal handlers are already registered
+// Simple SSH tunnel creation function
+const createSimpleSSHTunnel = async () => {
+  if (!process.env.SSH_TUNNEL_KEY && !process.env.SSH_KEY_URL) {
+    return null;
+  }
 
-const initializePool = async (): Promise<Pool> => {
-  const config = await getDatabaseConfig();
-  pool = new Pool(config);
+  const sshKey = process.env.SSH_TUNNEL_KEY || process.env.SSH_KEY_URL;
+  if (!sshKey) {
+    console.warn('SSH key environment variable is set but empty');
+    return null;
+  }
+
+  const decodedKey = decodeSSHKey(sshKey);
   
-  // Handle pool errors
-  pool.on('error', (err) => {
-    console.error('Unexpected error on idle client', err);
-  });
-
-  // Register signal handlers only once
-  if (!signalHandlersRegistered) {
-    signalHandlersRegistered = true;
-    
-    // Handle process termination - only in production or explicit shutdown
-    const handleShutdown = async (signal: string) => {
-      console.log(`Received ${signal}, closing database pool and SSH tunnel...`);
-      try {
-        if (pool && !(pool as any).ended) {
-          await pool.end();
-        }
-        if (sshTunnel) {
-          await sshTunnel.disconnect();
-        }
-        console.log('Cleanup completed successfully');
-        process.exit(0);
-      } catch (error) {
-        console.error('Error during cleanup:', error);
-        process.exit(1);
-      }
-    };
-
-    // Only register signal handlers in production or when explicitly requested
-    if (process.env.NODE_ENV === 'production' || process.env.HANDLE_SIGNALS === 'true') {
-      process.on('SIGINT', () => handleShutdown('SIGINT'));
-      process.on('SIGTERM', () => handleShutdown('SIGTERM'));
-    }
-  }
-
-  // Pre-warm the pool so first real request is fast
+  // Read private key from file or use the key directly
+  let privateKey: Buffer;
   try {
-    await pool.query('SELECT 1');
-  } catch (warmErr) {
-    console.warn('Database pre-warm query failed:', warmErr);
+    // Try to read as file path first
+    privateKey = readFileSync(decodedKey);
+  } catch (error) {
+    // If reading as file fails, treat it as the key content itself
+    privateKey = Buffer.from(decodedKey, 'utf8');
   }
 
+  const tunnelOptions = {
+    autoClose: false,
+  };
+
+  const serverOptions = {
+    host: '127.0.0.1',
+    port: 0, // Auto-assign local port
+  };
+
+  const sshOptions = {
+    host: process.env.SSH_HOST,
+    port: parseInt(process.env.SSH_PORT || '22'),
+    username: process.env.SSH_USER || 'root',
+    privateKey: privateKey,
+    passphrase: process.env.SSH_KEY_PASSPHRASE,
+    keepaliveInterval: 30000, // Increased from 5s to 30s
+    keepaliveCountMax: 3,
+    readyTimeout: 30000,
+  };
+
+  const forwardOptions = {
+    srcAddr: '127.0.0.1',
+    srcPort: 0,
+    dstAddr: process.env.DB_HOST_REMOTE || process.env.DB_HOST || 'localhost',
+    dstPort: parseInt(process.env.DB_PORT_REMOTE || process.env.DB_PORT || '5432'),
+  };
+
+  try {
+    console.log(`Creating SSH tunnel to ${sshOptions.host}:${sshOptions.port} -> ${forwardOptions.dstAddr}:${forwardOptions.dstPort}`);
+    const [server, conn] = await createTunnel(tunnelOptions, serverOptions, sshOptions, forwardOptions);
+    
+    const localPort = (server.address() as any)?.port || 0;
+    console.log(`SSH tunnel established on local port ${localPort}`);
+    
+    return { server, conn, localPort };
+  } catch (error) {
+    console.error('Failed to create SSH tunnel:', error);
+    return null;
+  }
+};
+
+// Function to create pool with optional SSH tunnel
+const createPool = async (): Promise<Pool> => {
+  const poolConfig = createPoolConfig();
+  
+  // Try to create SSH tunnel if configured
+  const tunnel = await createSimpleSSHTunnel();
+  
+  if (tunnel) {
+    // Use tunnel connection
+    poolConfig.host = '127.0.0.1';
+    poolConfig.port = tunnel.localPort;
+    console.log(`Using SSH tunnel: connecting to database via localhost:${tunnel.localPort}`);
+  } else {
+    console.log(`Using direct database connection: ${poolConfig.host}:${poolConfig.port}`);
+  }
+
+  return new Pool(poolConfig);
+};
+
+// Initialize pool
+let pool: Pool;
+let poolInitialized = false;
+let initializationPromise: Promise<void> | null = null;
+
+const initializePool = async (): Promise<void> => {
+  // If already initialized, return immediately
+  if (poolInitialized) return;
+  
+  // If initialization is in progress, wait for it to complete
+  if (initializationPromise) {
+    return initializationPromise;
+  }
+  
+  // Start initialization
+  initializationPromise = (async () => {
+    try {
+      console.log('Initializing database pool...');
+      pool = await createPool();
+      
+      // Handle pool errors
+      pool.on('error', (err) => {
+        console.error('Unexpected error on idle client', err);
+      });
+      
+      // Pre-warm the pool so first real request is fast
+      await pool.query('SELECT 1');
+      console.log('Database pool initialized and warmed successfully');
+      
+      poolInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize database pool:', error);
+      // Reset the promise so we can retry
+      initializationPromise = null;
+      throw error;
+    }
+  })();
+  
+  return initializationPromise;
+};
+
+// Handle process termination gracefully
+const handleShutdown = async (signal: string) => {
+  console.log(`Received ${signal}, closing database pool...`);
+  try {
+    if (pool && poolInitialized) {
+      await pool.end();
+    }
+    console.log('Database pool closed successfully');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during database pool cleanup:', error);
+    process.exit(1);
+  }
+};
+
+// Only register signal handlers in production or when explicitly requested
+if (process.env.NODE_ENV === 'production' || process.env.HANDLE_SIGNALS === 'true') {
+  process.on('SIGINT', () => handleShutdown('SIGINT'));
+  process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+}
+
+// Initialize pool at startup
+initializePool().catch((error) => {
+  console.error('Failed to initialize database at startup:', error);
+  process.exit(1);
+});
+
+// Export the pool getter functions
+export const getPool = async (): Promise<Pool> => {
+  if (!poolInitialized) {
+    await initializePool();
+  }
   return pool;
 };
 
-// Export a promise that resolves to the initialized pool
-export const getPool = async (): Promise<Pool> => {
-  if (!pool || (pool as any).ended) {
-    console.log('Initializing new database pool...');
-    await initializePool();
-  }
-  return pool!; // We know pool is defined after initializePool
-};
-
-// Synchronous pool getter for backward compatibility
-// This will throw an error if called before pool is initialized
 export const getPoolSync = (): Pool => {
-  if (!pool) {
+  if (!poolInitialized) {
     throw new Error('Database pool not initialized. Make sure to call getPool() first or wait for initialization.');
   }
   return pool;
 };
 
-// For backward compatibility, create a proxy object that will work once pool is initialized
+// For backward compatibility, export default as a proxy that ensures pool is initialized
 const poolProxy = new Proxy({} as Pool, {
   get(target, prop) {
-    if (!pool || (pool as any).ended) {
-      // If pool is not initialized or has been ended, throw a clear error
-      throw new Error('Database pool not available. The pool may have been closed. Please restart the server.');
+    if (!poolInitialized) {
+      throw new Error('Database pool not available. The pool may not be initialized yet. Please use getPool() instead.');
     }
     return (pool as any)[prop];
   }
 });
 
-// For backward compatibility, export the pool proxy
 export default poolProxy;
-
-// Immediately initialise and warm the pool at application startup
-(async () => {
-  try {
-    await initializePool();
-    console.log('Database pool initialised and warmed');
-  } catch (initErr) {
-    console.error('Failed to initialise database pool at startup:', initErr);
-  }
-})();
