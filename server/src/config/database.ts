@@ -56,11 +56,18 @@ const createPoolConfig = (): any => {
       rejectUnauthorized: false
     } : undefined,
     max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 300000, // 5 minutes before an idle client is closed
+    idleTimeoutMillis: 30000, // How long a client is allowed to remain idle before being closed
+    connectionTimeoutMillis: 2000, // How long to wait for a connection
     allowExitOnIdle: false, // keep Node process alive even when pool is idle
-    keepAlive: true, // ensure TCP keep-alives are sent
-    keepAliveInitialDelayMillis: 30000, // 30-s delay before first keep-alive packet
-    connectionTimeoutMillis: 10000, // Connection timeout
+    
+    // Query timeout to prevent hanging queries
+    query_timeout: 60000, // 60 seconds
+    
+    // Connection validation and retry settings
+    application_name: 'fio-relic-explorer',
+    
+    // Let PostgreSQL handle keep-alive instead of manual implementation
+    // Remove manual keepAlive settings to avoid conflicts
   };
 
   return poolConfig;
@@ -105,9 +112,9 @@ const createSimpleSSHTunnel = async () => {
     username: process.env.SSH_USER || 'root',
     privateKey: privateKey,
     passphrase: process.env.SSH_KEY_PASSPHRASE,
-    keepaliveInterval: 30000, // Increased from 5s to 30s
-    keepaliveCountMax: 3,
-    readyTimeout: 30000,
+    keepaliveInterval: 30000, // Send keep-alive every 30 seconds
+    keepaliveCountMax: 3, // Close after 3 failed keep-alives
+    readyTimeout: 30000, // 30 second timeout for initial connection
   };
 
   const forwardOptions = {
@@ -124,11 +131,63 @@ const createSimpleSSHTunnel = async () => {
     const localPort = (server.address() as any)?.port || 0;
     console.log(`SSH tunnel established on local port ${localPort}`);
     
+    // Handle tunnel connection errors
+    conn.on('error', (err: Error) => {
+      console.error('SSH tunnel connection error:', err);
+    });
+    
+    conn.on('close', () => {
+      console.warn('SSH tunnel connection closed');
+    });
+    
+    conn.on('ready', () => {
+      console.log('SSH connection ready');
+    });
+    
+    server.on('error', (err: Error) => {
+      console.error('SSH tunnel server error:', err);
+    });
+    
     return { server, conn, localPort };
   } catch (error) {
     console.error('Failed to create SSH tunnel:', error);
+    
+    // Provide more specific error guidance
+    const errorMessage = (error as Error)?.message || '';
+    if (errorMessage.includes('ENOTFOUND')) {
+      console.error('DNS resolution failed. Check SSH_HOST value.');
+    } else if (errorMessage.includes('ECONNREFUSED')) {
+      console.error('Connection refused. Check SSH_HOST and SSH_PORT values.');
+    } else if (errorMessage.includes('Authentication')) {
+      console.error('SSH authentication failed. Check SSH_USER and SSH key.');
+    }
+    
     return null;
   }
+};
+
+// Function to test tunnel connectivity
+const testTunnelConnection = async (host: string, port: number): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const net = require('net');
+    const socket = new net.Socket();
+    
+    const timeout = setTimeout(() => {
+      socket.destroy();
+      resolve(false);
+    }, 5000); // 5 second timeout
+    
+    socket.connect(port, host, () => {
+      clearTimeout(timeout);
+      socket.destroy();
+      resolve(true);
+    });
+    
+    socket.on('error', () => {
+      clearTimeout(timeout);
+      resolve(false);
+    });
+  });
 };
 
 // Function to create pool with optional SSH tunnel
@@ -142,7 +201,21 @@ const createPool = async (): Promise<Pool> => {
     // Use tunnel connection
     poolConfig.host = '127.0.0.1';
     poolConfig.port = tunnel.localPort;
+    // Increase timeout for SSH tunnel connections as they need more time
+    poolConfig.connectionTimeoutMillis = 10000; // 10 seconds for SSH tunnel
     console.log(`Using SSH tunnel: connecting to database via localhost:${tunnel.localPort}`);
+    
+    // Wait a moment for the tunnel to be fully ready
+    console.log('Waiting for SSH tunnel to stabilize...');
+    await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+    
+    // Test tunnel connectivity
+    console.log('Testing tunnel connectivity...');
+    const tunnelWorks = await testTunnelConnection('127.0.0.1', tunnel.localPort);
+    if (!tunnelWorks) {
+      throw new Error(`SSH tunnel connectivity test failed on localhost:${tunnel.localPort}`);
+    }
+    console.log('SSH tunnel connectivity test passed');
   } else {
     console.log(`Using direct database connection: ${poolConfig.host}:${poolConfig.port}`);
   }
@@ -170,15 +243,39 @@ const initializePool = async (): Promise<void> => {
       console.log('Initializing database pool...');
       pool = await createPool();
       
-      // Handle pool errors
+      // Handle pool errors with better reconnection logic
       pool.on('error', (err) => {
         console.error('Unexpected error on idle client', err);
+        
+        // Check if this is a connection error that requires reconnection
+        if (err.message?.includes('Connection terminated') || 
+            err.message?.includes('connection closed') ||
+            err.message?.includes('ECONNRESET') ||
+            err.message?.includes('connection reset')) {
+          console.log('Connection error detected, marking pool for reinitialization...');
+          poolInitialized = false;
+          initializationPromise = null;
+        }
+      });
+      
+      // Handle client connection errors
+      pool.on('connect', (client) => {
+        client.on('error', (err) => {
+          console.error('Client connection error:', err);
+        });
       });
       
       // Pre-warm the pool so first real request is fast
-      await pool.query('SELECT 1');
-      console.log('Database pool initialized and warmed successfully');
+      console.log('Testing initial database connection...');
+      const testClient = await pool.connect();
+      try {
+        await testClient.query('SELECT 1 as test');
+        console.log('Database connection test successful');
+      } finally {
+        testClient.release();
+      }
       
+      console.log('Database pool initialized and warmed successfully');
       poolInitialized = true;
     } catch (error) {
       console.error('Failed to initialize database pool:', error);
@@ -220,9 +317,22 @@ initializePool().catch((error) => {
 
 // Export the pool getter functions
 export const getPool = async (): Promise<Pool> => {
+  // Check if pool needs reinitialization (handles automatic reconnection)
   if (!poolInitialized) {
+    console.log('Pool not initialized, reinitializing...');
     await initializePool();
   }
+  
+  // Double-check pool health with a simple query
+  try {
+    await pool.query('SELECT 1');
+  } catch (error) {
+    console.warn('Pool health check failed, reinitializing pool...', error);
+    poolInitialized = false;
+    initializationPromise = null;
+    await initializePool();
+  }
+  
   return pool;
 };
 
