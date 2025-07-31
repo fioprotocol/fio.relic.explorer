@@ -140,7 +140,12 @@ const searchRoute: FastifyPluginAsync = async (fastify) => {
 
         // Format response based on the type of search
         return {
-          results: result.rows.map((row) => ({
+          results: result.rows.map((row: {
+            transaction_id: string;
+            domain_name: string;
+            account_name: string;
+            handle: string;
+          }) => ({
             id: row.transaction_id || row.domain_name || row.account_name || row.handle,
             type,
             title: '',

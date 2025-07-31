@@ -9,30 +9,35 @@ dotenv.config();
 // Function to decode base64 SSH key if needed
 const decodeSSHKey = (keyString: string): string => {
   if (!keyString) return keyString;
-  
+
   // If it's already a regular SSH key or file path, return as-is
-  if (keyString.includes('-----BEGIN') || 
-      keyString.includes('ssh-rsa') || 
-      keyString.includes('ssh-ed25519') ||
-      keyString.includes('/') ||  // likely a file path
-      keyString.includes('\\')) { // Windows file path
+  if (
+    keyString.includes('-----BEGIN') ||
+    keyString.includes('ssh-rsa') ||
+    keyString.includes('ssh-ed25519') ||
+    keyString.includes('/') || // likely a file path
+    keyString.includes('\\')
+  ) {
+    // Windows file path
     return keyString;
   }
-  
+
   // Clean the string (remove whitespace and newlines)
   const cleanedKey = keyString.replace(/\s+/g, '');
-  
+
   // Check if it looks like base64
   const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
-  
+
   if (cleanedKey.length > 0 && cleanedKey.length % 4 === 0 && base64Regex.test(cleanedKey)) {
     try {
       const decoded = Buffer.from(cleanedKey, 'base64').toString('utf8');
-      
+
       // Verify the decoded content looks like an SSH key
-      if (decoded.includes('-----BEGIN') || 
-          decoded.includes('ssh-rsa') || 
-          decoded.includes('ssh-ed25519')) {
+      if (
+        decoded.includes('-----BEGIN') ||
+        decoded.includes('ssh-rsa') ||
+        decoded.includes('ssh-ed25519')
+      ) {
         console.log('Successfully decoded base64 SSH key');
         return decoded;
       }
@@ -40,7 +45,7 @@ const decodeSSHKey = (keyString: string): string => {
       console.warn('Failed to decode as base64, using key as-is:', error);
     }
   }
-  
+
   return keyString;
 };
 
@@ -52,22 +57,27 @@ const createPoolConfig = (): any => {
     database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    ssl: process.env.DB_SSL === 'true' ? {
-      rejectUnauthorized: false
-    } : undefined,
-    max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 30000, // How long a client is allowed to remain idle before being closed
-    connectionTimeoutMillis: 2000, // How long to wait for a connection
-    allowExitOnIdle: false, // keep Node process alive even when pool is idle
-    
-    // Query timeout to prevent hanging queries
-    query_timeout: 60000, // 60 seconds
-    
-    // Connection validation and retry settings
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
+
+    // Pool settings - back to working values with minor improvements
+    max: parseInt(process.env.DB_POOL_MAX || '20'), // Back to reasonable size
+    min: parseInt(process.env.DB_POOL_MIN || '5'), // Back to original minimum
+    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '60000'), // Reduced to 1 minute (was 5 min)
+    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '8000'), // Conservative 8 seconds
+    allowExitOnIdle: false,
+
+    // Query timeouts - moderate increases only
+    query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT || '45000'), // 45 seconds (was 30)
+    statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT || '40000'), // 40 seconds (was 25)
+
     application_name: 'fio-relic-explorer',
-    
-    // Let PostgreSQL handle keep-alive instead of manual implementation
-    // Remove manual keepAlive settings to avoid conflicts
+
+    // Basic keep-alive
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000,
+
+    // Only include custom options if provided
+    ...(process.env.DB_OPTIONS && { options: process.env.DB_OPTIONS }),
   };
 
   return poolConfig;
@@ -86,35 +96,26 @@ const createSimpleSSHTunnel = async () => {
   }
 
   const decodedKey = decodeSSHKey(sshKey);
-  
+
   // Read private key from file or use the key directly
   let privateKey: Buffer;
   try {
-    // Try to read as file path first
     privateKey = readFileSync(decodedKey);
   } catch (error) {
-    // If reading as file fails, treat it as the key content itself
     privateKey = Buffer.from(decodedKey, 'utf8');
   }
 
-  const tunnelOptions = {
-    autoClose: false,
-  };
-
-  const serverOptions = {
-    host: '127.0.0.1',
-    port: 0, // Auto-assign local port
-  };
-
+  const tunnelOptions = { autoClose: false };
+  const serverOptions = { host: '127.0.0.1', port: 0 };
   const sshOptions = {
     host: process.env.SSH_HOST,
     port: parseInt(process.env.SSH_PORT || '22'),
     username: process.env.SSH_USER || 'root',
     privateKey: privateKey,
     passphrase: process.env.SSH_KEY_PASSPHRASE,
-    keepaliveInterval: 30000, // Send keep-alive every 30 seconds
-    keepaliveCountMax: 3, // Close after 3 failed keep-alives
-    readyTimeout: 30000, // 30 second timeout for initial connection
+    keepaliveInterval: 30000,
+    keepaliveCountMax: 3,
+    readyTimeout: 30000,
   };
 
   const forwardOptions = {
@@ -125,97 +126,43 @@ const createSimpleSSHTunnel = async () => {
   };
 
   try {
-    console.log(`Creating SSH tunnel to ${sshOptions.host}:${sshOptions.port} -> ${forwardOptions.dstAddr}:${forwardOptions.dstPort}`);
-    const [server, conn] = await createTunnel(tunnelOptions, serverOptions, sshOptions, forwardOptions);
-    
+    console.log(
+      `Creating SSH tunnel to ${sshOptions.host}:${sshOptions.port} -> ${forwardOptions.dstAddr}:${forwardOptions.dstPort}`
+    );
+    const [server, conn] = await createTunnel(
+      tunnelOptions,
+      serverOptions,
+      sshOptions,
+      forwardOptions
+    );
+
     const localPort = (server.address() as any)?.port || 0;
     console.log(`SSH tunnel established on local port ${localPort}`);
-    
-    // Handle tunnel connection errors
-    conn.on('error', (err: Error) => {
-      console.error('SSH tunnel connection error:', err);
-    });
-    
-    conn.on('close', () => {
-      console.warn('SSH tunnel connection closed');
-    });
-    
-    conn.on('ready', () => {
-      console.log('SSH connection ready');
-    });
-    
-    server.on('error', (err: Error) => {
-      console.error('SSH tunnel server error:', err);
-    });
-    
+
+    conn.on('error', (err: Error) => console.error('SSH tunnel connection error:', err));
+    conn.on('close', () => console.warn('SSH tunnel connection closed'));
+    conn.on('ready', () => console.log('SSH connection ready'));
+    server.on('error', (err: Error) => console.error('SSH tunnel server error:', err));
+
     return { server, conn, localPort };
   } catch (error) {
     console.error('Failed to create SSH tunnel:', error);
-    
-    // Provide more specific error guidance
-    const errorMessage = (error as Error)?.message || '';
-    if (errorMessage.includes('ENOTFOUND')) {
-      console.error('DNS resolution failed. Check SSH_HOST value.');
-    } else if (errorMessage.includes('ECONNREFUSED')) {
-      console.error('Connection refused. Check SSH_HOST and SSH_PORT values.');
-    } else if (errorMessage.includes('Authentication')) {
-      console.error('SSH authentication failed. Check SSH_USER and SSH key.');
-    }
-    
     return null;
   }
-};
-
-// Function to test tunnel connectivity
-const testTunnelConnection = async (host: string, port: number): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const net = require('net');
-    const socket = new net.Socket();
-    
-    const timeout = setTimeout(() => {
-      socket.destroy();
-      resolve(false);
-    }, 5000); // 5 second timeout
-    
-    socket.connect(port, host, () => {
-      clearTimeout(timeout);
-      socket.destroy();
-      resolve(true);
-    });
-    
-    socket.on('error', () => {
-      clearTimeout(timeout);
-      resolve(false);
-    });
-  });
 };
 
 // Function to create pool with optional SSH tunnel
 const createPool = async (): Promise<Pool> => {
   const poolConfig = createPoolConfig();
-  
-  // Try to create SSH tunnel if configured
+
   const tunnel = await createSimpleSSHTunnel();
-  
+
   if (tunnel) {
-    // Use tunnel connection
     poolConfig.host = '127.0.0.1';
     poolConfig.port = tunnel.localPort;
-    // Increase timeout for SSH tunnel connections as they need more time
-    poolConfig.connectionTimeoutMillis = 10000; // 10 seconds for SSH tunnel
+    poolConfig.connectionTimeoutMillis = parseInt(process.env.DB_CONNECTION_TIMEOUT_SSH || '12000'); // Conservative 12 seconds for SSH tunnel
     console.log(`Using SSH tunnel: connecting to database via localhost:${tunnel.localPort}`);
-    
-    // Wait a moment for the tunnel to be fully ready
-    console.log('Waiting for SSH tunnel to stabilize...');
-    await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
-    
-    // Test tunnel connectivity
-    console.log('Testing tunnel connectivity...');
-    const tunnelWorks = await testTunnelConnection('127.0.0.1', tunnel.localPort);
-    if (!tunnelWorks) {
-      throw new Error(`SSH tunnel connectivity test failed on localhost:${tunnel.localPort}`);
-    }
-    console.log('SSH tunnel connectivity test passed');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   } else {
     console.log(`Using direct database connection: ${poolConfig.host}:${poolConfig.port}`);
   }
@@ -229,44 +176,22 @@ let poolInitialized = false;
 let initializationPromise: Promise<void> | null = null;
 
 const initializePool = async (): Promise<void> => {
-  // If already initialized, return immediately
   if (poolInitialized) return;
-  
-  // If initialization is in progress, wait for it to complete
-  if (initializationPromise) {
-    return initializationPromise;
-  }
-  
-  // Start initialization
+  if (initializationPromise) return initializationPromise;
+
   initializationPromise = (async () => {
     try {
       console.log('Initializing database pool...');
       pool = await createPool();
-      
-      // Handle pool errors with better reconnection logic
+
+      // Basic pool error handling
       pool.on('error', (err) => {
-        console.error('Unexpected error on idle client', err);
-        
-        // Check if this is a connection error that requires reconnection
-        if (err.message?.includes('Connection terminated') || 
-            err.message?.includes('connection closed') ||
-            err.message?.includes('ECONNRESET') ||
-            err.message?.includes('connection reset')) {
-          console.log('Connection error detected, marking pool for reinitialization...');
-          poolInitialized = false;
-          initializationPromise = null;
-        }
+        console.error('Pool error:', err);
+        poolInitialized = false;
+        initializationPromise = null;
       });
-      
-      // Handle client connection errors
-      pool.on('connect', (client) => {
-        client.on('error', (err) => {
-          console.error('Client connection error:', err);
-        });
-      });
-      
-      // Pre-warm the pool so first real request is fast
-      console.log('Testing initial database connection...');
+
+      // Test initial connection
       const testClient = await pool.connect();
       try {
         await testClient.query('SELECT 1 as test');
@@ -274,83 +199,141 @@ const initializePool = async (): Promise<void> => {
       } finally {
         testClient.release();
       }
-      
-      console.log('Database pool initialized and warmed successfully');
+
       poolInitialized = true;
+      console.log('Database pool initialized successfully');
     } catch (error) {
       console.error('Failed to initialize database pool:', error);
-      // Reset the promise so we can retry
       initializationPromise = null;
       throw error;
     }
   })();
-  
+
   return initializationPromise;
 };
 
-// Handle process termination gracefully
+// Export the pool getter functions
+export const getPool = async (): Promise<Pool> => {
+  const maxRetries = parseInt(process.env.DB_CONNECTION_RETRIES || '3');
+  const retryDelay = parseInt(process.env.DB_RETRY_DELAY || '1000');
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      if (!poolInitialized) {
+        await initializePool();
+      }
+
+      // Simple connection test only
+      const testClient = await pool.connect();
+      try {
+        await testClient.query('SELECT 1');
+      } finally {
+        testClient.release();
+      }
+
+      return pool;
+    } catch (error) {
+      console.warn(`Pool check failed (attempt ${attempt}/${maxRetries}):`, error);
+
+      if (attempt === maxRetries) {
+        throw error;
+      }
+
+      poolInitialized = false;
+      initializationPromise = null;
+
+      if (attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay * attempt));
+      }
+    }
+  }
+
+  throw new Error('Failed to get database pool after all retries');
+};
+
+export const getPoolSync = (): Pool => {
+  if (!poolInitialized) {
+    throw new Error('Database pool not initialized. Call getPool() first.');
+  }
+  return pool;
+};
+
+// Handle process termination
 const handleShutdown = async (signal: string) => {
   console.log(`Received ${signal}, closing database pool...`);
   try {
     if (pool && poolInitialized) {
       await pool.end();
     }
-    console.log('Database pool closed successfully');
     process.exit(0);
   } catch (error) {
-    console.error('Error during database pool cleanup:', error);
+    console.error('Error during pool cleanup:', error);
     process.exit(1);
   }
 };
 
-// Only register signal handlers in production or when explicitly requested
+// Register signal handlers
 if (process.env.NODE_ENV === 'production' || process.env.HANDLE_SIGNALS === 'true') {
   process.on('SIGINT', () => handleShutdown('SIGINT'));
   process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 }
 
 // Initialize pool at startup
-initializePool().catch((error) => {
+initializePool().catch((error: any) => {
   console.error('Failed to initialize database at startup:', error);
   process.exit(1);
 });
 
-// Export the pool getter functions
-export const getPool = async (): Promise<Pool> => {
-  // Check if pool needs reinitialization (handles automatic reconnection)
-  if (!poolInitialized) {
-    console.log('Pool not initialized, reinitializing...');
-    await initializePool();
-  }
-  
-  // Double-check pool health with a simple query
-  try {
-    await pool.query('SELECT 1');
-  } catch (error) {
-    console.warn('Pool health check failed, reinitializing pool...', error);
-    poolInitialized = false;
-    initializationPromise = null;
-    await initializePool();
-  }
-  
-  return pool;
-};
-
-export const getPoolSync = (): Pool => {
-  if (!poolInitialized) {
-    throw new Error('Database pool not initialized. Make sure to call getPool() first or wait for initialization.');
-  }
-  return pool;
-};
-
-// For backward compatibility, export default as a proxy that ensures pool is initialized
-const poolProxy = new Proxy({} as Pool, {
-  get(target, prop) {
-    if (!poolInitialized) {
-      throw new Error('Database pool not available. The pool may not be initialized yet. Please use getPool() instead.');
+// Enhanced pool proxy for backward compatibility
+class EnhancedPoolProxy {
+  async query(text: string, params?: any[]): Promise<any>;
+  async query(config: any): Promise<any>;
+  async query(textOrConfig: string | any, params?: any[]): Promise<any> {
+    const pool = await getPool();
+    if (typeof textOrConfig === 'string') {
+      return pool.query(textOrConfig, params);
+    } else {
+      return pool.query(textOrConfig);
     }
-    return (pool as any)[prop];
   }
-});
 
-export default poolProxy;
+  async connect() {
+    const pool = await getPool();
+    return pool.connect();
+  }
+
+  async end() {
+    const pool = await getPool();
+    return pool.end();
+  }
+
+  on(event: 'error' | 'connect' | 'acquire' | 'remove' | 'release', listener: any) {
+    if (!poolInitialized) {
+      throw new Error('Database pool not available.');
+    }
+    return pool.on(event as any, listener);
+  }
+
+  get totalCount() {
+    if (!poolInitialized) {
+      throw new Error('Database pool not available.');
+    }
+    return pool.totalCount;
+  }
+
+  get idleCount() {
+    if (!poolInitialized) {
+      throw new Error('Database pool not available.');
+    }
+    return pool.idleCount;
+  }
+
+  get waitingCount() {
+    if (!poolInitialized) {
+      throw new Error('Database pool not available.');
+    }
+    return pool.waitingCount;
+  }
+}
+
+export default new EnhancedPoolProxy();

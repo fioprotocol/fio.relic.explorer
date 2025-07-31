@@ -103,6 +103,28 @@ jobs:
           echo "DB_PORT_REMOTE=${DB_PORT_REMOTE}" >> $GITHUB_ENV
           SSH_TUNNEL_KEY=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_TUNNEL_KEY" --with-decryption --query "Parameter.Value" --output text)
           echo "SSH_TUNNEL_KEY=${SSH_TUNNEL_KEY}" >> $GITHUB_ENV
+          
+          # New database configuration parameters (optional - will use defaults if not set)
+          DB_POOL_MAX=$(aws ssm get-parameter --name "/fio-relic/dev/DB_POOL_MAX" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "20")
+          echo "DB_POOL_MAX=${DB_POOL_MAX}" >> $GITHUB_ENV
+          DB_POOL_MIN=$(aws ssm get-parameter --name "/fio-relic/dev/DB_POOL_MIN" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "5")
+          echo "DB_POOL_MIN=${DB_POOL_MIN}" >> $GITHUB_ENV
+          DB_IDLE_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_IDLE_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "60000")
+          echo "DB_IDLE_TIMEOUT=${DB_IDLE_TIMEOUT}" >> $GITHUB_ENV
+          DB_CONNECTION_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_CONNECTION_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "8000")
+          echo "DB_CONNECTION_TIMEOUT=${DB_CONNECTION_TIMEOUT}" >> $GITHUB_ENV
+          DB_CONNECTION_TIMEOUT_SSH=$(aws ssm get-parameter --name "/fio-relic/dev/DB_CONNECTION_TIMEOUT_SSH" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "12000")
+          echo "DB_CONNECTION_TIMEOUT_SSH=${DB_CONNECTION_TIMEOUT_SSH}" >> $GITHUB_ENV
+          DB_QUERY_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_QUERY_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "45000")
+          echo "DB_QUERY_TIMEOUT=${DB_QUERY_TIMEOUT}" >> $GITHUB_ENV
+          DB_STATEMENT_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_STATEMENT_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "40000")
+          echo "DB_STATEMENT_TIMEOUT=${DB_STATEMENT_TIMEOUT}" >> $GITHUB_ENV
+          DB_CONNECTION_RETRIES=$(aws ssm get-parameter --name "/fio-relic/dev/DB_CONNECTION_RETRIES" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "3")
+          echo "DB_CONNECTION_RETRIES=${DB_CONNECTION_RETRIES}" >> $GITHUB_ENV
+          DB_RETRY_DELAY=$(aws ssm get-parameter --name "/fio-relic/dev/DB_RETRY_DELAY" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "1000")
+          echo "DB_RETRY_DELAY=${DB_RETRY_DELAY}" >> $GITHUB_ENV
+          HANDLE_SIGNALS=$(aws ssm get-parameter --name "/fio-relic/dev/HANDLE_SIGNALS" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "true")
+          echo "HANDLE_SIGNALS=${HANDLE_SIGNALS}" >> $GITHUB_ENV
       - name: Use the secret
         run: |
           echo "Secret value1 is $HOST"
