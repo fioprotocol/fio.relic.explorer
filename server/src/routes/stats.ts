@@ -127,7 +127,7 @@ const getStatsRoute: FastifyPluginAsync = async (fastify) => {
     }
 
     // Transform query results to return format
-    const transactions = transactionsResult.rows.map((row) => ({
+    const transactions = transactionsResult.rows.map((row: { date: Date; transactions: string }) => ({
       date: row.date.toISOString().split('T')[0],
       transactions: parseInt(row.transactions),
     }));

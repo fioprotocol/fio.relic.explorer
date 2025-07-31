@@ -60,7 +60,7 @@ const blocksRoute: FastifyPluginAsync = async (fastify) => {
       const result = await pool.query(sqlQuery, blocks);
 
       const data: Record<string, number> = result.rows.reduce(
-        (acc, block) => {
+        (acc: Record<string, number>, block: { pk_block_number: string; stamp: number }) => {
           acc[block.pk_block_number] = block.stamp;
           return acc;
         },
