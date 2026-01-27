@@ -5,6 +5,15 @@ import { truncateLongText } from 'src/utils/general';
 import { formatFioAmount } from 'src/utils/fio';
 import { TRANSACTION_TYPE } from '@shared/constants/transaction';
 
+export interface TokenTransferInfo {
+  payer_account_name: string;
+  payer_public_key: string;
+  payee_account_name: string;
+  payee_public_key: string;
+  amount: string;
+  memo: string;
+}
+
 export interface ActionInfo {
   description: string;
   details?: string;
@@ -14,6 +23,7 @@ export interface ActionInfo {
     transactionType?: string;
     payer_public_key?: string | null;
     payer_account_name?: string | null;
+    token_transfers?: TokenTransferInfo[];
   }) => string | ReactElement;
 }
 
@@ -227,4 +237,19 @@ export const ACTION_NAMES: Record<string, ActionInfo> = {
     description: 'Remove All NFT Signatures',
     details: 'fio_address',
   },
+  fipxlviii: {
+    description: 'Transfer FIO Tokens',
+    formatDetails: ({ payer_account_name, payer_public_key, transactionType, token_transfers }): string => {
+      // For transaction detail page, use token_transfers data
+      if (token_transfers && token_transfers.length > 0) {
+        const firstTransfer = token_transfers[0];
+        const payee = firstTransfer.payee_public_key || firstTransfer.payee_account_name || 'N/A';
+        return `To ${truncateLongText(payee)}`;
+      }
+      // For account transactions list, use the counterparty info
+      return transactionType === TRANSACTION_TYPE.RECEIVER
+        ? `From ${truncateLongText(payer_public_key || payer_account_name || 'N/A')}`
+        : `To ${truncateLongText(payer_public_key || payer_account_name || 'N/A')}`;
+    }
+  }
 };

@@ -26,6 +26,7 @@ export const transformDetails = ({
   transactionType,
   payer_public_key,
   payer_account_name,
+  token_transfers,
 }: {
   actionInfo: ActionInfo;
   request_data?: string;
@@ -33,16 +34,19 @@ export const transformDetails = ({
   transactionType?: string;
   payer_public_key?: string | null;
   payer_account_name?: string | null;
+  token_transfers?: { payer_account_name: string; payer_public_key: string; payee_account_name: string; payee_public_key: string; amount: string; memo: string }[];
 }): string | null => {
   let details = null;
 
-  if (actionInfo.formatDetails && request_data) {
+  if (actionInfo.formatDetails) {
+    const data = request_data ? JSON.parse(request_data) : {};
     details = actionInfo.formatDetails({
-      data: JSON.parse(request_data),
+      data,
       className,
       transactionType,
       payer_public_key,
       payer_account_name,
+      token_transfers,
     });
   } else if (actionInfo.details && request_data) {
     details = JSON.parse(request_data)[actionInfo.details] || details;

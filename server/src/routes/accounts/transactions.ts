@@ -184,6 +184,16 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
               GROUP BY fk_transaction_id
             ) rtt ON t.pk_transaction_id = rtt.fk_transaction_id
             WHERE aa.fk_account_id = $1 AND t.fk_account_id <> $1
+            AND NOT EXISTS (
+              SELECT 1 FROM tokentransfers tt
+              WHERE tt.fk_transaction_id = t.pk_transaction_id
+              AND tt.fk_payee_account_id = $1
+            )
+            AND NOT EXISTS (
+              SELECT 1 FROM tokentransfers tt
+              WHERE tt.fk_transaction_id = t.pk_transaction_id
+              AND tt.fk_payer_account_id = $1
+            )
           ),
           receiver_token_transfers AS (
             SELECT
@@ -203,12 +213,32 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
             WHERE tt.fk_payee_account_id = $1 AND t.fk_account_id <> $1
             GROUP BY t.pk_transaction_id, t.transaction_id, t.block_timestamp, t.action_name, t.fee, t.request_data, tt.fk_payer_account_id, acc.public_key, acc.account_name
           ),
+          sender_token_transfers AS (
+            SELECT
+              t.pk_transaction_id,
+              t.transaction_id,
+              t.block_timestamp,
+              t.action_name,
+              t.fee,
+              t.request_data,
+              'SENDER' AS transaction_type,
+              CAST(SUM(tt.fio_suf_amount) AS TEXT) AS fio_tokens,
+              acc.public_key AS payer_public_key,
+              acc.account_name AS payer_account_name
+            FROM tokentransfers tt
+            JOIN transactions t ON tt.fk_transaction_id = t.pk_transaction_id
+            JOIN accounts acc ON acc.pk_account_id = tt.fk_payee_account_id
+            WHERE tt.fk_payer_account_id = $1 AND t.fk_account_id <> $1
+            GROUP BY t.pk_transaction_id, t.transaction_id, t.block_timestamp, t.action_name, t.fee, t.request_data, tt.fk_payee_account_id, acc.public_key, acc.account_name
+          ),
           combined_transactions AS (
             SELECT * FROM sender_transactions
             UNION
             SELECT * FROM receiver_account_activities
             UNION
             SELECT * FROM receiver_token_transfers
+            UNION
+            SELECT * FROM sender_token_transfers
           )
           SELECT * FROM combined_transactions
           WHERE 1=1 ${cursorCondition}
@@ -252,6 +282,8 @@ const accountTransactionsRoute: FastifyPluginAsync = async (fastify) => {
                 SELECT fk_transaction_id AS pk_transaction_id FROM accountactivities WHERE fk_account_id = $1
                 UNION
                 SELECT fk_transaction_id AS pk_transaction_id FROM tokentransfers WHERE fk_payee_account_id = $1
+                UNION
+                SELECT fk_transaction_id AS pk_transaction_id FROM tokentransfers WHERE fk_payer_account_id = $1
               )
               SELECT COUNT(*) AS total FROM all_tx
             `,
