@@ -47,6 +47,15 @@ export type TransactionDetailResponse = {
   data: TransactionDetails;
 };
 
+export type TokenTransfer = {
+  payer_account_name: string;
+  payer_public_key: string;
+  payee_account_name: string;
+  payee_public_key: string;
+  amount: string;
+  memo: string;
+};
+
 export type TransactionDetails = {
   transaction_id: string;
   block_timestamp: string;
@@ -63,6 +72,7 @@ export type TransactionDetails = {
     action_name: string;
     request_data: string;
   }[];
+  token_transfers?: TokenTransfer[];
 };
 
 export type TransactionType = typeof TRANSACTION_TYPE[keyof typeof TRANSACTION_TYPE];

@@ -38,7 +38,7 @@ export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageCon
     params: { id },
   });
 
-  const { action_name, account_name, fee, request_data } = response?.data || {};
+  const { action_name, account_name, fee, request_data, token_transfers } = response?.data || {};
 
   const actionInfo = transformActionInfo(action_name);
 
@@ -49,7 +49,7 @@ export const useTransactionDetailsPageContext = (): UseTransactionDetailsPageCon
     },
     {
       title: 'Details/Item',
-      value: loading ? null : transformDetails({ actionInfo, request_data }) || ' - ',
+      value: loading ? null : transformDetails({ actionInfo, request_data, token_transfers }) || ' - ',
     },
     {
       title: 'Account',
