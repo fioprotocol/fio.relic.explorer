@@ -1,0 +1,12 @@
+@import '../../../styles/variables.scss';
+@import '~bootstrap/scss/mixins';
+
+.socialMediaLink {
+  width: 291px;
+}
+
+@include media-breakpoint-down(lg) {
+  .socialMediaLink {
+    width: 100%;
+  }
+}

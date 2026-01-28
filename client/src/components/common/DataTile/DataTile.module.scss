@@ -1,0 +1,59 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/font-mixins.scss';
+@import '~bootstrap/scss/mixins/breakpoints.scss';
+
+.dataItem {
+  border-color: $mercury !important;
+  padding: 0.75rem;
+  height: 100%;
+  width: 100%;
+
+  &:last-child {
+    border-bottom: none !important;
+  }
+
+  .dataItemTitle {
+    @include font-inter-400;
+    font-size: $font-size-xxs;
+    color: $mountain-mist;
+  }
+
+  .dataItemValue {
+    @include font-inter-600;
+    font-size: $font-size-sm;
+    color: $caviar;
+  }
+}
+
+.dataItemRow {
+  background-color: transparent;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid $mercury;
+}
+
+.gridItem {
+  position: relative;
+  
+  // Apply bottom border to all grid items by default
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: $mercury;
+  }
+  
+  // Last row will be set via JS based on grid calculation
+  &.lastRow::after {
+    display: none;
+  }
+}
+
+.childrenContainer {
+  @include media-breakpoint-down(md) {
+    border-left: none !important;
+  }
+}

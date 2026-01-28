@@ -1,32 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { FC } from 'react';
+import Chart  from '../common/Chart/Chart';
 
-import Chart, { ChartDataPoint } from '../common/Chart/Chart';
+import { DEFAULT_DAYS } from '@shared/constants/stats';
 
-import './TransactionChart.scss';
+import { TransactionChartProps } from './types';
 
-interface TransactionDataPoint extends ChartDataPoint {
-  date: string;
-  transactions: number;
-}
-
-interface TransactionChartProps {
-  data?: TransactionDataPoint[];
-  title?: string;
-}
-
-const TransactionChart: React.FC<TransactionChartProps> = ({
-  title = 'Transaction History in 7 Days',
+export const TransactionChart: FC<TransactionChartProps> = ({
+  chartData,
+  title = `Transaction History in ${DEFAULT_DAYS} Days`,
 }) => {
-  const [data, setData] = useState<TransactionDataPoint[]>([]);
-
-  const getTxData = async (): Promise<void> => {
-    const response = await fetch('/api/transactions-stats');
-    const responseData = await response.json();
-    setData(responseData.data.transactions);
-  };
-
   const formatDate = (date: string): string => {
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const formatTransactions = (value: number, index?: number): string => {
@@ -46,14 +30,10 @@ const TransactionChart: React.FC<TransactionChartProps> = ({
     });
   };
 
-  useEffect(() => {
-    getTxData();
-  }, []);
-
   return (
-    <div className="transaction-chart">
+    <div className="border border-0 pt-2 ps-0 px-3 rounded-3 w-100">
       <Chart
-        data={data}
+        data={chartData}
         title={title}
         xAxisKey="date"
         yAxisKey="transactions"

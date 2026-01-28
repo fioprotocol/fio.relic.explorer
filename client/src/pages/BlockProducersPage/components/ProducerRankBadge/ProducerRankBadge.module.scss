@@ -1,0 +1,8 @@
+@import '../../../../styles/variables.scss';
+@import '~bootstrap/scss/mixins';
+
+@include media-breakpoint-down(lg) {
+  .topBadge {
+    height: 24px;
+  }
+}

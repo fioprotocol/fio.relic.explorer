@@ -1,0 +1,19 @@
+.producerActionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  align-items: center;
+  
+  .linksColumn {
+    justify-self: start;
+  }
+  
+  .flagColumn {
+    justify-self: center;
+  }
+  
+  .badgesColumn {
+    justify-self: end;
+  }
+} 

@@ -1,0 +1,39 @@
+@import '../../../styles/variables.scss';
+@import '~bootstrap/scss/mixins';
+
+.nftItem {
+  max-width: 335px;
+  height: 305px;
+  background-color: $snow-drift;
+
+  & > div {
+    max-height: 305px;
+    height: 100%;
+
+    &.notImage {
+      background-color: $dark-jungle-green;
+    }
+
+    img {
+      width: 100%;
+
+      &.notImage {
+        width: 68px;
+      }
+
+      &.hasMultipleSignatures {
+        width: 200px;
+      }
+    }
+  }
+}
+
+.nftImgContainer {
+  min-width: 345px;
+}
+
+@include media-breakpoint-down(md) {
+  .nftItem {
+    max-width: 100%;
+  }
+}

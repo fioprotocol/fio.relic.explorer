@@ -1,0 +1,41 @@
+// Colors
+$primary: #765cd6;
+$secondary: #969696;
+$success: #baffe8;
+$warning: #ffea95;
+$info: #00c1ff;
+
+$red: #ff0000;
+$danger: #dc3545;
+
+$dark: #1f1f1f;
+$light: #f8f9fa;
+
+$border-color: #e6e6e6;
+
+// Typography
+$font-family-sans-serif:
+  'Inter Regular',
+  'Proxima Nova Regular',
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  sans-serif;
+
+$utilities: (
+  'opacity': (
+    property: opacity,
+    class: opacity,
+    state: hover,
+    values: (
+      0: 0,
+      25: 0.25,
+      50: 0.5,
+      75: 0.75,
+      100: 1,
+    ),
+  ),
+);

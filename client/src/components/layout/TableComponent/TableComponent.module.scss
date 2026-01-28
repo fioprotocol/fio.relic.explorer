@@ -1,0 +1,61 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/font-mixins.scss';
+
+.tableHeader {
+  border-color: $mercury;
+  @include font-inter-600;
+}
+
+.thead {
+  th {
+    @include font-inter-600;
+    font-size: $font-size-sm;
+    color: $dark;
+    border-color: $mercury;
+  }
+}
+
+.tbody {
+  tr {
+    border-bottom: 0.5px solid $mercury;
+
+    &:hover {
+      background-color: $snow-drift;
+    }
+
+    td {
+      @include font-inter-400;
+      font-size: $font-size-sm;
+      color: $dark;
+      vertical-align: middle;
+      white-space: pre-wrap;
+    }
+  }
+}
+
+.mobileRow {
+  border-color: $mercury;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.mobileItem {
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.mobileLabel {
+  @include font-inter-400;
+  font-size: $font-size-xs;
+  color: $mountain-mist;
+}
+
+.mobileValue {
+  @include font-inter-400;
+  font-size: $font-size-xs;
+  color: $dark;
+  white-space: pre-wrap;
+}

@@ -1,0 +1,36 @@
+@import '../../../styles/variables.scss';
+
+.receiver {
+  color: $green-teal !important;
+}
+
+.badge {
+  width: 35px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.badgeSender {
+    background-color: $malachite !important;
+  }
+
+  &.badgeReceiver {
+    background-color: $crystal-blue !important;
+  }
+}
+
+.tokenBadge {
+  &.sender {
+    border-color: $malachite !important;
+  }
+
+  &.receiver {
+    color: $green-teal !important;
+    border-color: $green-teal !important;
+  }
+}
+
+.senderRow {
+  background-color: $snow-drift !important;
+}

@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import dotenv from 'dotenv';
 import { AddressInfo } from 'net';
 import config from './config';
-import pool from './config/database'; // Import the database pool
+import { getPool } from './config/database'; // Import the async pool getter
 
 // Load environment variables
 dotenv.config();
@@ -11,31 +11,29 @@ dotenv.config();
 import swagger from './plugins/swagger';
 import cors from './plugins/cors';
 
-// Import routes
-import * as healthCheckRoute from './routes/health-check';
-import * as transactionsByDateRoute from './routes/transactions-stats';
+// Import routes handler
+import { registerRoutes } from './routes';
 
 const server = Fastify({
   logger: {
-    transport: config.isDev 
+    transport: config.isDev
       ? {
           target: 'pino-pretty',
           options: {
             translateTime: 'HH:MM:ss Z',
             ignore: 'pid,hostname',
-          }
+          },
         }
-      : undefined
-  }
+      : undefined,
+  },
 });
 
 // Register plugins
 server.register(cors);
 server.register(swagger);
 
-// Register routes
-server.register(healthCheckRoute.default, { prefix: '/api/health-check' });
-server.register(transactionsByDateRoute.default, { prefix: '/api/transactions-stats' });
+// Register all routes
+registerRoutes(server);
 
 // Root route
 server.get('/', async () => {
@@ -46,25 +44,24 @@ server.get('/', async () => {
 const start = async () => {
   try {
     // Test database connection before starting the server
+    const pool = await getPool();
     const client = await pool.connect();
     server.log.info('Successfully connected to the database');
     client.release();
   } catch (err) {
-    server.log.error(err);
+    server.log.error('Failed to connect to database:', err);
   }
 
   try {
     // Start the server after successful database connection
-    await server.listen({ 
+    await server.listen({
       port: config.server.port,
       host: config.server.host,
     });
-    
+
     const address = server.server.address();
-    const port = typeof address === 'string' 
-      ? address 
-      : (address as AddressInfo)?.port;
-      
+    const port = typeof address === 'string' ? address : (address as AddressInfo)?.port;
+
     console.log(`Server listening on port ${port}`);
   } catch (err) {
     server.log.error(err);
@@ -72,4 +69,4 @@ const start = async () => {
   }
 };
 
-start(); 
+start();

@@ -1,0 +1,30 @@
+@import '../../../styles/variables.scss';
+
+.jsonHighlighter {
+  word-break: break-all;
+}
+
+.jsonKey {
+  color: $dark; // Dark color for keys (default)
+}
+
+.jsonString {
+  color: $malachite; // Green for string values
+}
+
+.jsonNumber {
+  color: $primary; // Primary color for numbers
+}
+
+.jsonBoolean {
+  color: $dark; // Dark for booleans and null
+  font-weight: bold;
+}
+
+.jsonBrace {
+  color: $dark; // Dark for braces and brackets
+}
+
+.jsonComma {
+  color: $dark; // Dark for commas
+}

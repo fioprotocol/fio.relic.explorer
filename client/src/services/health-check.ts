@@ -1,9 +1,7 @@
-import axios from 'axios';
-import { HealthCheckResponse } from '../types/health-check';
-
-const API_URL = '/api/health-check';
+import { HealthCheckResponse } from '@shared/types/health-check';
+import { apiClient } from './api-client';
 
 export const getHealthCheck = async (): Promise<HealthCheckResponse> => {
-  const response = await axios.get<HealthCheckResponse>(API_URL);
+  const response = await apiClient.get<HealthCheckResponse>('/health-check');
   return response.data;
 };

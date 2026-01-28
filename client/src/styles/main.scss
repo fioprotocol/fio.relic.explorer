@@ -1,10 +1,51 @@
-// Import custom variables
 @import './variables.scss';
-@import '~bootstrap/scss/bootstrap.scss';
+@import './font-mixins.scss';
+
+@import '~bootstrap/scss/maps';
+@import '~bootstrap/scss/mixins';
+@import '~bootstrap/scss/root';
+
+@import '~bootstrap/scss/utilities';
+@import '~bootstrap/scss/reboot';
+
+@import '~bootstrap/scss/type';
+@import '~bootstrap/scss/images';
+@import '~bootstrap/scss/containers';
+@import '~bootstrap/scss/grid';
+@import '~bootstrap/scss/tables';
+@import '~bootstrap/scss/forms';
+@import '~bootstrap/scss/buttons';
+@import '~bootstrap/scss/transitions';
+@import '~bootstrap/scss/dropdown';
+@import '~bootstrap/scss/button-group';
+@import '~bootstrap/scss/nav';
+@import '~bootstrap/scss/navbar';
+@import '~bootstrap/scss/card';
+@import '~bootstrap/scss/accordion';
+@import '~bootstrap/scss/breadcrumb';
+@import '~bootstrap/scss/pagination';
+@import '~bootstrap/scss/badge';
+@import '~bootstrap/scss/alert';
+@import '~bootstrap/scss/progress';
+@import '~bootstrap/scss/list-group';
+@import '~bootstrap/scss/close';
+@import '~bootstrap/scss/toasts';
+@import '~bootstrap/scss/modal';
+@import '~bootstrap/scss/tooltip';
+@import '~bootstrap/scss/popover';
+@import '~bootstrap/scss/carousel';
+@import '~bootstrap/scss/spinners';
+@import '~bootstrap/scss/offcanvas';
+@import '~bootstrap/scss/placeholders';
+
+@import '~bootstrap/scss/helpers';
+
+@import '~bootstrap/scss/utilities/api';
 
 body {
   margin: 0;
-  font-family: $font-family-sans-serif;
+  font-family: 'Inter', $font-family-sans-serif;
+  @include font-inter-400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: $light;
@@ -30,4 +71,109 @@ body {
   color: $danger;
   font-size: 0.875rem;
   margin-top: 0.25rem;
+}
+
+.f-size-xs {
+  font-size: $font-size-xs;
+}
+
+.f-size-xsm {
+  font-size: $font-size-xsm;
+}
+
+.f-size-sm {
+  font-size: $font-size-sm;
+}
+
+.f-size-lsm {
+  font-size: $font-size-lsm;
+}
+
+.f-size-xxs {
+  font-size: $font-size-xxs;
+}
+
+.fw-normal-inter {
+  @include font-inter-400;
+}
+
+.fw-semibold-inter {
+  @include font-inter-600;
+}
+
+.fw-normal-proxima {
+  @include font-proxima-nova-400;
+}
+
+.fw-semibold-proxima {
+  @include font-proxima-nova-600;
+}
+
+.fw-extrabold-proxima {
+  @include font-proxima-nova-800;
+}
+
+a {
+  text-decoration: none;
+}
+
+.box-shadow-default {
+  box-shadow: $box-shadow-default;
+}
+
+.text-truncate-max-w {
+  max-width: 30rem;
+}
+
+.icon-24 {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-w-24 {
+  width: 24px;
+}
+
+.icon-h-24 {
+  height: 24px;
+}
+
+.green-icon {
+  color: $green;
+}
+
+.word-break-all {
+  word-break: break-all;
+}
+
+// Custom styles for nav-underline
+.nav-underline {
+  border-bottom: var(--bs-border-width) solid $border-color;
+  .nav-item {
+    .nav-link {
+      padding-right: 1.5rem;
+      padding-left: 1.5rem;
+      color: $secondary;
+
+      &.active {
+        color: $dark;
+        font-weight: 400;
+        border-color: $primary;
+      }
+    }
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.nowrap {
+  white-space: nowrap !important;
+}
+
+@include media-breakpoint-down(sm) {
+  .text-truncate-max-w {
+    max-width: 10rem;
+  }
 }

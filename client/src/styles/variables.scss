@@ -1,15 +1,62 @@
-// Colors
-$primary: #765CD6;
-$secondary: #6c757d;
-$success: #28a745;
-$danger: #dc3545;
-$warning: #ffc107;
-$info: #17a2b8;
-$light: #f8f9fa;
-$dark: #1f1f1f;
+@import '~bootstrap/scss/functions';
+@import './overrides.scss';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/variables-dark';
 
+$caviar: #2b2b2e;
 $border-light: rgba(0, 0, 0, 0.05);
+$baltic-sea: #282a2f;
+
+$mountain-mist: #969696;
+$briquette-grey: #515151;
+
+$sky-blue: #00c1ff;
+$crystal-blue: #4eb2fe;
+
+$bright-pink: #f502b1;
+$blood-burst: #ff4b4b;
+
+$saffron-gold: #ef9103;
+
+$golden-foil: #ccd000;
+
+$malachite: #13ce66;
+$benzol-green: #00d26d;
+$green: #00ff00;
+$malachite: #03d063;
+$green-teal: #01b26e;
+
+$gainsboro: #dcdcdc;
+$mercury: #e6e6e6;
+$white-smoke: #f6f6f6;
+$snow-drift: #f9f9f9;
+$seashell: #f0f0f0;
+
+$dark-jungle-green: #202020;
 
 // Typography
-$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-$font-size-base: 1rem;
+$font-family-sans-serif:
+  'Inter Regular',
+  'Proxima Nova Regular',
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  sans-serif;
+
+$font-size-lsm: $font-size-base * 0.9375; // 15px
+$font-size-xsm: $font-size-base * 0.8125; // 13px
+$font-size-xs: $font-size-base * 0.75; // 12px
+$font-size-xxs: $font-size-base * 0.625; // 10px
+// Layout
+$box-shadow-default:
+  0px 2px 10px 0px rgba(0, 0, 0, 0.08),
+  0px 18px 80px 0px rgba(0, 0, 0, 0.04);
+
+$custom-colors: (
+  'green': #00b045,
+);
+
+$theme-colors: map-merge($theme-colors, $custom-colors);

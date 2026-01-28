@@ -1,0 +1,151 @@
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+env: 
+  AWS_REGION_DEV : "us-west-2"
+  ECR_REPOSITORY_CLIENT: "fio-relic-explorer-client"
+  ECR_REPOSITORY_SERVER: "fio-relic-explorer-server"
+  
+permissions:
+      id-token: write
+      contents: read
+jobs:
+  Build-fio-relic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::916790350352:role/GitHubAction-AssumeRoleWithAction
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION_DEV }}
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build Image Client
+        id: build-image-clinet
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG -f Dockerfile-client .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG"
+      - name: Build Image Server
+        id: build-image-server
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG -f Dockerfile-server .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG"
+  Deploy-fio-relic:
+    needs: Build-fio-relic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::916790350352:role/GitHubAction-AssumeRoleWithAction
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION_DEV }}
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+      - name: Fetch secret from AWS Parameter Store
+        run: |
+          DB_NAME=$(aws ssm get-parameter --name "/fio-relic/dev/DB_NAME" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_NAME=${DB_NAME}" >> $GITHUB_ENV
+          DB_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_HOST=${DB_HOST}" >> $GITHUB_ENV
+          DB_PASSWORD=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_PASSWORD=${DB_PASSWORD}" >> $GITHUB_ENV
+          DB_PORT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_PORT=${DB_PORT}" >> $GITHUB_ENV
+          DB_SSL=$(aws ssm get-parameter --name "/fio-relic/dev/DB_SSL" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_SSL=${DB_SSL}" >> $GITHUB_ENV
+          DB_USER=$(aws ssm get-parameter --name "/fio-relic/dev/DB_USER" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_USER=${DB_USER}" >> $GITHUB_ENV
+          HOST=$(aws ssm get-parameter --name "/fio-relic/dev/HOST" --with-decryption --query "Parameter.Value" --output text)
+          echo "HOST=${HOST}" >> $GITHUB_ENV
+          NODE_ENV=$(aws ssm get-parameter --name "/fio-relic/dev/NODE_ENV" --with-decryption --query "Parameter.Value" --output text)
+          echo "NODE_ENV=${NODE_ENV}" >> $GITHUB_ENV
+          CLIENT_URL=$(aws ssm get-parameter --name "/fio-relic/dev/CLIENT_URL" --with-decryption --query "Parameter.Value" --output text)
+          echo "CLIENT_URL=${CLIENT_URL}" >> $GITHUB_ENV
+          PORT=$(aws ssm get-parameter --name "/fio-relic/dev/PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "PORT=${PORT}" >> $GITHUB_ENV
+          SSH_HOST_REL=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST_REL" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_HOST_REL=${SSH_HOST_REL}" >> $GITHUB_ENV
+          REACT_APP_BASE_URL=$(aws ssm get-parameter --name "/fio-relic/dev/REACT_APP_BASE_URL" --with-decryption --query "Parameter.Value" --output text)
+          echo "REACT_APP_BASE_URL=${REACT_APP_BASE_URL}" >> $GITHUB_ENV
+          aws ssm get-parameter --name "/fio-relic/dev/ssh_key" --with-decryption --query "Parameter.Value" --output text > ssh_key
+          chmod 600 ssh_key
+          SSH_HOST=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_HOST" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_HOST=${SSH_HOST}" >> $GITHUB_ENV
+          SSH_PORT=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_PORT" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_PORT=${SSH_PORT}" >> $GITHUB_ENV
+          SSH_USER=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_USER" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_USER=${SSH_USER}" >> $GITHUB_ENV
+          DB_HOST_REMOTE=$(aws ssm get-parameter --name "/fio-relic/dev/DB_HOST_REMOTE" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_HOST_REMOTE=${DB_HOST_REMOTE}" >> $GITHUB_ENV
+          DB_PORT_REMOTE=$(aws ssm get-parameter --name "/fio-relic/dev/DB_PORT_REMOTE" --with-decryption --query "Parameter.Value" --output text)
+          echo "DB_PORT_REMOTE=${DB_PORT_REMOTE}" >> $GITHUB_ENV
+          SSH_TUNNEL_KEY=$(aws ssm get-parameter --name "/fio-relic/dev/SSH_TUNNEL_KEY" --with-decryption --query "Parameter.Value" --output text)
+          echo "SSH_TUNNEL_KEY=${SSH_TUNNEL_KEY}" >> $GITHUB_ENV
+          
+          # New database configuration parameters (optional - will use defaults if not set)
+          DB_POOL_MAX=$(aws ssm get-parameter --name "/fio-relic/dev/DB_POOL_MAX" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "20")
+          echo "DB_POOL_MAX=${DB_POOL_MAX}" >> $GITHUB_ENV
+          DB_POOL_MIN=$(aws ssm get-parameter --name "/fio-relic/dev/DB_POOL_MIN" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "5")
+          echo "DB_POOL_MIN=${DB_POOL_MIN}" >> $GITHUB_ENV
+          DB_IDLE_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_IDLE_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "60000")
+          echo "DB_IDLE_TIMEOUT=${DB_IDLE_TIMEOUT}" >> $GITHUB_ENV
+          DB_CONNECTION_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_CONNECTION_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "8000")
+          echo "DB_CONNECTION_TIMEOUT=${DB_CONNECTION_TIMEOUT}" >> $GITHUB_ENV
+          DB_CONNECTION_TIMEOUT_SSH=$(aws ssm get-parameter --name "/fio-relic/dev/DB_CONNECTION_TIMEOUT_SSH" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "12000")
+          echo "DB_CONNECTION_TIMEOUT_SSH=${DB_CONNECTION_TIMEOUT_SSH}" >> $GITHUB_ENV
+          DB_QUERY_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_QUERY_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "45000")
+          echo "DB_QUERY_TIMEOUT=${DB_QUERY_TIMEOUT}" >> $GITHUB_ENV
+          DB_STATEMENT_TIMEOUT=$(aws ssm get-parameter --name "/fio-relic/dev/DB_STATEMENT_TIMEOUT" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "40000")
+          echo "DB_STATEMENT_TIMEOUT=${DB_STATEMENT_TIMEOUT}" >> $GITHUB_ENV
+          DB_CONNECTION_RETRIES=$(aws ssm get-parameter --name "/fio-relic/dev/DB_CONNECTION_RETRIES" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "3")
+          echo "DB_CONNECTION_RETRIES=${DB_CONNECTION_RETRIES}" >> $GITHUB_ENV
+          DB_RETRY_DELAY=$(aws ssm get-parameter --name "/fio-relic/dev/DB_RETRY_DELAY" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "1000")
+          echo "DB_RETRY_DELAY=${DB_RETRY_DELAY}" >> $GITHUB_ENV
+          HANDLE_SIGNALS=$(aws ssm get-parameter --name "/fio-relic/dev/HANDLE_SIGNALS" --with-decryption --query "Parameter.Value" --output text 2>/dev/null || echo "true")
+          echo "HANDLE_SIGNALS=${HANDLE_SIGNALS}" >> $GITHUB_ENV
+      - name: Use the secret
+        run: |
+          echo "Secret value1 is $HOST"
+          echo "Secret value2 is $DB_HOST"
+      - name: Prepare ENV file
+        run: |
+          envsubst < ansible/roles/fio-server/templates/fio-server.env.j2.tmp > ansible/roles/fio-server/templates/fio-server.env.j2
+          envsubst < ansible/roles/fio-server/templates/fio-client.env.j2.tmp > ansible/roles/fio-server/templates/fio-client.env.j2
+      - name: SSH to EC2 and run command
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ssh_key root@$SSH_HOST_REL "\
+            aws ecr get-login-password --region us-west-2 | \
+            docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client && \
+            aws ecr get-login-password --region us-west-2 | \
+            docker login --username AWS --password-stdin 916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-server"
+      - name: Run Deploy Server
+        id: deploy-fio-server
+        env:
+          IMAGE_PREFIX_SERVER: "916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-server"
+          IMAGE_PREFIX_CLIENT: "916790350352.dkr.ecr.us-west-2.amazonaws.com/fio-relic-explorer-client"
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          ls -al
+          ansible-playbook -i ansible/dev-inventory --private-key ./ssh_key --extra-vars "IMAGE_TAG=$IMAGE_TAG IMAGE_PREFIX_SERVER=$IMAGE_PREFIX_SERVER IMAGE_PREFIX_CLIENT=$IMAGE_PREFIX_CLIENT" ansible/deploy-server.yml

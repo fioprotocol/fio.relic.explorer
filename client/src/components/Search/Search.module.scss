@@ -1,0 +1,38 @@
+@import '../../styles/variables.scss';
+
+.searchContainer {
+  background-image: url('../../assets/bg-dig-field.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  background-blend-mode: overlay;
+
+  input {
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+}
+
+.topBarSearchInput {
+  font-size: $font-size-sm;
+
+  &::placeholder {
+    font-size: $font-size-sm;
+  }
+
+  &:focus {
+    box-shadow: none !important;
+  }
+}
+
+.topBarSearchIcon {
+  &:global(.spinner-border-sm) {
+    --bs-spinner-width: 0.875rem;
+    --bs-spinner-height: 0.875rem;
+  }
+}
+
+.hovered {
+  margin-bottom: -4rem;
+}

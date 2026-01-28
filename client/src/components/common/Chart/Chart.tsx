@@ -8,7 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import './Chart.scss';
+
+import styles from './Chart.module.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DataValue = any;
@@ -35,7 +36,9 @@ export interface ChartProps {
   };
 }
 
-const COLOR_PRIMARY = '#765CD6';
+const COLOR_LINE = '#000000';
+const COLOR_SECONDARY = '#d9d9d9';
+const COLOR_GRID = '#eee';
 
 const defaultFormatter = (value: DataValue): string => value;
 
@@ -47,22 +50,25 @@ const Chart: React.FC<ChartProps> = ({
   xAxisFormatter = defaultFormatter,
   yAxisFormatter = defaultFormatter,
   tooltipFormatter = defaultFormatter,
-  lineColor = COLOR_PRIMARY,
-  height = 300,
+  lineColor = COLOR_LINE,
+  height = 150,
   margin = { top: 20, right: 20, left: 0, bottom: 20 },
 }) => {
   return (
-    <div className="chart">
-      {title && <h2 className="text-start">{title}</h2>}
-      <div className="chart-container">
+    <div className={styles.chart}>
+      {title && <h6 className="mb-3 ps-4">{title}</h6>}
+      <div>
         <ResponsiveContainer width="100%" height={height}>
           <RechartsLineChart data={data} margin={margin}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <CartesianGrid strokeDasharray="3 3" stroke={COLOR_GRID} vertical={false} />
             <XAxis
               dataKey={xAxisKey}
               tickFormatter={xAxisFormatter}
               axisLine={false}
               tickLine={false}
+              className="f-size-xs"
+              tick={{ fill: COLOR_LINE }}
+              dy={15}
             />
             <YAxis
               tickFormatter={yAxisFormatter}
@@ -70,14 +76,19 @@ const Chart: React.FC<ChartProps> = ({
               axisLine={false}
               tickCount={3}
               tickLine={false}
+              className="f-size-xs"
             />
             <Tooltip
               content={({ active, payload, label }): React.ReactNode => {
-                if (active && payload && payload.length) {
+                if (active && payload && payload.length && payload[0]?.value !== undefined) {
                   return (
-                    <div className="custom-tooltip">
-                      <p className="label">{tooltipFormatter(label)}</p>
-                      <p className="value">{yAxisFormatter(payload[0].value)}</p>
+                    <div
+                      className={`${styles.customTooltip} bg-dark px-3 py-2 rounded-3 text-white`}
+                    >
+                      <p className="mb-0 f-size-xs">{tooltipFormatter(label)}</p>
+                      <p className="mb-0 f-size-xs">
+                        Transactions: {payload[0].value.toLocaleString()}
+                      </p>
                     </div>
                   );
                 }
@@ -88,9 +99,9 @@ const Chart: React.FC<ChartProps> = ({
               type="monotone"
               dataKey={yAxisKey}
               stroke={lineColor}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 8 }}
+              strokeWidth={1}
+              dot={{ r: 0 }}
+              activeDot={{ r: 8, fill: COLOR_SECONDARY, strokeWidth: 0 }}
             />
           </RechartsLineChart>
         </ResponsiveContainer>
